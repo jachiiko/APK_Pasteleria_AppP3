@@ -1,0 +1,18 @@
+{
+  "Región Metropolitana": [
+    "Santiago",
+    "Ñuñoa",
+    "La Florida",
+    "Puente Alto"
+  ],
+  "Valparaíso": [
+    "Valparaíso",
+    "Viña del Mar",
+    "Quilpué"
+  ],
+  "Biobío": [
+    "Concepción",
+    "Talcahuano",
+    "Chiguayante"
+  ]
+}

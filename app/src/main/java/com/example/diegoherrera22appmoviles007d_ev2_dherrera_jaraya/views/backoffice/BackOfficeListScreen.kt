@@ -8,14 +8,26 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material3.*
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.example.diegoherrera22appmoviles007d_ev2_dherrera_jaraya.model.Producto
 import com.example.diegoherrera22appmoviles007d_ev2_dherrera_jaraya.repository.ProductRepository
+import com.example.diegoherrera22appmoviles007d_ev2_dherrera_jaraya.ui.theme.PastelTextButtonColors
 
 /**
  * Back Office (SOLO VISUAL):
@@ -41,7 +53,7 @@ fun BackOfficeListScreen(
             TopAppBar(
                 title = { Text("Back Office – Productos") },
                 actions = {
-                    TextButton(onClick = onAddProduct) { Text("Agregar") }
+                    TextButton(onClick = onAddProduct, colors = PastelTextButtonColors) { Text("Agregar") }
                 }
             )
         }
@@ -79,11 +91,12 @@ fun BackOfficeListScreen(
                         onClick = {
                             toDelete?.let { products.remove(it) }
                             toDelete = null
-                        }
+                        },
+                        colors = PastelTextButtonColors
                     ) { Text("Eliminar") }
                 },
                 dismissButton = {
-                    TextButton(onClick = { toDelete = null }) { Text("Cancelar") }
+                    TextButton(onClick = { toDelete = null }, colors = PastelTextButtonColors) { Text("Cancelar") }
                 }
             )
         }
@@ -98,7 +111,8 @@ private fun BackOfficeItemCard(
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = 12.dp, vertical = 8.dp)
+            .padding(horizontal = 12.dp, vertical = 8.dp),
+        colors = CardDefaults.cardColors(containerColor = Color.White)
     ) {
         Row(Modifier.padding(12.dp)) {
             Image(

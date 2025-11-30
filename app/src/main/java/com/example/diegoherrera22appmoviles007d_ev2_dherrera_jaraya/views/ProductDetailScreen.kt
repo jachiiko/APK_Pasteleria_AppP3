@@ -3,8 +3,18 @@
 package com.example.diegoherrera22appmoviles007d_ev2_dherrera_jaraya.views
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
-import androidx.compose.material3.*
+import androidx.compose.material3.Button
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -18,6 +28,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.diegoherrera22appmoviles007d_ev2_dherrera_jaraya.repository.ProductRepository
 import com.example.diegoherrera22appmoviles007d_ev2_dherrera_jaraya.viewmodel.CatalogViewModel
 import com.example.diegoherrera22appmoviles007d_ev2_dherrera_jaraya.model.Producto
+import com.example.diegoherrera22appmoviles007d_ev2_dherrera_jaraya.ui.theme.PastelButtonColors
 import java.text.NumberFormat
 import java.util.Locale
 import androidx.compose.material.icons.Icons
@@ -60,7 +71,10 @@ fun ProductDetailScreen(
             }
         ) { inner ->
             Box(
-                Modifier.fillMaxSize().padding(inner),
+                Modifier
+                    .fillMaxSize()
+                    .padding(inner)
+                    .background(MaterialTheme.colorScheme.background),
                 contentAlignment = Alignment.Center
             ) { Text("No encontramos este producto.") }
         }
@@ -84,7 +98,8 @@ fun ProductDetailScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(inner)
-                .padding(16.dp),
+                .padding(16.dp)
+                .background(MaterialTheme.colorScheme.background),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             Image(
@@ -107,7 +122,8 @@ fun ProductDetailScreen(
                     catalogVM.addToCart(product)
                     lastAdded = product   //
                 },
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier.fillMaxWidth(),
+                colors = PastelButtonColors
             ) { Text("Agregar al carrito") }
         }
     }

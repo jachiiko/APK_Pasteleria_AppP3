@@ -1,20 +1,37 @@
 package com.example.diegoherrera22appmoviles007d_ev2_dherrera_jaraya.views
 
 import android.net.Uri
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material3.*
+import androidx.compose.material3.Button
+import androidx.compose.material3.Divider
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Tab
+import androidx.compose.material3.TabRow
+import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavController
+import com.example.diegoherrera22appmoviles007d_ev2_dherrera_jaraya.ui.theme.PastelButtonColors
+import com.example.diegoherrera22appmoviles007d_ev2_dherrera_jaraya.ui.theme.PastelTextButtonColors
+import com.example.diegoherrera22appmoviles007d_ev2_dherrera_jaraya.ui.theme.SoftPink
 import com.example.diegoherrera22appmoviles007d_ev2_dherrera_jaraya.viewmodel.CatalogViewModel
 import java.text.NumberFormat
 import java.util.Locale
@@ -51,6 +68,7 @@ fun CheckoutResultTabsScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(inner)
+                .background(MaterialTheme.colorScheme.background)
         ) {
             TabRow(selectedTabIndex = selectedTab) {
                 tabs.forEachIndexed { index, title ->
@@ -76,7 +94,7 @@ fun CheckoutResultTabsScreen(
                     },
                     onClearCart = { catalogVM.clearCart() }
                 )
-                1 -> FailureTab(
+                @@ -80,103 +98,113 @@ fun CheckoutResultTabsScreen(
                     money = money,
                     onGoCart = {
                         navController.popBackStack() // back a cart
@@ -102,6 +120,7 @@ private fun SuccessTab(
     Column(
         modifier = Modifier
             .fillMaxSize()
+            .background(MaterialTheme.colorScheme.background)
             .padding(16.dp),
         verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
@@ -140,12 +159,15 @@ private fun SuccessTab(
                     onClearCart()
                     onContinueShopping()
                 },
-                modifier = Modifier.weight(1f)
+                modifier = Modifier.weight(1f),
+                colors = PastelButtonColors
             ) { Text("Seguir comprando") }
 
             OutlinedButton(
                 onClick = onGoCart,
-                modifier = Modifier.weight(1f)
+                modifier = Modifier.weight(1f),
+                colors = PastelTextButtonColors,
+                border = BorderStroke(1.dp, SoftPink)
             ) { Text("Volver al carrito") }
         }
     }
@@ -160,6 +182,7 @@ private fun FailureTab(
     Column(
         modifier = Modifier
             .fillMaxSize()
+            .background(MaterialTheme.colorScheme.background)
             .padding(16.dp),
         verticalArrangement = Arrangement.spacedBy(12.dp),
         horizontalAlignment = Alignment.CenterHorizontally
@@ -172,10 +195,15 @@ private fun FailureTab(
 
         Spacer(Modifier.height(8.dp))
 
-        Button(onClick = onGoCart, modifier = Modifier.fillMaxWidth()) {
+        Button(onClick = onGoCart, modifier = Modifier.fillMaxWidth(), colors = PastelButtonColors) {
             Text("Volver al carrito")
         }
-        OutlinedButton(onClick = onReviewPayment, modifier = Modifier.fillMaxWidth()) {
+        OutlinedButton(
+            onClick = onReviewPayment,
+            modifier = Modifier.fillMaxWidth(),
+            colors = PastelTextButtonColors,
+            border = BorderStroke(1.dp, SoftPink)
+        ) {
             Text("Revisar métodos de pago")
         }
     }

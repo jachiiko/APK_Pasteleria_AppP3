@@ -1,19 +1,39 @@
 package com.example.diegoherrera22appmoviles007d_ev2_dherrera_jaraya.views
 
-
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material3.Button
+import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExposedDropdownMenu
+import androidx.compose.material3.ExposedDropdownMenuBox
+import androidx.compose.material3.ExposedDropdownMenuDefaults
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-//import androidx.compose.ui.text.input.KeyboardOptions
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import com.example.diegoherrera22appmoviles007d_ev2_dherrera_jaraya.ui.theme.PastelButtonColors
+import com.example.diegoherrera22appmoviles007d_ev2_dherrera_jaraya.ui.theme.PastelOutlinedTextFieldColors
+import com.example.diegoherrera22appmoviles007d_ev2_dherrera_jaraya.ui.theme.PastelTextButtonColors
 import com.example.diegoherrera22appmoviles007d_ev2_dherrera_jaraya.viewmodel.AuthViewModel
 import com.example.diegoherrera22appmoviles007d_ev2_dherrera_jaraya.viewmodel.RegionViewModel
-
 
 private fun isAllowedEmail(email: String): Boolean {
     val e = email.trim().lowercase()
@@ -32,47 +52,56 @@ fun RegisterScreen(navController: NavController, viewModel: AuthViewModel, regio
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
 
-    // datos desde JSON (assets) via ViewModel/Repository
-
-    // error específico del email
     var emailError by remember { mutableStateOf<String?>(null) }
 
     val regiones = remember { regionViewModel.regiones }
     val comunas = remember(region) { regionViewModel.comunasDe(region) }
 
-    // control de menús desplegables
     var regionsExpanded by remember { mutableStateOf(false) }
     var comunasExpanded by remember { mutableStateOf(false) }
 
     Column(
         modifier = Modifier
             .fillMaxSize()
+            .background(MaterialTheme.colorScheme.background)
             .padding(20.dp),
-        verticalArrangement = Arrangement.Center
+        verticalArrangement = Arrangement.spacedBy(14.dp)
     ) {
         Text("Registro", style = MaterialTheme.typography.titleLarge)
 
-        // Campos básicos
         OutlinedTextField(
-            value = nombre, onValueChange = { nombre = it },
-            label = { Text("Nombre") }, modifier = Modifier.fillMaxWidth()
-        )
-        OutlinedTextField(
-            value = apellido, onValueChange = { apellido = it },
-            label = { Text("Apellido") }, modifier = Modifier.fillMaxWidth()
-        )
-        OutlinedTextField(
-            value = rutText, onValueChange = { rutText = it.filter(Char::isDigit) },
-            label = { Text("RUT (solo números, sin DV)") },
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-            modifier = Modifier.fillMaxWidth()
-        )
-        OutlinedTextField(
-            value = direccion, onValueChange = { direccion = it },
-            label = { Text("Dirección") }, modifier = Modifier.fillMaxWidth()
+            value = nombre,
+            onValueChange = { nombre = it },
+            label = { Text("Nombre") },
+            modifier = Modifier.fillMaxWidth(),
+            colors = PastelOutlinedTextFieldColors
         )
 
-        // Región (desde JSON)
+        OutlinedTextField(
+            value = apellido,
+            onValueChange = { apellido = it },
+            label = { Text("Apellido") },
+            modifier = Modifier.fillMaxWidth(),
+            colors = PastelOutlinedTextFieldColors
+        )
+
+        OutlinedTextField(
+            value = rutText,
+            onValueChange = { rutText = it.filter(Char::isDigit) },
+            label = { Text("RUT (solo números, sin DV)") },
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+            modifier = Modifier.fillMaxWidth(),
+            colors = PastelOutlinedTextFieldColors
+        )
+
+        OutlinedTextField(
+            value = direccion,
+            onValueChange = { direccion = it },
+            label = { Text("Dirección") },
+            modifier = Modifier.fillMaxWidth(),
+            colors = PastelOutlinedTextFieldColors
+        )
+
         ExposedDropdownMenuBox(
             expanded = regionsExpanded,
             onExpandedChange = { regionsExpanded = !regionsExpanded }
@@ -85,7 +114,8 @@ fun RegisterScreen(navController: NavController, viewModel: AuthViewModel, regio
                 trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = regionsExpanded) },
                 modifier = Modifier
                     .menuAnchor()
-                    .fillMaxWidth()
+                    .fillMaxWidth(),
+                colors = PastelOutlinedTextFieldColors
             )
             ExposedDropdownMenu(
                 expanded = regionsExpanded,
@@ -96,7 +126,7 @@ fun RegisterScreen(navController: NavController, viewModel: AuthViewModel, regio
                         text = { Text(r) },
                         onClick = {
                             region = r
-                            comuna = "" // al cambiar región, limpiar comuna
+                            comuna = ""
                             regionsExpanded = false
                         }
                     )
@@ -104,7 +134,6 @@ fun RegisterScreen(navController: NavController, viewModel: AuthViewModel, regio
             }
         }
 
-        // Comuna dependiente de región (desde JSON)
         ExposedDropdownMenuBox(
             expanded = comunasExpanded,
             onExpandedChange = {
@@ -122,7 +151,8 @@ fun RegisterScreen(navController: NavController, viewModel: AuthViewModel, regio
                 },
                 modifier = Modifier
                     .menuAnchor()
-                    .fillMaxWidth()
+                    .fillMaxWidth(),
+                colors = PastelOutlinedTextFieldColors
             )
             ExposedDropdownMenu(
                 expanded = comunasExpanded,
@@ -152,20 +182,26 @@ fun RegisterScreen(navController: NavController, viewModel: AuthViewModel, regio
                 if (emailError != null) Text(emailError!!)
                 else Text("Solo @duoc.cl o @admin.cl")
             },
-            modifier = Modifier.fillMaxWidth()
-        )
-        OutlinedTextField(
-            value = password, onValueChange = { password = it },
-            label = { Text("Contraseña") }, modifier = Modifier.fillMaxWidth()
+            modifier = Modifier.fillMaxWidth(),
+            colors = PastelOutlinedTextFieldColors
         )
 
-        Spacer(modifier = Modifier.height(10.dp))
+        OutlinedTextField(
+            value = password,
+            onValueChange = { password = it },
+            label = { Text("Contraseña") },
+            modifier = Modifier.fillMaxWidth(),
+            colors = PastelOutlinedTextFieldColors
+        )
+
+        Spacer(modifier = Modifier.height(6.dp))
 
         Button(
             onClick = {
                 if (!isAllowedEmail(email)) {
                     emailError = "Solo se permiten correos @duoc.cl o @admin.cl"
-                    return@Button}
+                    return@Button
+                }
                 val rut = rutText.toIntOrNull() ?: 0
                 viewModel.registrar(
                     nombre = nombre,
@@ -178,12 +214,18 @@ fun RegisterScreen(navController: NavController, viewModel: AuthViewModel, regio
                     password = password
                 )
             },
-            modifier = Modifier.fillMaxWidth()
-        ) { Text("Registrar") }
+            modifier = Modifier.fillMaxWidth(),
+            colors = PastelButtonColors
+        ) {
+            Text("Registrar")
+        }
 
         Text(viewModel.mensaje.value, modifier = Modifier.padding(top = 10.dp))
 
-        TextButton(onClick = { navController.navigate("login") }) {
+        TextButton(
+            onClick = { navController.navigate("login") },
+            colors = PastelTextButtonColors
+        ) {
             Text("¿Ya tienes cuenta? Inicia sesión")
         }
     }

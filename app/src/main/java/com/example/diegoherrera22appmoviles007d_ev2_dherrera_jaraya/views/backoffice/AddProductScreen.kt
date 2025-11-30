@@ -1,17 +1,34 @@
 package com.example.diegoherrera22appmoviles007d_ev2_dherrera_jaraya.views.backoffice
 
-
-
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material3.Button
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import com.example.diegoherrera22appmoviles007d_ev2_dherrera_jaraya.ui.theme.PastelButtonColors
+import com.example.diegoherrera22appmoviles007d_ev2_dherrera_jaraya.ui.theme.PastelOutlinedTextFieldColors
 
 /**
  * Pantalla "Agregar Producto" SOLO VISUAL (no guarda en ningún lado).
@@ -42,62 +59,61 @@ fun AddProductScreen(navController: NavController) {
         Column(
             modifier = Modifier
                 .padding(padding)
-                .padding(16.dp)
+                .fillMaxSize()
+                .background(MaterialTheme.colorScheme.background)
+                .padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
 
             OutlinedTextField(
                 value = name,
                 onValueChange = { name = it },
                 label = { Text("Nombre del producto") },
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier.fillMaxWidth(),
+                colors = PastelOutlinedTextFieldColors
             )
-
-            Spacer(Modifier.height(8.dp))
 
             OutlinedTextField(
                 value = price,
                 onValueChange = { price = it },
                 label = { Text("Precio (CLP)") },
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier.fillMaxWidth(),
+                colors = PastelOutlinedTextFieldColors
             )
-
-            Spacer(Modifier.height(8.dp))
 
             OutlinedTextField(
                 value = description,
                 onValueChange = { description = it },
                 label = { Text("Descripción") },
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier.fillMaxWidth(),
+                colors = PastelOutlinedTextFieldColors
             )
-
-            Spacer(Modifier.height(8.dp))
 
             OutlinedTextField(
                 value = category,
                 onValueChange = { category = it },
                 label = { Text("Categoría") },
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier.fillMaxWidth(),
+                colors = PastelOutlinedTextFieldColors
             )
-
-            Spacer(Modifier.height(8.dp))
 
             OutlinedTextField(
                 value = imageInfo,
                 onValueChange = { imageInfo = it },
                 label = { Text("Imagen (referencia visual)") },
                 supportingText = { Text("Ej: nombre del drawable o link (no funcional)") },
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier.fillMaxWidth(),
+                colors = PastelOutlinedTextFieldColors
             )
-
-            Spacer(Modifier.height(16.dp))
 
             Button(
                 onClick = {
                     // SOLO VISUAL: no persiste, volvemos atrás
                     navController.popBackStack()
                 },
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier.fillMaxWidth(),
+                colors = PastelButtonColors
             ) {
                 Text("Guardar (no funcional)")
             }

@@ -22,9 +22,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
-import com.example.diegoherrera22appmoviles007d_ev2_dherrera_jaraya.ui.theme.PastelButtonColors
-import com.example.diegoherrera22appmoviles007d_ev2_dherrera_jaraya.ui.theme.PastelOutlinedTextFieldColors
-import com.example.diegoherrera22appmoviles007d_ev2_dherrera_jaraya.ui.theme.PastelTextButtonColors
+import com.example.diegoherrera22appmoviles007d_ev2_dherrera_jaraya.ui.theme.pastelButtonColors
+import com.example.diegoherrera22appmoviles007d_ev2_dherrera_jaraya.ui.theme.pastelOutlinedTextFieldColors
+import com.example.diegoherrera22appmoviles007d_ev2_dherrera_jaraya.ui.theme.pastelTextButtonColors
 import com.example.diegoherrera22appmoviles007d_ev2_dherrera_jaraya.viewmodel.AuthViewModel
 
 @Composable
@@ -46,7 +46,7 @@ fun LoginScreen(navController: NavController, viewModel: AuthViewModel) {
             onValueChange = { email = it },
             label = { Text("Email") },
             modifier = Modifier.fillMaxWidth(),
-            colors = PastelOutlinedTextFieldColors
+            colors = pastelOutlinedTextFieldColors()
         )
 
         OutlinedTextField(
@@ -56,7 +56,7 @@ fun LoginScreen(navController: NavController, viewModel: AuthViewModel) {
             singleLine = true,
             visualTransformation = PasswordVisualTransformation(),
             modifier = Modifier.fillMaxWidth(),
-            colors = PastelOutlinedTextFieldColors
+            colors = pastelOutlinedTextFieldColors()
         )
 
         Spacer(modifier = Modifier.height(4.dp))
@@ -79,7 +79,7 @@ fun LoginScreen(navController: NavController, viewModel: AuthViewModel) {
                     popUpTo("login") { inclusive = true }
                 }
             },
-            colors = PastelButtonColors,
+            colors = pastelButtonColors(),
             modifier = Modifier.fillMaxWidth()
         ) {
             Text("Entrar")
@@ -90,7 +90,7 @@ fun LoginScreen(navController: NavController, viewModel: AuthViewModel) {
         TextButton(
             onClick = { navController.navigate("register") },
             modifier = Modifier.padding(top = 4.dp),
-            colors = PastelTextButtonColors
+            colors = pastelTextButtonColors()
         ) {
             Text("¿No tienes cuenta? Regístrate")
         }

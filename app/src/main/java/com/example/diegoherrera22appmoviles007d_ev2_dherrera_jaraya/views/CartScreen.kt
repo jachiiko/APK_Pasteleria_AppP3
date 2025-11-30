@@ -40,8 +40,8 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavController
-import com.example.diegoherrera22appmoviles007d_ev2_dherrera_jaraya.ui.theme.PastelButtonColors
-import com.example.diegoherrera22appmoviles007d_ev2_dherrera_jaraya.ui.theme.PastelTextButtonColors
+import com.example.diegoherrera22appmoviles007d_ev2_dherrera_jaraya.ui.theme.pastelButtonColors
+import com.example.diegoherrera22appmoviles007d_ev2_dherrera_jaraya.ui.theme.pastelTextButtonColors
 import com.example.diegoherrera22appmoviles007d_ev2_dherrera_jaraya.viewmodel.CatalogViewModel
 import com.example.diegoherrera22appmoviles007d_ev2_dherrera_jaraya.viewmodel.CartLine
 import java.text.NumberFormat
@@ -75,7 +75,7 @@ fun CartScreen(
                 },
                 actions = {
                     if (lines.isNotEmpty()) {
-                        TextButton(onClick = { catalogVM.clearCart() }, colors = PastelTextButtonColors) {
+                        TextButton(onClick = { catalogVM.clearCart() }, colors = pastelTextButtonColors()) {
                             Text("Vaciar")
                         }
                     }
@@ -131,7 +131,7 @@ fun CartScreen(
                 Button(
                     onClick = { navController.navigate("checkout/results") },
                     modifier = Modifier.fillMaxWidth(),
-                    colors = PastelButtonColors
+                    colors = pastelButtonColors()
                 ) {
                     Text("Finalizar compra")
                 }

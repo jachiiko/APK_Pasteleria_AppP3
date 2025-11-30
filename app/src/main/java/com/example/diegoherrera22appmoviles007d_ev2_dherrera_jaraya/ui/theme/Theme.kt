@@ -41,16 +41,19 @@ private val LightColorScheme = lightColorScheme(
     onSurfaceVariant = LightGrayText
 )
 
-val PastelButtonColors = ButtonDefaults.buttonColors(
+@Composable
+fun pastelButtonColors() = ButtonDefaults.buttonColors(
     containerColor = SoftPink,
     contentColor = Color.White
 )
 
-val PastelTextButtonColors = ButtonDefaults.textButtonColors(
+@Composable
+fun pastelTextButtonColors() = ButtonDefaults.textButtonColors(
     contentColor = Chocolate
 )
 
-val PastelOutlinedTextFieldColors = OutlinedTextFieldDefaults.colors(
+@Composable
+fun pastelOutlinedTextFieldColors() = OutlinedTextFieldDefaults.colors(
     focusedBorderColor = SoftPink,
     unfocusedBorderColor = SoftPink.copy(alpha = 0.6f),
     cursorColor = Chocolate,

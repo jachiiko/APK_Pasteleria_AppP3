@@ -28,7 +28,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.diegoherrera22appmoviles007d_ev2_dherrera_jaraya.repository.ProductRepository
 import com.example.diegoherrera22appmoviles007d_ev2_dherrera_jaraya.viewmodel.CatalogViewModel
 import com.example.diegoherrera22appmoviles007d_ev2_dherrera_jaraya.model.Producto
-import com.example.diegoherrera22appmoviles007d_ev2_dherrera_jaraya.ui.theme.PastelButtonColors
+import com.example.diegoherrera22appmoviles007d_ev2_dherrera_jaraya.ui.theme.pastelButtonColors
 import java.text.NumberFormat
 import java.util.Locale
 import androidx.compose.material.icons.Icons
@@ -123,7 +123,7 @@ fun ProductDetailScreen(
                     lastAdded = product   //
                 },
                 modifier = Modifier.fillMaxWidth(),
-                colors = PastelButtonColors
+                colors = pastelButtonColors()
             ) { Text("Agregar al carrito") }
         }
     }

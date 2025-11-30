@@ -27,8 +27,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
-import com.example.diegoherrera22appmoviles007d_ev2_dherrera_jaraya.ui.theme.PastelButtonColors
-import com.example.diegoherrera22appmoviles007d_ev2_dherrera_jaraya.ui.theme.PastelOutlinedTextFieldColors
+import com.example.diegoherrera22appmoviles007d_ev2_dherrera_jaraya.ui.theme.pastelButtonColors
+import com.example.diegoherrera22appmoviles007d_ev2_dherrera_jaraya.ui.theme.pastelOutlinedTextFieldColors
 
 /**
  * Pantalla "Agregar Producto" SOLO VISUAL (no guarda en ningún lado).
@@ -70,7 +70,7 @@ fun AddProductScreen(navController: NavController) {
                 onValueChange = { name = it },
                 label = { Text("Nombre del producto") },
                 modifier = Modifier.fillMaxWidth(),
-                colors = PastelOutlinedTextFieldColors
+                colors = pastelOutlinedTextFieldColors()
             )
 
             OutlinedTextField(
@@ -79,7 +79,7 @@ fun AddProductScreen(navController: NavController) {
                 label = { Text("Precio (CLP)") },
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                 modifier = Modifier.fillMaxWidth(),
-                colors = PastelOutlinedTextFieldColors
+                colors = pastelOutlinedTextFieldColors()
             )
 
             OutlinedTextField(
@@ -87,7 +87,7 @@ fun AddProductScreen(navController: NavController) {
                 onValueChange = { description = it },
                 label = { Text("Descripción") },
                 modifier = Modifier.fillMaxWidth(),
-                colors = PastelOutlinedTextFieldColors
+                colors = pastelOutlinedTextFieldColors()
             )
 
             OutlinedTextField(
@@ -95,7 +95,7 @@ fun AddProductScreen(navController: NavController) {
                 onValueChange = { category = it },
                 label = { Text("Categoría") },
                 modifier = Modifier.fillMaxWidth(),
-                colors = PastelOutlinedTextFieldColors
+                colors = pastelOutlinedTextFieldColors()
             )
 
             OutlinedTextField(
@@ -104,7 +104,7 @@ fun AddProductScreen(navController: NavController) {
                 label = { Text("Imagen (referencia visual)") },
                 supportingText = { Text("Ej: nombre del drawable o link (no funcional)") },
                 modifier = Modifier.fillMaxWidth(),
-                colors = PastelOutlinedTextFieldColors
+                colors = pastelOutlinedTextFieldColors()
             )
 
             Button(
@@ -113,7 +113,7 @@ fun AddProductScreen(navController: NavController) {
                     navController.popBackStack()
                 },
                 modifier = Modifier.fillMaxWidth(),
-                colors = PastelButtonColors
+                colors = pastelButtonColors()
             ) {
                 Text("Guardar (no funcional)")
             }

@@ -15,6 +15,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenu
 import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.ExposedDropdownMenuDefaults
+import androidx.compose.material3.menuAnchor
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
@@ -29,9 +30,9 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
-import com.example.diegoherrera22appmoviles007d_ev2_dherrera_jaraya.ui.theme.PastelButtonColors
-import com.example.diegoherrera22appmoviles007d_ev2_dherrera_jaraya.ui.theme.PastelOutlinedTextFieldColors
-import com.example.diegoherrera22appmoviles007d_ev2_dherrera_jaraya.ui.theme.PastelTextButtonColors
+import com.example.diegoherrera22appmoviles007d_ev2_dherrera_jaraya.ui.theme.pastelButtonColors
+import com.example.diegoherrera22appmoviles007d_ev2_dherrera_jaraya.ui.theme.pastelOutlinedTextFieldColors
+import com.example.diegoherrera22appmoviles007d_ev2_dherrera_jaraya.ui.theme.pastelTextButtonColors
 import com.example.diegoherrera22appmoviles007d_ev2_dherrera_jaraya.viewmodel.AuthViewModel
 import com.example.diegoherrera22appmoviles007d_ev2_dherrera_jaraya.viewmodel.RegionViewModel
 
@@ -74,7 +75,7 @@ fun RegisterScreen(navController: NavController, viewModel: AuthViewModel, regio
             onValueChange = { nombre = it },
             label = { Text("Nombre") },
             modifier = Modifier.fillMaxWidth(),
-            colors = PastelOutlinedTextFieldColors
+            colors = pastelOutlinedTextFieldColors()
         )
 
         OutlinedTextField(
@@ -82,7 +83,7 @@ fun RegisterScreen(navController: NavController, viewModel: AuthViewModel, regio
             onValueChange = { apellido = it },
             label = { Text("Apellido") },
             modifier = Modifier.fillMaxWidth(),
-            colors = PastelOutlinedTextFieldColors
+            colors = pastelOutlinedTextFieldColors()
         )
 
         OutlinedTextField(
@@ -91,7 +92,7 @@ fun RegisterScreen(navController: NavController, viewModel: AuthViewModel, regio
             label = { Text("RUT (solo números, sin DV)") },
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
             modifier = Modifier.fillMaxWidth(),
-            colors = PastelOutlinedTextFieldColors
+            colors = pastelOutlinedTextFieldColors()
         )
 
         OutlinedTextField(
@@ -99,7 +100,7 @@ fun RegisterScreen(navController: NavController, viewModel: AuthViewModel, regio
             onValueChange = { direccion = it },
             label = { Text("Dirección") },
             modifier = Modifier.fillMaxWidth(),
-            colors = PastelOutlinedTextFieldColors
+            colors = pastelOutlinedTextFieldColors()
         )
 
         ExposedDropdownMenuBox(
@@ -115,7 +116,7 @@ fun RegisterScreen(navController: NavController, viewModel: AuthViewModel, regio
                 modifier = Modifier
                     .menuAnchor()
                     .fillMaxWidth(),
-                colors = PastelOutlinedTextFieldColors
+                colors = pastelOutlinedTextFieldColors()
             )
             ExposedDropdownMenu(
                 expanded = regionsExpanded,
@@ -152,7 +153,7 @@ fun RegisterScreen(navController: NavController, viewModel: AuthViewModel, regio
                 modifier = Modifier
                     .menuAnchor()
                     .fillMaxWidth(),
-                colors = PastelOutlinedTextFieldColors
+                colors = pastelOutlinedTextFieldColors()
             )
             ExposedDropdownMenu(
                 expanded = comunasExpanded,
@@ -183,7 +184,7 @@ fun RegisterScreen(navController: NavController, viewModel: AuthViewModel, regio
                 else Text("Solo @duoc.cl o @admin.cl")
             },
             modifier = Modifier.fillMaxWidth(),
-            colors = PastelOutlinedTextFieldColors
+            colors = pastelOutlinedTextFieldColors()
         )
 
         OutlinedTextField(
@@ -191,7 +192,7 @@ fun RegisterScreen(navController: NavController, viewModel: AuthViewModel, regio
             onValueChange = { password = it },
             label = { Text("Contraseña") },
             modifier = Modifier.fillMaxWidth(),
-            colors = PastelOutlinedTextFieldColors
+            colors = pastelOutlinedTextFieldColors()
         )
 
         Spacer(modifier = Modifier.height(6.dp))
@@ -215,7 +216,7 @@ fun RegisterScreen(navController: NavController, viewModel: AuthViewModel, regio
                 )
             },
             modifier = Modifier.fillMaxWidth(),
-            colors = PastelButtonColors
+            colors = pastelButtonColors()
         ) {
             Text("Registrar")
         }
@@ -224,7 +225,7 @@ fun RegisterScreen(navController: NavController, viewModel: AuthViewModel, regio
 
         TextButton(
             onClick = { navController.navigate("login") },
-            colors = PastelTextButtonColors
+            colors = pastelTextButtonColors()
         ) {
             Text("¿Ya tienes cuenta? Inicia sesión")
         }

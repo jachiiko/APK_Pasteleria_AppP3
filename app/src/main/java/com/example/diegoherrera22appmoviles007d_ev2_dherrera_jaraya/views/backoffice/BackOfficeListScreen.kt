@@ -27,7 +27,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.example.diegoherrera22appmoviles007d_ev2_dherrera_jaraya.model.Producto
 import com.example.diegoherrera22appmoviles007d_ev2_dherrera_jaraya.repository.ProductRepository
-import com.example.diegoherrera22appmoviles007d_ev2_dherrera_jaraya.ui.theme.PastelTextButtonColors
+import com.example.diegoherrera22appmoviles007d_ev2_dherrera_jaraya.ui.theme.pastelTextButtonColors
 
 /**
  * Back Office (SOLO VISUAL):
@@ -53,7 +53,7 @@ fun BackOfficeListScreen(
             TopAppBar(
                 title = { Text("Back Office – Productos") },
                 actions = {
-                    TextButton(onClick = onAddProduct, colors = PastelTextButtonColors) { Text("Agregar") }
+                    TextButton(onClick = onAddProduct, colors = pastelTextButtonColors()) { Text("Agregar") }
                 }
             )
         }
@@ -92,11 +92,11 @@ fun BackOfficeListScreen(
                             toDelete?.let { products.remove(it) }
                             toDelete = null
                         },
-                        colors = PastelTextButtonColors
+                        colors = pastelTextButtonColors()
                     ) { Text("Eliminar") }
                 },
                 dismissButton = {
-                    TextButton(onClick = { toDelete = null }, colors = PastelTextButtonColors) { Text("Cancelar") }
+                    TextButton(onClick = { toDelete = null }, colors = pastelTextButtonColors()) { Text("Cancelar") }
                 }
             )
         }

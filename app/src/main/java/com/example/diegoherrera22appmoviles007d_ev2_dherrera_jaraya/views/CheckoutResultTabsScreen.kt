@@ -29,8 +29,8 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavController
-import com.example.diegoherrera22appmoviles007d_ev2_dherrera_jaraya.ui.theme.PastelButtonColors
-import com.example.diegoherrera22appmoviles007d_ev2_dherrera_jaraya.ui.theme.PastelTextButtonColors
+import com.example.diegoherrera22appmoviles007d_ev2_dherrera_jaraya.ui.theme.pastelButtonColors
+import com.example.diegoherrera22appmoviles007d_ev2_dherrera_jaraya.ui.theme.pastelTextButtonColors
 import com.example.diegoherrera22appmoviles007d_ev2_dherrera_jaraya.ui.theme.SoftPink
 import com.example.diegoherrera22appmoviles007d_ev2_dherrera_jaraya.viewmodel.CatalogViewModel
 import java.text.NumberFormat
@@ -160,13 +160,13 @@ private fun SuccessTab(
                     onContinueShopping()
                 },
                 modifier = Modifier.weight(1f),
-                colors = PastelButtonColors
+                colors = pastelButtonColors()
             ) { Text("Seguir comprando") }
 
             OutlinedButton(
                 onClick = onGoCart,
                 modifier = Modifier.weight(1f),
-                colors = PastelTextButtonColors,
+                colors = pastelTextButtonColors(),
                 border = BorderStroke(1.dp, SoftPink)
             ) { Text("Volver al carrito") }
         }
@@ -195,13 +195,13 @@ private fun FailureTab(
 
         Spacer(Modifier.height(8.dp))
 
-        Button(onClick = onGoCart, modifier = Modifier.fillMaxWidth(), colors = PastelButtonColors) {
+        Button(onClick = onGoCart, modifier = Modifier.fillMaxWidth(), colors = pastelButtonColors()) {
             Text("Volver al carrito")
         }
         OutlinedButton(
             onClick = onReviewPayment,
             modifier = Modifier.fillMaxWidth(),
-            colors = PastelTextButtonColors,
+            colors = pastelTextButtonColors(),
             border = BorderStroke(1.dp, SoftPink)
         ) {
             Text("Revisar métodos de pago")

@@ -1,24 +1,23 @@
 package com.example.diegoherrera22appmoviles007d_ev2_dherrera_jaraya.views
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material3.Button
-import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.ExposedDropdownMenuBox
+import androidx.compose.material3.ExposedDropdownMenuDefaults
+import androidx.compose.material3.ExposedDropdownMenu
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Icon
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -28,6 +27,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -67,7 +67,9 @@ fun RegisterScreen(navController: NavController, viewModel: AuthViewModel, regio
         modifier = Modifier
             .fillMaxSize()
             .background(MaterialTheme.colorScheme.background)
-            .padding(20.dp),
+            .padding(horizontal = 24.dp, vertical = 32.dp)
+            .verticalScroll(rememberScrollState()),
+        horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(14.dp)
     ) {
         Text("Registro", style = MaterialTheme.typography.titleLarge)
@@ -105,21 +107,25 @@ fun RegisterScreen(navController: NavController, viewModel: AuthViewModel, regio
             colors = pastelOutlinedTextFieldColors()
         )
 
-        Box {
+        ExposedDropdownMenuBox(
+            expanded = regionsExpanded,
+            onExpandedChange = { regionsExpanded = it && regiones.isNotEmpty() }
+        ) {
             OutlinedTextField(
                 value = region,
                 onValueChange = {},
                 readOnly = true,
                 label = { Text("Región") },
-                trailingIcon = { Icon(imageVector = Icons.Filled.ArrowDropDown, contentDescription = "") },
+                trailingIcon = {
+                    ExposedDropdownMenuDefaults.TrailingIcon(expanded = regionsExpanded)
+                },
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(bottom = 2.dp)
-                    .clickable { regionsExpanded = !regionsExpanded },
+                    .menuAnchor()
+                    .fillMaxWidth(),
                 colors = pastelOutlinedTextFieldColors(),
                 enabled = regiones.isNotEmpty()
             )
-            DropdownMenu(
+            ExposedDropdownMenu(
                 expanded = regionsExpanded,
                 onDismissRequest = { regionsExpanded = false }
             ) {
@@ -136,24 +142,30 @@ fun RegisterScreen(navController: NavController, viewModel: AuthViewModel, regio
             }
         }
 
-        Box {
+        ExposedDropdownMenuBox(
+            expanded = comunasExpanded,
+            onExpandedChange = { expanded ->
+                if (region.isNotBlank()) comunasExpanded = expanded
+            }
+        ) {
             OutlinedTextField(
                 value = comuna,
                 onValueChange = {},
                 readOnly = true,
                 label = { Text("Comuna") },
-                trailingIcon = { Icon(imageVector = Icons.Filled.ArrowDropDown, contentDescription = "") },
+                trailingIcon = {
+                    ExposedDropdownMenuDefaults.TrailingIcon(expanded = comunasExpanded)
+                },
                 supportingText = {
                     if (region.isBlank()) Text("Selecciona primero una región")
                 },
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(bottom = 2.dp)
-                    .clickable(enabled = region.isNotBlank()) { comunasExpanded = !comunasExpanded },
+                    .menuAnchor()
+                    .fillMaxWidth(),
                 colors = pastelOutlinedTextFieldColors(),
                 enabled = region.isNotBlank()
             )
-            DropdownMenu(
+            ExposedDropdownMenu(
                 expanded = comunasExpanded,
                 onDismissRequest = { comunasExpanded = false }
             ) {

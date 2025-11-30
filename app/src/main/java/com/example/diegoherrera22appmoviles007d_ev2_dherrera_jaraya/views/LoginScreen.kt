@@ -1,5 +1,6 @@
 package com.example.diegoherrera22appmoviles007d_ev2_dherrera_jaraya.views
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -8,6 +9,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
@@ -19,9 +21,12 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import com.example.diegoherrera22appmoviles007d_ev2_dherrera_jaraya.R
 import com.example.diegoherrera22appmoviles007d_ev2_dherrera_jaraya.ui.theme.pastelButtonColors
 import com.example.diegoherrera22appmoviles007d_ev2_dherrera_jaraya.ui.theme.pastelOutlinedTextFieldColors
 import com.example.diegoherrera22appmoviles007d_ev2_dherrera_jaraya.ui.theme.pastelTextButtonColors
@@ -36,10 +41,27 @@ fun LoginScreen(navController: NavController, viewModel: AuthViewModel) {
         modifier = Modifier
             .fillMaxSize()
             .background(MaterialTheme.colorScheme.background)
-            .padding(20.dp),
-        verticalArrangement = Arrangement.spacedBy(16.dp)
+            .padding(horizontal = 24.dp, vertical = 32.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.spacedBy(16.dp, Alignment.CenterVertically)
     ) {
-        Text("Inicio de Sesión", style = MaterialTheme.typography.titleLarge)
+        Image(
+            painter = painterResource(id = R.drawable.icono),
+            contentDescription = "Icono de Pastelería",
+            modifier = Modifier.size(120.dp)
+        )
+
+        Text(
+            "Pasteleria 1000 sabores",
+            style = MaterialTheme.typography.headlineSmall,
+            modifier = Modifier.padding(top = 12.dp)
+        )
+
+        Text(
+            "Inicio de Sesión",
+            style = MaterialTheme.typography.titleLarge,
+            modifier = Modifier.padding(top = 4.dp, bottom = 4.dp)
+        )
 
         OutlinedTextField(
             value = email,

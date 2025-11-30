@@ -1,7 +1,9 @@
 package com.example.diegoherrera22appmoviles007d_ev2_dherrera_jaraya.views
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -9,14 +11,14 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material3.Button
+import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.ExposedDropdownMenu
-import androidx.compose.material3.ExposedDropdownMenuBox
-import androidx.compose.material3.ExposedDropdownMenuDefaults
-import androidx.compose.material3.menuAnchor
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Icon
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -103,22 +105,21 @@ fun RegisterScreen(navController: NavController, viewModel: AuthViewModel, regio
             colors = pastelOutlinedTextFieldColors()
         )
 
-        ExposedDropdownMenuBox(
-            expanded = regionsExpanded,
-            onExpandedChange = { regionsExpanded = !regionsExpanded }
-        ) {
+        Box {
             OutlinedTextField(
                 value = region,
                 onValueChange = {},
                 readOnly = true,
                 label = { Text("Región") },
-                trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = regionsExpanded) },
+                trailingIcon = { Icon(imageVector = Icons.Filled.ArrowDropDown, contentDescription = "") },
                 modifier = Modifier
-                    .menuAnchor()
-                    .fillMaxWidth(),
-                colors = pastelOutlinedTextFieldColors()
+                    .fillMaxWidth()
+                    .padding(bottom = 2.dp)
+                    .clickable { regionsExpanded = !regionsExpanded },
+                colors = pastelOutlinedTextFieldColors(),
+                enabled = regiones.isNotEmpty()
             )
-            ExposedDropdownMenu(
+            DropdownMenu(
                 expanded = regionsExpanded,
                 onDismissRequest = { regionsExpanded = false }
             ) {
@@ -135,27 +136,24 @@ fun RegisterScreen(navController: NavController, viewModel: AuthViewModel, regio
             }
         }
 
-        ExposedDropdownMenuBox(
-            expanded = comunasExpanded,
-            onExpandedChange = {
-                if (region.isNotBlank()) comunasExpanded = !comunasExpanded
-            }
-        ) {
+        Box {
             OutlinedTextField(
                 value = comuna,
                 onValueChange = {},
                 readOnly = true,
                 label = { Text("Comuna") },
-                trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = comunasExpanded) },
+                trailingIcon = { Icon(imageVector = Icons.Filled.ArrowDropDown, contentDescription = "") },
                 supportingText = {
                     if (region.isBlank()) Text("Selecciona primero una región")
                 },
                 modifier = Modifier
-                    .menuAnchor()
-                    .fillMaxWidth(),
-                colors = pastelOutlinedTextFieldColors()
+                    .fillMaxWidth()
+                    .padding(bottom = 2.dp)
+                    .clickable(enabled = region.isNotBlank()) { comunasExpanded = !comunasExpanded },
+                colors = pastelOutlinedTextFieldColors(),
+                enabled = region.isNotBlank()
             )
-            ExposedDropdownMenu(
+            DropdownMenu(
                 expanded = comunasExpanded,
                 onDismissRequest = { comunasExpanded = false }
             ) {

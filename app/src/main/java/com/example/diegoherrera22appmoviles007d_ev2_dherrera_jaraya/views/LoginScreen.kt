@@ -22,6 +22,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
@@ -41,9 +42,9 @@ fun LoginScreen(navController: NavController, viewModel: AuthViewModel) {
         modifier = Modifier
             .fillMaxSize()
             .background(MaterialTheme.colorScheme.background)
-            .padding(horizontal = 24.dp, vertical = 32.dp),
+            .padding(horizontal = 24.dp, vertical = 48.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.spacedBy(16.dp, Alignment.CenterVertically)
+        verticalArrangement = Arrangement.spacedBy(18.dp, Alignment.CenterVertically)
     ) {
         Image(
             painter = painterResource(id = R.drawable.icono),
@@ -52,16 +53,20 @@ fun LoginScreen(navController: NavController, viewModel: AuthViewModel) {
         )
 
         Text(
-            "Pasteleria 1000 sabores",
-            style = MaterialTheme.typography.headlineSmall,
-            modifier = Modifier.padding(top = 12.dp)
+            "Pasteleria 100 Sabores",
+            style = MaterialTheme.typography.displaySmall,
+            textAlign = TextAlign.Center,
+            modifier = Modifier.padding(top = 16.dp)
         )
 
         Text(
-            "Inicio de Sesión",
+            "Inicio de sesión",
             style = MaterialTheme.typography.titleLarge,
-            modifier = Modifier.padding(top = 4.dp, bottom = 4.dp)
+            textAlign = TextAlign.Center,
+            modifier = Modifier.padding(top = 6.dp, bottom = 10.dp)
         )
+
+        Spacer(modifier = Modifier.height(4.dp))
 
         OutlinedTextField(
             value = email,

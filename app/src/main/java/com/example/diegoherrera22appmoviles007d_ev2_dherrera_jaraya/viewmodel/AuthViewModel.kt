@@ -19,12 +19,14 @@ class AuthViewModel : ViewModel() {
         comuna: String,
         email: String,
         password: String
-    ) {
+    ): Boolean {
         val nuevo = Usuario(nombre, apellido, rut, direccion, region, comuna, email, password)
-        if (FakeDatabase.registrar(nuevo)) {
-            mensaje.value = "Registro exitoso ✅"
+        return if (FakeDatabase.registrar(nuevo)) {
+            mensaje.value = "Registro exitoso"
+            true
         } else {
-            mensaje.value = "El usuario ya existe ❌"
+            mensaje.value = "El usuario ya existe"
+            false
         }
     }
 
@@ -32,10 +34,10 @@ class AuthViewModel : ViewModel() {
     fun login(email: String, password: String): Boolean {
         return if (FakeDatabase.login(email, password)) {
             usuarioActual.value = email
-            mensaje.value = "Inicio de sesión exitoso 🎉"
+            mensaje.value = "Inicio de sesión exitoso"
             true
         } else {
-            mensaje.value = "Credenciales inválidas ❌"
+            mensaje.value = "Credenciales inválidas"
             false
         }
     }

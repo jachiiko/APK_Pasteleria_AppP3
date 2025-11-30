@@ -29,6 +29,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
@@ -67,12 +68,16 @@ fun RegisterScreen(navController: NavController, viewModel: AuthViewModel, regio
         modifier = Modifier
             .fillMaxSize()
             .background(MaterialTheme.colorScheme.background)
-            .padding(horizontal = 24.dp, vertical = 32.dp)
+            .padding(horizontal = 24.dp, vertical = 48.dp)
             .verticalScroll(rememberScrollState()),
         horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.spacedBy(14.dp)
+        verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
-        Text("Registro", style = MaterialTheme.typography.titleLarge)
+        Text(
+            "Registro",
+            style = MaterialTheme.typography.titleLarge,
+            textAlign = TextAlign.Center
+        )
 
         OutlinedTextField(
             value = nombre,
@@ -205,8 +210,6 @@ fun RegisterScreen(navController: NavController, viewModel: AuthViewModel, regio
             colors = pastelOutlinedTextFieldColors()
         )
 
-        Spacer(modifier = Modifier.height(6.dp))
-
         Button(
             onClick = {
                 if (!isAllowedEmail(email)) {
@@ -214,7 +217,7 @@ fun RegisterScreen(navController: NavController, viewModel: AuthViewModel, regio
                     return@Button
                 }
                 val rut = rutText.toIntOrNull() ?: 0
-                viewModel.registrar(
+                val registrado = viewModel.registrar(
                     nombre = nombre,
                     apellido = apellido,
                     rut = rut,
@@ -224,6 +227,11 @@ fun RegisterScreen(navController: NavController, viewModel: AuthViewModel, regio
                     email = email,
                     password = password
                 )
+                if (registrado) {
+                    navController.navigate("login") {
+                        popUpTo("login") { inclusive = true }
+                    }
+                }
             },
             modifier = Modifier.fillMaxWidth(),
             colors = pastelButtonColors()
@@ -234,10 +242,14 @@ fun RegisterScreen(navController: NavController, viewModel: AuthViewModel, regio
         Text(viewModel.mensaje.value, modifier = Modifier.padding(top = 10.dp))
 
         TextButton(
-            onClick = { navController.navigate("login") },
+            onClick = {
+                navController.navigate("login") {
+                    popUpTo("login") { inclusive = true }
+                }
+            },
             colors = pastelTextButtonColors()
         ) {
-            Text("¿Ya tienes cuenta? Inicia sesión")
+            Text("¿Ya tienes cuenta? Accede")
         }
     }
 }

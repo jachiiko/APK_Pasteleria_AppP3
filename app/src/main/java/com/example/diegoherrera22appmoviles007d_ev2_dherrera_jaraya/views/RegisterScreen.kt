@@ -36,7 +36,6 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.diegoherrera22appmoviles007d_ev2_dherrera_jaraya.ui.theme.pastelButtonColors
 import com.example.diegoherrera22appmoviles007d_ev2_dherrera_jaraya.ui.theme.pastelOutlinedTextFieldColors
-import com.example.diegoherrera22appmoviles007d_ev2_dherrera_jaraya.ui.theme.pastelTextButtonColors
 import com.example.diegoherrera22appmoviles007d_ev2_dherrera_jaraya.viewmodel.AuthViewModel
 import com.example.diegoherrera22appmoviles007d_ev2_dherrera_jaraya.viewmodel.RegionViewModel
 
@@ -247,13 +246,13 @@ fun RegisterScreen(navController: NavController, viewModel: AuthViewModel, regio
 
         Text(viewModel.mensaje.value, modifier = Modifier.padding(top = 8.dp))
 
-        TextButton(
+        Button(
             onClick = {
                 navController.navigate("login") {
                     popUpTo("login") { inclusive = true }
                 }
             },
-            colors = pastelTextButtonColors(),
+            colors = pastelButtonColors(),
             modifier = Modifier
                 .padding(top = 8.dp, bottom = 24.dp)
                 .fillMaxWidth()
@@ -261,8 +260,7 @@ fun RegisterScreen(navController: NavController, viewModel: AuthViewModel, regio
             Text(
                 "¿Ya tienes cuenta? Accede",
                 modifier = Modifier.fillMaxWidth(),
-                textAlign = TextAlign.Center,
-                style = MaterialTheme.typography.bodyMedium.copy(color = MaterialTheme.colorScheme.primary)
+                textAlign = TextAlign.Center
             )
         }
     }

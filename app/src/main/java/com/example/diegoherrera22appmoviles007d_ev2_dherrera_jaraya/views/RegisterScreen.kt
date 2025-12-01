@@ -28,6 +28,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -68,18 +69,20 @@ fun RegisterScreen(navController: NavController, viewModel: AuthViewModel, regio
         modifier = Modifier
             .fillMaxSize()
             .background(MaterialTheme.colorScheme.background)
-            .padding(horizontal = 24.dp, vertical = 56.dp)
+            .padding(horizontal = 24.dp, vertical = 96.dp)
             .verticalScroll(rememberScrollState()),
         horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.spacedBy(14.dp)
+        verticalArrangement = Arrangement.spacedBy(10.dp)
     ) {
         Text(
             "Registro",
-            style = MaterialTheme.typography.titleLarge,
+            style = MaterialTheme.typography.titleLarge.copy(
+                fontFamily = FontFamily.Cursive
+            ),
             textAlign = TextAlign.Center,
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(bottom = 6.dp)
+                .padding(bottom = 4.dp)
         )
 
         OutlinedTextField(
@@ -242,7 +245,7 @@ fun RegisterScreen(navController: NavController, viewModel: AuthViewModel, regio
             Text("Registrar")
         }
 
-        Text(viewModel.mensaje.value, modifier = Modifier.padding(top = 10.dp))
+        Text(viewModel.mensaje.value, modifier = Modifier.padding(top = 8.dp))
 
         TextButton(
             onClick = {
@@ -251,9 +254,16 @@ fun RegisterScreen(navController: NavController, viewModel: AuthViewModel, regio
                 }
             },
             colors = pastelTextButtonColors(),
-            modifier = Modifier.padding(top = 6.dp, bottom = 12.dp)
+            modifier = Modifier
+                .padding(top = 8.dp, bottom = 24.dp)
+                .fillMaxWidth()
         ) {
-            Text("¿Ya tienes cuenta? Accede")
+            Text(
+                "¿Ya tienes cuenta? Accede",
+                modifier = Modifier.fillMaxWidth(),
+                textAlign = TextAlign.Center,
+                style = MaterialTheme.typography.bodyMedium.copy(color = MaterialTheme.colorScheme.primary)
+            )
         }
     }
 }

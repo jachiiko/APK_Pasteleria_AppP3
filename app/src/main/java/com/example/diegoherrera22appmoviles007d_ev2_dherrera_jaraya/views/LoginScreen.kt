@@ -22,6 +22,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.PasswordVisualTransformation
@@ -43,30 +44,38 @@ fun LoginScreen(navController: NavController, viewModel: AuthViewModel) {
         modifier = Modifier
             .fillMaxSize()
             .background(MaterialTheme.colorScheme.background)
-            .padding(horizontal = 24.dp, vertical = 48.dp),
+            .padding(horizontal = 24.dp, vertical = 32.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Top
+        verticalArrangement = Arrangement.Center
     ) {
-        Image(
-            painter = painterResource(id = R.drawable.icono),
-            contentDescription = "Icono de Pastelería",
-            modifier = Modifier.size(120.dp)
-        )
+        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+            Image(
+                painter = painterResource(id = R.drawable.icono),
+                contentDescription = "Icono de Pastelería",
+                modifier = Modifier.size(132.dp)
+            )
 
-        Text(
-            text = "Pasteleria 100\nSabores",
-            style = MaterialTheme.typography.displaySmall.copy(fontSize = 40.sp, lineHeight = 44.sp),
-            textAlign = TextAlign.Center,
-            modifier = Modifier
-                .padding(top = 16.dp)
-                .fillMaxWidth()
-        )
+            Text(
+                text = "Pasteleria 100\nSabores",
+                style = MaterialTheme.typography.displaySmall.copy(
+                    fontSize = 44.sp,
+                    lineHeight = 48.sp,
+                    fontFamily = FontFamily.Cursive
+                ),
+                textAlign = TextAlign.Center,
+                modifier = Modifier
+                    .padding(top = 16.dp)
+                    .fillMaxWidth()
+            )
+        }
 
-        Spacer(modifier = Modifier.height(28.dp))
+        Spacer(modifier = Modifier.height(40.dp))
 
         Text(
             text = "Inicio de sesión",
-            style = MaterialTheme.typography.titleLarge,
+            style = MaterialTheme.typography.titleLarge.copy(
+                fontFamily = FontFamily.Cursive
+            ),
             textAlign = TextAlign.Center,
             modifier = Modifier
                 .padding(bottom = 8.dp)

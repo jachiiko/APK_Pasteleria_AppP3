@@ -1,6 +1,5 @@
 package com.example.diegoherrera22appmoviles007d_ev2_dherrera_jaraya.views
 
-import android.view.inputmethod.InputMethodManager
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -18,16 +17,16 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.focus.onFocusChanged
-import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalSoftwareKeyboardController
-import androidx.compose.ui.platform.LocalView
+import androidx.compose.ui.platform.LocalTextToolbar
+import androidx.compose.ui.platform.TextToolbar
+import androidx.compose.ui.platform.TextToolbarStatus
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
@@ -36,7 +35,6 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.core.content.getSystemService
 import androidx.navigation.NavController
 import com.example.diegoherrera22appmoviles007d_ev2_dherrera_jaraya.R
 import com.example.diegoherrera22appmoviles007d_ev2_dherrera_jaraya.ui.theme.pastelButtonColors
@@ -46,26 +44,35 @@ import com.example.diegoherrera22appmoviles007d_ev2_dherrera_jaraya.viewmodel.Au
 
 @Composable
 fun LoginScreen(navController: NavController, viewModel: AuthViewModel) {
-    val keyboardController = LocalSoftwareKeyboardController.current
-    val context = LocalContext.current
-    val view = LocalView.current
-    val inputMethodManager = remember { context.getSystemService<InputMethodManager>() }
-
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(MaterialTheme.colorScheme.background)
-            .padding(horizontal = 24.dp, vertical = 32.dp),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
-    ) {
-        Column(horizontalAlignment = Alignment.CenterHorizontally) {
-            Image(
-                painter = painterResource(id = R.drawable.icono),
-                contentDescription = "Icono de Pastelería",
+    val disabledTextToolbar = object : TextToolbar {
+        override val status: TextToolbarStatus = TextToolbarStatus.Hidden
+        override fun showMenu(
+            rect: androidx.compose.ui.geometry.Rect,
+            onCopyRequested: (() -> Unit)?,
+            onPasteRequested: (() -> Unit)?,
+            onCutRequested: (() -> Unit)?,
+            onSelectAllRequested: (() -> Unit)?
+        ) = Unit
+
+        override fun hide() = Unit
+    }
+
+    CompositionLocalProvider(LocalTextToolbar provides disabledTextToolbar) {
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(MaterialTheme.colorScheme.background)
+                .padding(horizontal = 24.dp, vertical = 24.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.spacedBy(16.dp, Alignment.Top)
+        ) {
+            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                Image(
+                    painter = painterResource(id = R.drawable.icono),
+                    contentDescription = "Icono de Pastelería",
                 modifier = Modifier.size(132.dp)
             )
 
@@ -99,14 +106,7 @@ fun LoginScreen(navController: NavController, viewModel: AuthViewModel) {
             value = email,
             onValueChange = { email = it },
             label = { Text("Email") },
-            modifier = Modifier
-                .fillMaxWidth()
-                .onFocusChanged { focus ->
-                    if (focus.isFocused) {
-                        keyboardController?.show()
-                        view.post { inputMethodManager?.showSoftInput(view, InputMethodManager.SHOW_IMPLICIT) }
-                    }
-                },
+            modifier = Modifier.fillMaxWidth(),
             singleLine = true,
             keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
             colors = pastelOutlinedTextFieldColors()
@@ -118,14 +118,7 @@ fun LoginScreen(navController: NavController, viewModel: AuthViewModel) {
             label = { Text("Contraseña") },
             singleLine = true,
             visualTransformation = PasswordVisualTransformation(),
-            modifier = Modifier
-                .fillMaxWidth()
-                .onFocusChanged { focus ->
-                    if (focus.isFocused) {
-                        keyboardController?.show()
-                        view.post { inputMethodManager?.showSoftInput(view, InputMethodManager.SHOW_IMPLICIT) }
-                    }
-                },
+            modifier = Modifier.fillMaxWidth(),
             keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
             colors = pastelOutlinedTextFieldColors()
         )
@@ -160,10 +153,11 @@ fun LoginScreen(navController: NavController, viewModel: AuthViewModel) {
 
         TextButton(
             onClick = { navController.navigate("register") },
-            modifier = Modifier.padding(top = 4.dp),
+            modifier = Modifier.padding(top = 2.dp),
             colors = pastelTextButtonColors()
         ) {
             Text("¿No tienes cuenta? Regístrate")
         }
     }
+}
 }

@@ -1,6 +1,5 @@
 package com.example.diegoherrera22appmoviles007d_ev2_dherrera_jaraya.views
 
-import android.view.inputmethod.InputMethodManager
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -23,22 +22,21 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.focus.onFocusChanged
-import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalSoftwareKeyboardController
-import androidx.compose.ui.platform.LocalView
+import androidx.compose.ui.platform.LocalTextToolbar
+import androidx.compose.ui.platform.TextToolbar
+import androidx.compose.ui.platform.TextToolbarStatus
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.core.content.getSystemService
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.diegoherrera22appmoviles007d_ev2_dherrera_jaraya.ui.theme.pastelButtonColors
@@ -55,11 +53,6 @@ private fun isAllowedEmail(email: String): Boolean {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun RegisterScreen(navController: NavController, viewModel: AuthViewModel, regionViewModel: RegionViewModel = viewModel()) {
-    val keyboardController = LocalSoftwareKeyboardController.current
-    val context = LocalContext.current
-    val view = LocalView.current
-    val inputMethodManager = remember { context.getSystemService<InputMethodManager>() }
-
     var nombre by remember { mutableStateOf("") }
     var apellido by remember { mutableStateOf("") }
     var rutText by remember { mutableStateOf("") }
@@ -77,36 +70,43 @@ fun RegisterScreen(navController: NavController, viewModel: AuthViewModel, regio
     var regionsExpanded by remember { mutableStateOf(false) }
     var comunasExpanded by remember { mutableStateOf(false) }
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(MaterialTheme.colorScheme.background)
-            .padding(horizontal = 24.dp, vertical = 48.dp)
-            .verticalScroll(rememberScrollState()),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.spacedBy(12.dp)
-    ) {
-        Text(
-            "Registro",
-            style = MaterialTheme.typography.titleLarge,
-            textAlign = TextAlign.Center,
+    val disabledTextToolbar = object : TextToolbar {
+        override val status: TextToolbarStatus = TextToolbarStatus.Hidden
+        override fun showMenu(
+            rect: androidx.compose.ui.geometry.Rect,
+            onCopyRequested: (() -> Unit)?,
+            onPasteRequested: (() -> Unit)?,
+            onCutRequested: (() -> Unit)?,
+            onSelectAllRequested: (() -> Unit)?
+        ) = Unit
+
+        override fun hide() = Unit
+    }
+
+    CompositionLocalProvider(LocalTextToolbar provides disabledTextToolbar) {
+        Column(
             modifier = Modifier
-                .fillMaxWidth()
-                .padding(bottom = 4.dp)
+                .fillMaxSize()
+                .background(MaterialTheme.colorScheme.background)
+                .padding(horizontal = 20.dp, vertical = 28.dp)
+                .verticalScroll(rememberScrollState()),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.spacedBy(10.dp)
+        ) {
+            Text(
+                "Registro",
+                style = MaterialTheme.typography.titleLarge,
+                textAlign = TextAlign.Center,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(bottom = 2.dp)
         )
 
         OutlinedTextField(
             value = nombre,
             onValueChange = { nombre = it },
             label = { Text("Nombre") },
-            modifier = Modifier
-                .fillMaxWidth()
-                .onFocusChanged { focus ->
-                    if (focus.isFocused) {
-                        keyboardController?.show()
-                        view.post { inputMethodManager?.showSoftInput(view, InputMethodManager.SHOW_IMPLICIT) }
-                    }
-                },
+            modifier = Modifier.fillMaxWidth(),
             singleLine = true,
             keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
             colors = pastelOutlinedTextFieldColors()
@@ -116,14 +116,7 @@ fun RegisterScreen(navController: NavController, viewModel: AuthViewModel, regio
             value = apellido,
             onValueChange = { apellido = it },
             label = { Text("Apellido") },
-            modifier = Modifier
-                .fillMaxWidth()
-                .onFocusChanged { focus ->
-                    if (focus.isFocused) {
-                        keyboardController?.show()
-                        view.post { inputMethodManager?.showSoftInput(view, InputMethodManager.SHOW_IMPLICIT) }
-                    }
-                },
+            modifier = Modifier.fillMaxWidth(),
             singleLine = true,
             keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
             colors = pastelOutlinedTextFieldColors()
@@ -137,14 +130,7 @@ fun RegisterScreen(navController: NavController, viewModel: AuthViewModel, regio
                 keyboardType = KeyboardType.Number,
                 imeAction = ImeAction.Next
             ),
-            modifier = Modifier
-                .fillMaxWidth()
-                .onFocusChanged { focus ->
-                    if (focus.isFocused) {
-                        keyboardController?.show()
-                        view.post { inputMethodManager?.showSoftInput(view, InputMethodManager.SHOW_IMPLICIT) }
-                    }
-                },
+            modifier = Modifier.fillMaxWidth(),
             colors = pastelOutlinedTextFieldColors()
         )
 
@@ -152,14 +138,7 @@ fun RegisterScreen(navController: NavController, viewModel: AuthViewModel, regio
             value = direccion,
             onValueChange = { direccion = it },
             label = { Text("Dirección") },
-            modifier = Modifier
-                .fillMaxWidth()
-                .onFocusChanged { focus ->
-                    if (focus.isFocused) {
-                        keyboardController?.show()
-                        view.post { inputMethodManager?.showSoftInput(view, InputMethodManager.SHOW_IMPLICIT) }
-                    }
-                },
+            modifier = Modifier.fillMaxWidth(),
             keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
             colors = pastelOutlinedTextFieldColors()
         )
@@ -250,14 +229,7 @@ fun RegisterScreen(navController: NavController, viewModel: AuthViewModel, regio
                 if (emailError != null) Text(emailError!!)
                 else Text("Solo @duoc.cl o @admin.cl")
             },
-            modifier = Modifier
-                .fillMaxWidth()
-                .onFocusChanged { focus ->
-                    if (focus.isFocused) {
-                        keyboardController?.show()
-                        view.post { inputMethodManager?.showSoftInput(view, InputMethodManager.SHOW_IMPLICIT) }
-                    }
-                },
+            modifier = Modifier.fillMaxWidth(),
             singleLine = true,
             keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
             colors = pastelOutlinedTextFieldColors()
@@ -267,14 +239,7 @@ fun RegisterScreen(navController: NavController, viewModel: AuthViewModel, regio
             value = password,
             onValueChange = { password = it },
             label = { Text("Contraseña") },
-            modifier = Modifier
-                .fillMaxWidth()
-                .onFocusChanged { focus ->
-                    if (focus.isFocused) {
-                        keyboardController?.show()
-                        view.post { inputMethodManager?.showSoftInput(view, InputMethodManager.SHOW_IMPLICIT) }
-                    }
-                },
+            modifier = Modifier.fillMaxWidth(),
             singleLine = true,
             keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
             visualTransformation = PasswordVisualTransformation(),
@@ -324,10 +289,11 @@ fun RegisterScreen(navController: NavController, viewModel: AuthViewModel, regio
             colors = pastelTextButtonColors()
         ) {
             Text(
-                "¿Ya tienes cuenta? Accede",
+                "¿Ya tienes cuenta? Inicia sesión",
                 textAlign = TextAlign.Center,
                 modifier = Modifier.fillMaxWidth()
             )
         }
     }
+}
 }

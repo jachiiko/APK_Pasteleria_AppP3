@@ -1,5 +1,6 @@
 package com.example.diegoherrera22appmoviles007d_ev2_dherrera_jaraya.views
 
+import android.view.inputmethod.InputMethodManager
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -9,28 +10,35 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
+import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.ExposedDropdownMenuDefaults
-import androidx.compose.material3.TextButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
-import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Modifier
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.onFocusChanged
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
+import androidx.compose.ui.platform.LocalView
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.core.content.getSystemService
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.diegoherrera22appmoviles007d_ev2_dherrera_jaraya.ui.theme.pastelButtonColors
@@ -47,6 +55,11 @@ private fun isAllowedEmail(email: String): Boolean {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun RegisterScreen(navController: NavController, viewModel: AuthViewModel, regionViewModel: RegionViewModel = viewModel()) {
+    val keyboardController = LocalSoftwareKeyboardController.current
+    val context = LocalContext.current
+    val view = LocalView.current
+    val inputMethodManager = remember { context.getSystemService<InputMethodManager>() }
+
     var nombre by remember { mutableStateOf("") }
     var apellido by remember { mutableStateOf("") }
     var rutText by remember { mutableStateOf("") }
@@ -68,10 +81,10 @@ fun RegisterScreen(navController: NavController, viewModel: AuthViewModel, regio
         modifier = Modifier
             .fillMaxSize()
             .background(MaterialTheme.colorScheme.background)
-            .padding(horizontal = 24.dp, vertical = 96.dp)
+            .padding(horizontal = 24.dp, vertical = 48.dp)
             .verticalScroll(rememberScrollState()),
         horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.spacedBy(10.dp)
+        verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
         Text(
             "Registro",
@@ -86,7 +99,16 @@ fun RegisterScreen(navController: NavController, viewModel: AuthViewModel, regio
             value = nombre,
             onValueChange = { nombre = it },
             label = { Text("Nombre") },
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier
+                .fillMaxWidth()
+                .onFocusChanged { focus ->
+                    if (focus.isFocused) {
+                        keyboardController?.show()
+                        view.post { inputMethodManager?.showSoftInput(view, InputMethodManager.SHOW_IMPLICIT) }
+                    }
+                },
+            singleLine = true,
+            keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
             colors = pastelOutlinedTextFieldColors()
         )
 
@@ -94,7 +116,16 @@ fun RegisterScreen(navController: NavController, viewModel: AuthViewModel, regio
             value = apellido,
             onValueChange = { apellido = it },
             label = { Text("Apellido") },
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier
+                .fillMaxWidth()
+                .onFocusChanged { focus ->
+                    if (focus.isFocused) {
+                        keyboardController?.show()
+                        view.post { inputMethodManager?.showSoftInput(view, InputMethodManager.SHOW_IMPLICIT) }
+                    }
+                },
+            singleLine = true,
+            keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
             colors = pastelOutlinedTextFieldColors()
         )
 
@@ -102,8 +133,18 @@ fun RegisterScreen(navController: NavController, viewModel: AuthViewModel, regio
             value = rutText,
             onValueChange = { rutText = it.filter(Char::isDigit) },
             label = { Text("RUT (solo números, sin DV)") },
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-            modifier = Modifier.fillMaxWidth(),
+            keyboardOptions = KeyboardOptions(
+                keyboardType = KeyboardType.Number,
+                imeAction = ImeAction.Next
+            ),
+            modifier = Modifier
+                .fillMaxWidth()
+                .onFocusChanged { focus ->
+                    if (focus.isFocused) {
+                        keyboardController?.show()
+                        view.post { inputMethodManager?.showSoftInput(view, InputMethodManager.SHOW_IMPLICIT) }
+                    }
+                },
             colors = pastelOutlinedTextFieldColors()
         )
 
@@ -111,7 +152,15 @@ fun RegisterScreen(navController: NavController, viewModel: AuthViewModel, regio
             value = direccion,
             onValueChange = { direccion = it },
             label = { Text("Dirección") },
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier
+                .fillMaxWidth()
+                .onFocusChanged { focus ->
+                    if (focus.isFocused) {
+                        keyboardController?.show()
+                        view.post { inputMethodManager?.showSoftInput(view, InputMethodManager.SHOW_IMPLICIT) }
+                    }
+                },
+            keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
             colors = pastelOutlinedTextFieldColors()
         )
 
@@ -201,7 +250,16 @@ fun RegisterScreen(navController: NavController, viewModel: AuthViewModel, regio
                 if (emailError != null) Text(emailError!!)
                 else Text("Solo @duoc.cl o @admin.cl")
             },
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier
+                .fillMaxWidth()
+                .onFocusChanged { focus ->
+                    if (focus.isFocused) {
+                        keyboardController?.show()
+                        view.post { inputMethodManager?.showSoftInput(view, InputMethodManager.SHOW_IMPLICIT) }
+                    }
+                },
+            singleLine = true,
+            keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
             colors = pastelOutlinedTextFieldColors()
         )
 
@@ -209,7 +267,17 @@ fun RegisterScreen(navController: NavController, viewModel: AuthViewModel, regio
             value = password,
             onValueChange = { password = it },
             label = { Text("Contraseña") },
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier
+                .fillMaxWidth()
+                .onFocusChanged { focus ->
+                    if (focus.isFocused) {
+                        keyboardController?.show()
+                        view.post { inputMethodManager?.showSoftInput(view, InputMethodManager.SHOW_IMPLICIT) }
+                    }
+                },
+            singleLine = true,
+            keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
+            visualTransformation = PasswordVisualTransformation(),
             colors = pastelOutlinedTextFieldColors()
         )
 
@@ -242,7 +310,7 @@ fun RegisterScreen(navController: NavController, viewModel: AuthViewModel, regio
             Text("Registrar")
         }
 
-        Text(viewModel.mensaje.value, modifier = Modifier.padding(top = 8.dp))
+        Text(viewModel.mensaje.value, modifier = Modifier.padding(top = 6.dp))
 
         TextButton(
             onClick = {
@@ -251,14 +319,14 @@ fun RegisterScreen(navController: NavController, viewModel: AuthViewModel, regio
                 }
             },
             modifier = Modifier
-                .padding(top = 16.dp, bottom = 32.dp)
-                .fillMaxWidth(),
+                .fillMaxWidth()
+                .padding(top = 2.dp),
             colors = pastelTextButtonColors()
         ) {
             Text(
                 "¿Ya tienes cuenta? Accede",
-                modifier = Modifier.fillMaxWidth(),
-                textAlign = TextAlign.Center
+                textAlign = TextAlign.Center,
+                modifier = Modifier.fillMaxWidth()
             )
         }
     }

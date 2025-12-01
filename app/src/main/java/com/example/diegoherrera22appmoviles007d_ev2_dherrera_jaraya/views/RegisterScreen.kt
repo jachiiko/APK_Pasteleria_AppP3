@@ -16,10 +16,10 @@ import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.ExposedDropdownMenuDefaults
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -28,7 +28,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -36,6 +35,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.diegoherrera22appmoviles007d_ev2_dherrera_jaraya.ui.theme.pastelButtonColors
 import com.example.diegoherrera22appmoviles007d_ev2_dherrera_jaraya.ui.theme.pastelOutlinedTextFieldColors
+import com.example.diegoherrera22appmoviles007d_ev2_dherrera_jaraya.ui.theme.pastelTextButtonColors
 import com.example.diegoherrera22appmoviles007d_ev2_dherrera_jaraya.viewmodel.AuthViewModel
 import com.example.diegoherrera22appmoviles007d_ev2_dherrera_jaraya.viewmodel.RegionViewModel
 
@@ -75,9 +75,7 @@ fun RegisterScreen(navController: NavController, viewModel: AuthViewModel, regio
     ) {
         Text(
             "Registro",
-            style = MaterialTheme.typography.titleLarge.copy(
-                fontFamily = FontFamily.Cursive
-            ),
+            style = MaterialTheme.typography.titleLarge,
             textAlign = TextAlign.Center,
             modifier = Modifier
                 .fillMaxWidth()
@@ -246,16 +244,16 @@ fun RegisterScreen(navController: NavController, viewModel: AuthViewModel, regio
 
         Text(viewModel.mensaje.value, modifier = Modifier.padding(top = 8.dp))
 
-        Button(
+        TextButton(
             onClick = {
                 navController.navigate("login") {
                     popUpTo("login") { inclusive = true }
                 }
             },
-            colors = pastelButtonColors(),
             modifier = Modifier
-                .padding(top = 8.dp, bottom = 24.dp)
-                .fillMaxWidth()
+                .padding(top = 16.dp, bottom = 32.dp)
+                .fillMaxWidth(),
+            colors = pastelTextButtonColors()
         ) {
             Text(
                 "¿Ya tienes cuenta? Accede",

@@ -68,15 +68,18 @@ fun RegisterScreen(navController: NavController, viewModel: AuthViewModel, regio
         modifier = Modifier
             .fillMaxSize()
             .background(MaterialTheme.colorScheme.background)
-            .padding(horizontal = 24.dp, vertical = 48.dp)
+            .padding(horizontal = 24.dp, vertical = 56.dp)
             .verticalScroll(rememberScrollState()),
         horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.spacedBy(16.dp)
+        verticalArrangement = Arrangement.spacedBy(14.dp)
     ) {
         Text(
             "Registro",
             style = MaterialTheme.typography.titleLarge,
-            textAlign = TextAlign.Center
+            textAlign = TextAlign.Center,
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(bottom = 6.dp)
         )
 
         OutlinedTextField(
@@ -247,7 +250,8 @@ fun RegisterScreen(navController: NavController, viewModel: AuthViewModel, regio
                     popUpTo("login") { inclusive = true }
                 }
             },
-            colors = pastelTextButtonColors()
+            colors = pastelTextButtonColors(),
+            modifier = Modifier.padding(top = 6.dp, bottom = 12.dp)
         ) {
             Text("¿Ya tienes cuenta? Accede")
         }

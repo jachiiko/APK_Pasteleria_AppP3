@@ -26,6 +26,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.diegoherrera22appmoviles007d_ev2_dherrera_jaraya.R
 import com.example.diegoherrera22appmoviles007d_ev2_dherrera_jaraya.ui.theme.pastelButtonColors
@@ -44,7 +45,7 @@ fun LoginScreen(navController: NavController, viewModel: AuthViewModel) {
             .background(MaterialTheme.colorScheme.background)
             .padding(horizontal = 24.dp, vertical = 48.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.spacedBy(18.dp, Alignment.CenterVertically)
+        verticalArrangement = Arrangement.Top
     ) {
         Image(
             painter = painterResource(id = R.drawable.icono),
@@ -53,20 +54,24 @@ fun LoginScreen(navController: NavController, viewModel: AuthViewModel) {
         )
 
         Text(
-            "Pasteleria 100 Sabores",
-            style = MaterialTheme.typography.displaySmall,
+            text = "Pasteleria 100\nSabores",
+            style = MaterialTheme.typography.displaySmall.copy(fontSize = 40.sp, lineHeight = 44.sp),
             textAlign = TextAlign.Center,
-            modifier = Modifier.padding(top = 16.dp)
+            modifier = Modifier
+                .padding(top = 16.dp)
+                .fillMaxWidth()
         )
+
+        Spacer(modifier = Modifier.height(28.dp))
 
         Text(
-            "Inicio de sesión",
+            text = "Inicio de sesión",
             style = MaterialTheme.typography.titleLarge,
             textAlign = TextAlign.Center,
-            modifier = Modifier.padding(top = 6.dp, bottom = 10.dp)
+            modifier = Modifier
+                .padding(bottom = 8.dp)
+                .fillMaxWidth()
         )
-
-        Spacer(modifier = Modifier.height(4.dp))
 
         OutlinedTextField(
             value = email,
@@ -86,7 +91,7 @@ fun LoginScreen(navController: NavController, viewModel: AuthViewModel) {
             colors = pastelOutlinedTextFieldColors()
         )
 
-        Spacer(modifier = Modifier.height(4.dp))
+        Spacer(modifier = Modifier.height(10.dp))
 
         Button(
             onClick = {
@@ -96,7 +101,7 @@ fun LoginScreen(navController: NavController, viewModel: AuthViewModel) {
                 val e = email.trim().lowercase()
                 val destination = when {
                     e.endsWith("@admin.cl") -> "backoffice"
-                    e.endsWith("@duoc.cl") -> "home/$email"   // mantiene tu ruta con parámetro
+                    e.endsWith("@duoc.cl") -> "home/$email"
                     else -> {
                         viewModel.mensaje.value = "Dominio no permitido (usa @duoc.cl o @admin.cl)"
                         return@Button

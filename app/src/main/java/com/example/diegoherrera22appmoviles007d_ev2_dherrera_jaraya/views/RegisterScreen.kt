@@ -8,16 +8,13 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
-
-// Dropdown menus (Material 2)
-import androidx.compose.material.DropdownMenu
-import androidx.compose.material.DropdownMenuItem
 
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -39,6 +36,7 @@ import com.example.diegoherrera22appmoviles007d_ev2_dherrera_jaraya.ui.theme.pas
 
 import com.example.diegoherrera22appmoviles007d_ev2_dherrera_jaraya.viewmodel.AuthViewModel
 import com.example.diegoherrera22appmoviles007d_ev2_dherrera_jaraya.viewmodel.RegionViewModel
+
 
 
 private fun isAllowedEmail(email: String): Boolean {
@@ -166,22 +164,25 @@ fun RegisterScreen(
                         trailingIcon = {
                             ExposedDropdownMenuDefaults.TrailingIcon(expanded = regionsExpanded)
                         },
-                        modifier = Modifier.fillMaxWidth(),
+                        modifier = Modifier
+                            .menuAnchor()
+                            .fillMaxWidth(),
                         colors = pastelOutlinedTextFieldColors()
                     )
 
-                    DropdownMenu(
+                    ExposedDropdownMenu(
                         expanded = regionsExpanded,
                         onDismissRequest = { regionsExpanded = false }
                     ) {
                         regiones.forEach { r ->
-                            DropdownMenuItem(onClick = {
-                                region = r
-                                comuna = ""
-                                regionsExpanded = false
-                            }) {
-                                Text(r)
-                            }
+                            DropdownMenuItem(
+                                text = { Text(r) },
+                                onClick = {
+                                    region = r
+                                    comuna = ""
+                                    regionsExpanded = false
+                                }
+                            )
                         }
                     }
                 }
@@ -201,24 +202,29 @@ fun RegisterScreen(
                         trailingIcon = {
                             ExposedDropdownMenuDefaults.TrailingIcon(expanded = comunasExpanded)
                         },
-                        modifier = Modifier.fillMaxWidth(),
+                        modifier = Modifier
+                            .menuAnchor()
+                            .fillMaxWidth(),
                         colors = pastelOutlinedTextFieldColors()
                     )
 
-                    DropdownMenu(
+                    ExposedDropdownMenu(
                         expanded = comunasExpanded,
                         onDismissRequest = { comunasExpanded = false }
                     ) {
                         comunas.forEach { c ->
-                            DropdownMenuItem(onClick = {
-                                comuna = c
-                                comunasExpanded = false
-                            }) {
-                                Text(c)
-                            }
+                            DropdownMenuItem(
+                                text = { Text(c) },
+                                onClick = {
+                                    comuna = c
+                                    comunasExpanded = false
+                                }
+                            )
                         }
+
                     }
                 }
+
 
                 // EMAIL
                 OutlinedTextField(

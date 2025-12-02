@@ -2,24 +2,24 @@ package com.example.diegoherrera22appmoviles007d_ev2_dherrera_jaraya
 
 import com.example.diegoherrera22appmoviles007d_ev2_dherrera_jaraya.model.FakeDatabase
 import com.example.diegoherrera22appmoviles007d_ev2_dherrera_jaraya.viewmodel.AuthViewModel
-import org.junit.jupiter.api.*
+import io.kotest.core.spec.style.StringSpec
+import io.kotest.matchers.shouldBe
 
-class AuthViewModelTest {
+class AuthViewModelTest : StringSpec({
 
-    private lateinit var viewModel: AuthViewModel
+    lateinit var viewModel: AuthViewModel
 
-    @BeforeEach
-    fun setUp() {
+    beforeTest {
         FakeDatabase.clear()
         viewModel = AuthViewModel()
     }
 
-    @Test
-    fun registrarUsuarioValido_actualizaMensajeYPermiteLogin() {
+    "registrar usuario válido debe permitir login" {
+
         val email = "usuario@correo.com"
         val password = "seguro"
 
-        val registroExitoso = viewModel.registrar(
+        val registro = viewModel.registrar(
             nombre = "Juan",
             apellido = "Pérez",
             rut = "12.345.678-5",
@@ -30,19 +30,19 @@ class AuthViewModelTest {
             password = password
         )
 
-        Assertions.assertTrue(registroExitoso)
-        Assertions.assertEquals("Registro exitoso", viewModel.mensaje.value)
+        registro shouldBe true
+        viewModel.mensaje.value shouldBe "Registro exitoso"
 
-        val loginExitoso = viewModel.login(email, password)
+        val login = viewModel.login(email, password)
 
-        Assertions.assertTrue(loginExitoso)
-        Assertions.assertEquals(email, viewModel.usuarioActual.value)
-        Assertions.assertEquals("Inicio de sesión exitoso", viewModel.mensaje.value)
+        login shouldBe true
+        viewModel.usuarioActual.value shouldBe email
+        viewModel.mensaje.value shouldBe "Inicio de sesión exitoso"
     }
 
-    @Test
-    fun registrarUsuarioConRutInvalido_actualizaMensajeError() {
-        val registroExitoso = viewModel.registrar(
+    "registrar usuario con RUT inválido debe mostrar error" {
+
+        val registro = viewModel.registrar(
             nombre = "Ana",
             apellido = "Torres",
             rut = "12.345.678-9",
@@ -53,15 +53,15 @@ class AuthViewModelTest {
             password = "password"
         )
 
-        Assertions.assertFalse(registroExitoso)
-        Assertions.assertEquals("RUT inválido", viewModel.mensaje.value)
+        registro shouldBe false
+        viewModel.mensaje.value shouldBe "RUT inválido"
     }
 
-    @Test
-    fun registrarUsuarioDuplicado_devuelveMensajeDeExistencia() {
+    "registrar usuario duplicado debe mostrar mensaje de existencia" {
+
         val email = "duplicado@correo.com"
 
-        val primerRegistro = viewModel.registrar(
+        viewModel.registrar(
             nombre = "Luis",
             apellido = "Ramírez",
             rut = "12.345.678-5",
@@ -70,11 +70,9 @@ class AuthViewModelTest {
             comuna = "Concepción",
             email = email,
             password = "clave1"
-        )
+        ) shouldBe true
 
-        Assertions.assertTrue(primerRegistro)
-
-        val segundoRegistro = viewModel.registrar(
+        val registro2 = viewModel.registrar(
             nombre = "Luis",
             apellido = "Ramírez",
             rut = "12.345.678-5",
@@ -85,7 +83,7 @@ class AuthViewModelTest {
             password = "clave2"
         )
 
-        Assertions.assertFalse(segundoRegistro)
-        Assertions.assertEquals("El usuario ya existe", viewModel.mensaje.value)
+        registro2 shouldBe false
+        viewModel.mensaje.value shouldBe "El usuario ya existe"
     }
-}
+})

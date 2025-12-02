@@ -26,6 +26,7 @@ import androidx.navigation.compose.navigation
 import com.example.diegoherrera22appmoviles007d_ev2_dherrera_jaraya.views.ProductDetailScreen
 import androidx.navigation.navigation
 import androidx.navigation.navArgument
+import com.example.diegoherrera22appmoviles007d_ev2_dherrera_jaraya.viewmodel.RegionViewModel
 import com.example.diegoherrera22appmoviles007d_ev2_dherrera_jaraya.views.CartScreen
 import com.example.diegoherrera22appmoviles007d_ev2_dherrera_jaraya.views.CheckoutResultTabsScreen
 import com.example.diegoherrera22appmoviles007d_ev2_dherrera_jaraya.views.backoffice.AddProductScreen
@@ -50,30 +51,40 @@ class MainActivity : ComponentActivity() {
 
 @Composable
 fun AppNavigation() {
+
     val navController = rememberNavController()
+
+    // ViewModels que deben ser únicos en toda la app
     val authViewModel: AuthViewModel = viewModel()
+    val regionViewModel: RegionViewModel = viewModel() // ← **IMPORTANTE**
 
     NavHost(
         navController = navController,
         startDestination = "login"
     ) {
         composable("login") {
-            LoginScreen(navController = navController, viewModel = authViewModel)
+            LoginScreen(
+                navController = navController,
+                viewModel = authViewModel
+            )
         }
 
         composable("register") {
-            RegisterScreen(navController = navController, viewModel = authViewModel)
+            RegisterScreen(
+                navController = navController,
+                viewModel = authViewModel,
+                regionViewModel = regionViewModel // ← **PASADO AQUÍ**
+            )
         }
 
-        // Graph padre para compartir ViewModel entre Home y Detalle
+        // Graph padre para HOME y Detalles
         navigation(startDestination = "home/{email}", route = "shop") {
 
             composable(
                 route = "home/{email}",
                 arguments = listOf(navArgument("email") { type = NavType.StringType })
             ) { backStackEntry ->
-                // parentEntry del graph "shop" recordado con clave NavBackStackEntry
-                val parentEntry = androidx.compose.runtime.remember(backStackEntry) {
+                val parentEntry = remember(backStackEntry) {
                     navController.getBackStackEntry("shop")
                 }
                 val email = backStackEntry.arguments?.getString("email")
@@ -84,20 +95,19 @@ fun AppNavigation() {
                 route = "product/{id}",
                 arguments = listOf(navArgument("id") { type = NavType.StringType })
             ) { backStackEntry ->
-                val parentEntry = androidx.compose.runtime.remember(backStackEntry) {
+                val parentEntry = remember(backStackEntry) {
                     navController.getBackStackEntry("shop")
                 }
                 val id = backStackEntry.arguments?.getString("id") ?: return@composable
                 ProductDetailScreen(productId = id, navController = navController, parentEntry = parentEntry)
             }
-            // Back Office (solo visual): lista de productos reutilizando el mismo JSON
+
             composable("backoffice") {
                 BackOfficeListScreen(
                     onAddProduct = { navController.navigate("backoffice/add") }
                 )
             }
 
-            // Pantalla para Agregar Producto (solo UI, sin persistencia)
             composable("backoffice/add") {
                 AddProductScreen(navController = navController)
             }

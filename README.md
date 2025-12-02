@@ -43,7 +43,11 @@ DESARROLLO DE APLICACIONES MOVILES_007D
 ## Datos y repositorios
 - **Catálogo**: `ProductRepository` expone `getCatalog()` (productos con imágenes en `res/drawable`), `getById()` y descripciones extendidas en `getDetailDescription()`.
 - **Usuarios**: `FakeDatabase` guarda registros en memoria y expone `registrar()` / `login()`.
-- **Regiones/Comunas**: `ApiClient` configura Retrofit contra `http://10.0.2.2:8080/` y `RegionComunaRepository` define `GET /regions`. `RegionViewModel` consume la API y, si falla, usa un *fallback* local con tres regiones chilenas.
+- - **Regiones/Comunas (microservicio)**:
+  - **Cliente**: `ApiClient` crea Retrofit apuntando a `http://10.0.2.2:8080/` (loopback del host para el emulador) y expone `regionApi` que implementa `RegionComunaRepository`.
+  - **Endpoint esperado**: `GET /regions` devuelve un listado JSON de regiones con esquema `{ id: string, nombre: string, comunas: string[] }`.
+  - **Seguridad de red**: `network_security_config.xml` habilita tráfico *cleartext* hacia `10.0.2.2` para permitir pruebas locales sin HTTPS.
+  - **Consumo y resiliencia**: `RegionViewModel` solicita las regiones en el `init`, loguea la respuesta, y si el microservicio no responde usa un *fallback* local con tres regiones chilenas, asegurando que el registro siga funcionando..
 
 ## Theming y componentes reutilizables
 - Paleta y estilos en `ui/theme` más funciones auxiliares (`pastelButtonColors`, `pastelOutlinedTextFieldColors`, etc.).
@@ -53,6 +57,11 @@ DESARROLLO DE APLICACIONES MOVILES_007D
 - Todo el almacenamiento (usuarios, carrito, catálogo) es **en memoria**; no hay persistencia local ni remota.
 - El Back Office y el formulario de agregar producto son mockups sin CRUD real.
 - La API de regiones se asume disponible en local (`10.0.2.2:8080`); si no responde, la app sigue operativa gracias al *fallback*.
+
+## Ramas del repositorio
+- **main**: rama por defecto con el estado estable del proyecto.
+- **ConexionBackend**: integración principal con el microservicio de regiones/comunas (`10.0.2.2:8080`).
+- **BackUpConexionBackend**: respaldo de la integración al microservicio, útil si hay que comparar o restaurar cambios de conexión.
 
 ## Estructura rápida del módulo `app`
 - `MainActivity.kt`: arranque de Compose y grafo de navegación.

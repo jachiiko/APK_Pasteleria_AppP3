@@ -13,13 +13,18 @@ class AuthViewModel : ViewModel() {
     fun registrar(
         nombre: String,
         apellido: String,
-        rut: Int,
+        rut: String,
         direccion: String,
         region: String,
         comuna: String,
         email: String,
         password: String
     ): Boolean {
+        if (!esRutValido(rut)) {
+            mensaje.value = "RUT inválido"
+            return false
+        }
+
         val nuevo = Usuario(nombre, apellido, rut, direccion, region, comuna, email, password)
         return if (FakeDatabase.registrar(nuevo)) {
             mensaje.value = "Registro exitoso"
@@ -28,6 +33,37 @@ class AuthViewModel : ViewModel() {
             mensaje.value = "El usuario ya existe"
             false
         }
+    }
+
+    private fun esRutValido(rutIngresado: String): Boolean {
+        val rut = rutIngresado
+            .replace(".", "")
+            .replace("-", "")
+            .uppercase()
+
+        if (rut.length < 2) return false
+
+        val cuerpo = rut.dropLast(1)
+        val dv = rut.last()
+        val cuerpoNumero = cuerpo.toIntOrNull() ?: return false
+
+        var suma = 0
+        var multiplicador = 2
+
+        cuerpo.reversed().forEach { caracter ->
+            val digito = caracter.digitToInt()
+            suma += digito * multiplicador
+            multiplicador = if (multiplicador == 7) 2 else multiplicador + 1
+        }
+
+        val resto = 11 - (suma % 11)
+        val dvEsperado = when (resto) {
+            11 -> '0'
+            10 -> 'K'
+            else -> resto.digitToChar()
+        }
+
+        return dv == dvEsperado && cuerpoNumero > 0
     }
 
 

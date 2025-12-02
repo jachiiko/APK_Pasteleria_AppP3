@@ -12,4 +12,12 @@ object FakeDatabase {
     fun login(email: String, password: String): Boolean {
         return usuarios.any { it.email == email && it.password == password }
     }
+
+    /**
+     * Limpia los datos almacenados. Pensado para pruebas unitarias. //esto nos sirve por ahora, Esto se va a borrar una vez conectemos con la base de datos
+     */
+    fun clear() {
+        usuarios.clear()
+    }
+
 }

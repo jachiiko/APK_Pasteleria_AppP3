@@ -13,6 +13,25 @@ class RegionViewModel : ViewModel() {
     private val _regiones = MutableStateFlow<List<Region>>(emptyList())
     val regiones: StateFlow<List<Region>> = _regiones
 
+    // Datos locales para cuando la API no responda
+    private val fallbackRegiones = listOf(
+        Region(
+            id = "13",
+            nombre = "Región Metropolitana",
+            comunas = listOf("Santiago", "Ñuñoa", "La Florida", "Puente Alto")
+        ),
+        Region(
+            id = "05",
+            nombre = "Valparaíso",
+            comunas = listOf("Valparaíso", "Viña del Mar", "Quilpué")
+        ),
+        Region(
+            id = "08",
+            nombre = "Biobío",
+            comunas = listOf("Concepción", "Talcahuano", "Chiguayante")
+        )
+    )
+
     init {
         cargarRegiones()
     }
@@ -22,9 +41,10 @@ class RegionViewModel : ViewModel() {
             try {
                 val data = ApiClient.regionApi.getRegions()
                 android.util.Log.d("API_REGIONES", "Regiones recibidas: $data")
-                _regiones.value = data
+                _regiones.value = if (data.isNotEmpty()) data else fallbackRegiones
             } catch (e: Exception) {
                 android.util.Log.e("API_REGIONES", "Error cargando regiones", e)
+                _regiones.value = fallbackRegiones
             }
         }
     }

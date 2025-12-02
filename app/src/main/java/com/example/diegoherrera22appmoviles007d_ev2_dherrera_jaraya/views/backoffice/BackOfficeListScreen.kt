@@ -3,6 +3,7 @@ package com.example.diegoherrera22appmoviles007d_ev2_dherrera_jaraya.views.backo
 
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -21,6 +22,7 @@ import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
@@ -115,11 +117,26 @@ private fun BackOfficeItemCard(
         colors = CardDefaults.cardColors(containerColor = Color.White)
     ) {
         Row(Modifier.padding(12.dp)) {
-            Image(
-                painter = painterResource(id = p.imageRes),
-                contentDescription = p.name,
-                modifier = Modifier.size(72.dp)
-            )
+            if (p.imageRes != null) {
+                Image(
+                    painter = painterResource(id = p.imageRes),
+                    contentDescription = p.name,
+                    modifier = Modifier.size(72.dp)
+                )
+            } else {
+                Box(
+                    modifier = Modifier
+                        .size(72.dp)
+                        .background(MaterialTheme.colorScheme.surfaceVariant),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text(
+                        text = "Imagen\npendiente",
+                        style = MaterialTheme.typography.labelSmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
+            }
             Spacer(Modifier.width(12.dp))
             Column(Modifier.weight(1f)) {
                 Text(p.name, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold)

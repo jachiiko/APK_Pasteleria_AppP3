@@ -1,16 +1,31 @@
-@file:OptIn(ExperimentalMaterial3Api::class)
+@file:OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
 
 package com.example.diegoherrera22appmoviles007d_ev2_dherrera_jaraya.views
 
 
 
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.FlowRow
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowDropDown
+import androidx.compose.material.icons.filled.ArrowDropUp
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
@@ -75,13 +90,112 @@ fun HomeScreen(
                 Spacer(Modifier.height(8.dp))
             }
 
+            var showCategoryMenu by remember { mutableStateOf(false) }
+            var showPriceMenu by remember { mutableStateOf(false) }
+
+            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                Box {
+                    FilterChip(
+                        selected = showCategoryMenu,
+                        onClick = { showCategoryMenu = !showCategoryMenu },
+                        label = { Text("Categorías") },
+                        leadingIcon = {
+                            Icon(
+                                imageVector = if (showCategoryMenu) Icons.Filled.ArrowDropUp else Icons.Filled.ArrowDropDown,
+                                contentDescription = null
+                            )
+                        },
+                        colors = FilterChipDefaults.filterChipColors(
+                            labelColor = MaterialTheme.colorScheme.secondary,
+                            selectedLabelColor = MaterialTheme.colorScheme.secondary,
+                            iconColor = MaterialTheme.colorScheme.secondary,
+                            selectedLeadingIconColor = MaterialTheme.colorScheme.secondary
+                        )
+                    )
+
+                    DropdownMenu(
+                        expanded = showCategoryMenu,
+                        onDismissRequest = { showCategoryMenu = false },
+                        offset = DpOffset(0.dp, 8.dp)
+                    ) {
+                        Column(
+                            modifier = Modifier
+                                .padding(12.dp)
+                                .widthIn(min = 220.dp, max = 360.dp),
+                            verticalArrangement = Arrangement.spacedBy(12.dp)
+                        ) {
+                            Text("Filtrar por categoría", style = MaterialTheme.typography.titleSmall)
+                            FlowRow(
+                                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                                verticalArrangement = Arrangement.spacedBy(8.dp),
+                                modifier = Modifier.fillMaxWidth()
+                            ) {
+                                catalogVM.categories.forEach { category ->
+                                    FilterChip(
+                                        selected = catalogVM.selectedCategories.contains(category),
+                                        onClick = { catalogVM.toggleCategory(category) },
+                                        label = { Text(category) }
+                                    )
+                                }
+                            }
+                        }
+                    }
+                }
+
+                Box {
+                    FilterChip(
+                        selected = showPriceMenu,
+                        onClick = { showPriceMenu = !showPriceMenu },
+                        label = { Text("Precio") },
+                        leadingIcon = {
+                            Icon(
+                                imageVector = if (showPriceMenu) Icons.Filled.ArrowDropUp else Icons.Filled.ArrowDropDown,
+                                contentDescription = null
+                            )
+                        },
+                        colors = FilterChipDefaults.filterChipColors(
+                            labelColor = MaterialTheme.colorScheme.secondary,
+                            selectedLabelColor = MaterialTheme.colorScheme.secondary,
+                            iconColor = MaterialTheme.colorScheme.secondary,
+                            selectedLeadingIconColor = MaterialTheme.colorScheme.secondary
+                        )
+                    )
+
+                    DropdownMenu(
+                        expanded = showPriceMenu,
+                        onDismissRequest = { showPriceMenu = false },
+                        offset = DpOffset(0.dp, 8.dp)
+                    ) {
+                        Column(
+                            modifier = Modifier
+                                .padding(12.dp)
+                                .widthIn(min = 220.dp, max = 360.dp),
+                            verticalArrangement = Arrangement.spacedBy(12.dp)
+                        ) {
+                            Text("Rango de precios", style = MaterialTheme.typography.titleSmall)
+                            RangeSlider(
+                                value = catalogVM.selectedPriceRange,
+                                onValueChange = { catalogVM.updatePriceRange(it) },
+                                valueRange = catalogVM.priceRangeLimits
+                            )
+                            Text(
+                                "${money.format(catalogVM.selectedPriceRange.start.toInt())} - ${money.format(catalogVM.selectedPriceRange.endInclusive.toInt())}",
+                                style = MaterialTheme.typography.bodyMedium
+                            )
+                        }
+                    }
+                }
+            }
+
+            Spacer(Modifier.height(8.dp))
+
             LazyVerticalGrid(
                 columns = GridCells.Adaptive(minSize = 220.dp),
                 verticalArrangement = Arrangement.spacedBy(12.dp),
                 horizontalArrangement = Arrangement.spacedBy(12.dp),
                 modifier = Modifier.fillMaxSize()
             ) {
-                items(catalogVM.products, key = { it.id }) { p ->
+                items(catalogVM.filteredProducts, key = { it.id }) { p ->
                     ProductCard(
                         product = p, // <- Producto
                         onAddToCart = { added ->

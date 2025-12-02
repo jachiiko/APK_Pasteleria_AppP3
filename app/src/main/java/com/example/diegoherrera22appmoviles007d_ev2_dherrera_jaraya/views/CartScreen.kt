@@ -153,12 +153,27 @@ private fun CartItemRow(
             modifier = Modifier.padding(12.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Image(
-                painter = painterResource(line.product.imageRes),
-                contentDescription = line.product.name,
-                contentScale = ContentScale.Crop,
-                modifier = Modifier.size(64.dp)
-            )
+            if (line.product.imageRes != null) {
+                Image(
+                    painter = painterResource(line.product.imageRes),
+                    contentDescription = line.product.name,
+                    contentScale = ContentScale.Crop,
+                    modifier = Modifier.size(64.dp)
+                )
+            } else {
+                Box(
+                    modifier = Modifier
+                        .size(64.dp)
+                        .background(MaterialTheme.colorScheme.surfaceVariant),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text(
+                        text = "Imagen",
+                        style = MaterialTheme.typography.labelSmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
+            }
             Spacer(Modifier.width(12.dp))
             Column(modifier = Modifier.weight(1f)) {
                 Text(line.product.name, style = MaterialTheme.typography.titleMedium)

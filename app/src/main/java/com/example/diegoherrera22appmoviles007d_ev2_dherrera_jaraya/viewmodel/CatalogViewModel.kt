@@ -1,7 +1,10 @@
 package com.example.diegoherrera22appmoviles007d_ev2_dherrera_jaraya.viewmodel
 
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateMapOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.runtime.snapshots.SnapshotStateMap
 import androidx.lifecycle.ViewModel
@@ -10,6 +13,7 @@ import com.example.diegoherrera22appmoviles007d_ev2_dherrera_jaraya.repository.P
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
+import kotlin.ranges.ClosedFloatingPointRange
 
 data class CartLine(
     val product: Producto,
@@ -32,9 +36,42 @@ data class OrderSummary(
 
 class CatalogViewModel : ViewModel() {
     val products: List<Producto> = ProductRepository.getCatalog()
+    val categories: List<String> = products.map { it.category }.distinct().sorted()
+
+    private val priceMin = products.minOf { it.price }.toFloat()
+    private val priceMax = products.maxOf { it.price }.toFloat()
+
+    private val _selectedCategories = mutableStateListOf<String>()
+    val selectedCategories: List<String> get() = _selectedCategories
+
+    var selectedPriceRange by mutableStateOf(priceMin..priceMax)
+        private set
+
+    val priceRangeLimits: ClosedFloatingPointRange<Float> get() = priceMin..priceMax
+
+    val filteredProducts: List<Producto>
+        get() {
+            val categoryFilter = selectedCategories.toSet()
+            return products.filter { product ->
+                (categoryFilter.isEmpty() || categoryFilter.contains(product.category)) &&
+                        product.price.toFloat() in selectedPriceRange
+            }
+        }
 
     private val _cart: SnapshotStateMap<String, CartLine> = mutableStateMapOf()
     val cartLines: List<CartLine> get() = _cart.values.toList()
+
+    fun toggleCategory(category: String) {
+        if (_selectedCategories.contains(category)) {
+            _selectedCategories.remove(category)
+        } else {
+            _selectedCategories.add(category)
+        }
+    }
+
+    fun updatePriceRange(range: ClosedFloatingPointRange<Float>) {
+        selectedPriceRange = range
+    }
 
     fun addToCart(product: Producto, amount: Int = 1) {
         val id = product.id

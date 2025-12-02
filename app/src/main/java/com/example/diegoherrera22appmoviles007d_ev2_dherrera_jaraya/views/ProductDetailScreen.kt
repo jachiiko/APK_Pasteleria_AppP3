@@ -4,7 +4,19 @@ package com.example.diegoherrera22appmoviles007d_ev2_dherrera_jaraya.views
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Remove
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -15,46 +27,49 @@ import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.navigation.NavController
-import androidx.navigation.NavBackStackEntry
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.example.diegoherrera22appmoviles007d_ev2_dherrera_jaraya.repository.ProductRepository
-import com.example.diegoherrera22appmoviles007d_ev2_dherrera_jaraya.viewmodel.CatalogViewModel
+import androidx.navigation.NavBackStackEntry
+import androidx.navigation.NavController
 import com.example.diegoherrera22appmoviles007d_ev2_dherrera_jaraya.model.Producto
+import com.example.diegoherrera22appmoviles007d_ev2_dherrera_jaraya.repository.ProductRepository
 import com.example.diegoherrera22appmoviles007d_ev2_dherrera_jaraya.ui.theme.pastelButtonColors
+import com.example.diegoherrera22appmoviles007d_ev2_dherrera_jaraya.viewmodel.CatalogViewModel
 import java.text.NumberFormat
 import java.util.Locale
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
 
 @Composable
 fun ProductDetailScreen(
     productId: String,
     navController: NavController,
     parentEntry: NavBackStackEntry
-
 ) {
-
     val catalogVM: CatalogViewModel = viewModel(parentEntry)
 
-    val product = remember(productId) { ProductRepository.getById(productId) }
+    val product = remember(productId) {
+        catalogVM.products.firstOrNull { it.id == productId } ?: ProductRepository.getById(productId)
+    }
+    val detailDescription = remember(productId) { ProductRepository.getDetailDescription(productId) }
     val snackbarHostState = remember { SnackbarHostState() }
 
-    // Estado + efecto para snackbar (como en Home)
-    var lastAdded by remember { mutableStateOf<Producto?>(null) }
+    var lastAdded by remember { mutableStateOf<Pair<Producto, Int>?>(null) }
     LaunchedEffect(lastAdded) {
-        lastAdded?.let { snackbarHostState.showSnackbar("Agregado: ${it.name}") }
+        lastAdded?.let { (p, qty) -> snackbarHostState.showSnackbar("Agregado: ${p.name} x$qty") }
     }
 
     val money = remember {
-        NumberFormat.getCurrencyInstance(Locale("es","CL")).apply { maximumFractionDigits = 0 }
+        NumberFormat.getCurrencyInstance(Locale("es", "CL")).apply { maximumFractionDigits = 0 }
     }
 
     if (product == null) {
@@ -102,25 +117,70 @@ fun ProductDetailScreen(
                 .background(MaterialTheme.colorScheme.background),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            Image(
-                painter = painterResource(product.imageRes),
-                contentDescription = product.name,
-                contentScale = ContentScale.Crop,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(220.dp)
-            )
+            if (product.imageRes != null) {
+                Image(
+                    painter = painterResource(product.imageRes),
+                    contentDescription = product.name,
+                    contentScale = ContentScale.Crop,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(220.dp)
+                )
+            } else {
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(220.dp)
+                        .background(MaterialTheme.colorScheme.surfaceVariant),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text(
+                        text = "Imagen próximamente",
+                        style = MaterialTheme.typography.bodyLarge,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
+            }
 
             Text(product.name, style = MaterialTheme.typography.headlineSmall, fontWeight = FontWeight.Bold)
-            Text(product.description, style = MaterialTheme.typography.bodyLarge, color = MaterialTheme.colorScheme.onSurfaceVariant)
+            Text(product.category, style = MaterialTheme.typography.labelLarge, color = MaterialTheme.colorScheme.primary)
+            Text(detailDescription ?: product.description, style = MaterialTheme.typography.bodyLarge, color = MaterialTheme.colorScheme.onSurfaceVariant)
             Text(money.format(product.price), style = MaterialTheme.typography.titleLarge)
 
             Spacer(Modifier.height(8.dp))
 
+            var quantity by remember { mutableStateOf(1) }
+
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text("Cantidad", style = MaterialTheme.typography.titleMedium)
+                Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    IconButton(
+                        onClick = { if (quantity > 1) quantity-- }
+                    ) { Icon(Icons.Filled.Remove, contentDescription = "Disminuir cantidad") }
+
+                    Text(
+                        quantity.toString(),
+                        style = MaterialTheme.typography.titleMedium,
+                        modifier = Modifier.padding(horizontal = 4.dp)
+                    )
+
+                    IconButton(onClick = { quantity++ }) {
+                        Icon(Icons.Filled.Add, contentDescription = "Aumentar cantidad")
+                    }
+                }
+            }
+
+            Spacer(Modifier.height(4.dp))
+
             Button(
                 onClick = {
-                    catalogVM.addToCart(product)
-                    lastAdded = product   //
+                    catalogVM.addToCart(product, quantity)
+                    lastAdded = product to quantity
+                    quantity = 1
                 },
                 modifier = Modifier.fillMaxWidth(),
                 colors = pastelButtonColors()

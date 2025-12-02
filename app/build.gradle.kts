@@ -70,6 +70,27 @@ dependencies {
     androidTestImplementation(libs.androidx.espresso.core)
     androidTestImplementation(platform(libs.androidx.compose.bom))
 
+    // Kotest
+    testImplementation(libs.kotest.runner.junit5)
+    testImplementation(libs.kotest.assertions.core)
+
+// JUnit 5
+    testImplementation(libs.junit.jupiter)
+
+// MockK
+    testImplementation(libs.mockk)
+
+// Compose UI Test
+    androidTestImplementation(libs.androidx.ui.test.junit4)
+    debugImplementation(libs.androidx.ui.test.manifest)
+
+
     debugImplementation(libs.androidx.compose.ui.tooling)
     debugImplementation(libs.androidx.compose.ui.test.manifest)
+
+    tasks.withType<Test>().configureEach {
+        useJUnitPlatform()
+    }
+
 }
+

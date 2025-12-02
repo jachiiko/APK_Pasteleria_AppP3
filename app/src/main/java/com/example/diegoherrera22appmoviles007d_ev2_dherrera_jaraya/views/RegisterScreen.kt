@@ -131,12 +131,16 @@ fun RegisterScreen(
 
                 OutlinedTextField(
                     value = rutText,
-                    onValueChange = { rutText = it.filter(Char::isDigit) },
-                    label = { Text("RUT (solo números)") },
+                    onValueChange = {
+                        rutText = it.uppercase().filter { char ->
+                            char.isDigit() || char == 'K' || char == '-'
+                        }
+                    },
+                    label = { Text("RUT (ej: 12345678-9)") },
                     modifier = Modifier.fillMaxWidth(),
                     singleLine = true,
                     keyboardOptions = KeyboardOptions(
-                        keyboardType = KeyboardType.Number,
+                        keyboardType = KeyboardType.Text,
                         imeAction = ImeAction.Next
                     ),
                     colors = pastelOutlinedTextFieldColors()
@@ -265,12 +269,10 @@ fun RegisterScreen(
                             return@Button
                         }
 
-                        val rut = rutText.toIntOrNull() ?: 0
-
                         val registrado = viewModel.registrar(
                             nombre = nombre,
                             apellido = apellido,
-                            rut = rut,
+                            rut = rutText,
                             direccion = direccion,
                             region = region,
                             comuna = comuna,

@@ -3,6 +3,7 @@
     <item>
         <bitmap
             android:gravity="center"
-            android:src="@drawable/icono" />
+            android:src="@drawable/icono"
+            android:tint="#000000" />
     </item>
 </layer-list>

@@ -3,7 +3,6 @@ package com.example.diegoherrera22appmoviles007d_ev2_dherrera_jaraya.views
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -62,108 +61,103 @@ fun LoginScreen(navController: NavController, viewModel: AuthViewModel) {
     }
 
     CompositionLocalProvider(LocalTextToolbar provides disabledTextToolbar) {
-        Box(
+        Column(
             modifier = Modifier
                 .fillMaxSize()
                 .background(MaterialTheme.colorScheme.background)
+                .padding(horizontal = 24.dp, vertical = 24.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.spacedBy(16.dp, Alignment.Top)
         ) {
-            Column(
+            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                Image(
+                    painter = painterResource(id = R.drawable.icono),
+                    contentDescription = "Icono de Pastelería",
+                modifier = Modifier.size(132.dp)
+            )
+
+            Text(
+                text = "Pasteleria 100\nSabores",
+                style = MaterialTheme.typography.displaySmall.copy(
+                    fontSize = 44.sp,
+                    lineHeight = 48.sp,
+                    fontFamily = FontFamily.Cursive,
+                    fontWeight = FontWeight.Bold
+                ),
+                textAlign = TextAlign.Center,
                 modifier = Modifier
-                    .align(Alignment.Center)
-                    .padding(horizontal = 24.dp, vertical = 32.dp),
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.spacedBy(16.dp, Alignment.CenterVertically)
-            ) {
-                Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                    Image(
-                        painter = painterResource(id = R.drawable.icono),
-                        contentDescription = "Icono de Pastelería",
-                        modifier = Modifier.size(132.dp)
-                    )
+                    .padding(top = 16.dp)
+                    .fillMaxWidth()
+            )
+        }
 
-                    Text(
-                        text = "Pasteleria 1000\nSabores",
-                        style = MaterialTheme.typography.displaySmall.copy(
-                            fontSize = 44.sp,
-                            lineHeight = 48.sp,
-                            fontFamily = FontFamily.Cursive,
-                            fontWeight = FontWeight.Bold
-                        ),
-                        textAlign = TextAlign.Center,
-                        modifier = Modifier
-                            .padding(top = 16.dp)
-                            .fillMaxWidth()
-                    )
+        Spacer(modifier = Modifier.height(40.dp))
+
+        Text(
+            text = "Inicio de sesión",
+            style = MaterialTheme.typography.titleLarge,
+            textAlign = TextAlign.Center,
+            modifier = Modifier
+                .padding(bottom = 8.dp)
+                .fillMaxWidth()
+        )
+
+        OutlinedTextField(
+            value = email,
+            onValueChange = { email = it },
+            label = { Text("Email") },
+            modifier = Modifier.fillMaxWidth(),
+            singleLine = true,
+            keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
+            colors = pastelOutlinedTextFieldColors()
+        )
+
+        OutlinedTextField(
+            value = password,
+            onValueChange = { password = it },
+            label = { Text("Contraseña") },
+            singleLine = true,
+            visualTransformation = PasswordVisualTransformation(),
+            modifier = Modifier.fillMaxWidth(),
+            keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
+            colors = pastelOutlinedTextFieldColors()
+        )
+
+        Spacer(modifier = Modifier.height(10.dp))
+
+        Button(
+            onClick = {
+                val ok = viewModel.login(email, password)
+                if (!ok) return@Button
+
+                val e = email.trim().lowercase()
+                val destination = when {
+                    e.endsWith("@admin.cl") -> "backoffice"
+                    e.endsWith("@duoc.cl") -> "home/$email"
+                    else -> {
+                        viewModel.mensaje.value = "Dominio no permitido (usa @duoc.cl o @admin.cl)"
+                        return@Button
+                    }
                 }
-
-                Spacer(modifier = Modifier.height(24.dp))
-
-                Text(
-                    text = "Inicio de sesión",
-                    style = MaterialTheme.typography.titleLarge,
-                    textAlign = TextAlign.Center,
-                    modifier = Modifier
-                        .padding(bottom = 4.dp)
-                        .fillMaxWidth()
-                )
-
-                OutlinedTextField(
-                    value = email,
-                    onValueChange = { email = it },
-                    label = { Text("Email") },
-                    modifier = Modifier.fillMaxWidth(),
-                    singleLine = true,
-                    keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
-                    colors = pastelOutlinedTextFieldColors()
-                )
-
-                OutlinedTextField(
-                    value = password,
-                    onValueChange = { password = it },
-                    label = { Text("Contraseña") },
-                    singleLine = true,
-                    visualTransformation = PasswordVisualTransformation(),
-                    modifier = Modifier.fillMaxWidth(),
-                    keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
-                    colors = pastelOutlinedTextFieldColors()
-                )
-
-                Spacer(modifier = Modifier.height(6.dp))
-
-                Button(
-                    onClick = {
-                        val ok = viewModel.login(email, password)
-                        if (!ok) return@Button
-
-                        val e = email.trim().lowercase()
-                        val destination = when {
-                            e.endsWith("@admin.cl") -> "backoffice"
-                            e.endsWith("@duoc.cl") -> "home/$email"
-                            else -> {
-                                viewModel.mensaje.value = "Dominio no permitido (usa @duoc.cl o @admin.cl)"
-                                return@Button
-                            }
-                        }
-                        navController.navigate(destination) {
-                            popUpTo("login") { inclusive = true }
-                        }
-                    },
-                    colors = pastelButtonColors(),
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    Text("Entrar")
+                navController.navigate(destination) {
+                    popUpTo("login") { inclusive = true }
                 }
+            },
+            colors = pastelButtonColors(),
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Text("Entrar")
+        }
 
-                Text(viewModel.mensaje.value, modifier = Modifier.padding(top = 10.dp))
+        Text(viewModel.mensaje.value, modifier = Modifier.padding(top = 10.dp))
 
-                TextButton(
-                    onClick = { navController.navigate("register") },
-                    modifier = Modifier.padding(top = 2.dp),
-                    colors = pastelTextButtonColors()
-                ) {
-                    Text("¿No tienes cuenta? Regístrate")
-                }
-            }
+        TextButton(
+            onClick = { navController.navigate("register") },
+            modifier = Modifier.padding(top = 2.dp),
+            colors = pastelTextButtonColors()
+        ) {
+            Text("¿No tienes cuenta? Regístrate")
         }
     }
+}
 }

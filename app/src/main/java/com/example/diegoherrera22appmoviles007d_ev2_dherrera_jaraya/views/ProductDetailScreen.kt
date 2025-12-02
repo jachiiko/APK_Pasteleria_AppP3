@@ -25,7 +25,6 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.NavBackStackEntry
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.example.diegoherrera22appmoviles007d_ev2_dherrera_jaraya.repository.ProductRepository
 import com.example.diegoherrera22appmoviles007d_ev2_dherrera_jaraya.viewmodel.CatalogViewModel
 import com.example.diegoherrera22appmoviles007d_ev2_dherrera_jaraya.model.Producto
 import com.example.diegoherrera22appmoviles007d_ev2_dherrera_jaraya.ui.theme.pastelButtonColors
@@ -44,7 +43,7 @@ fun ProductDetailScreen(
 
     val catalogVM: CatalogViewModel = viewModel(parentEntry)
 
-    val product = remember(productId) { ProductRepository.getById(productId) }
+    val product = remember(productId) { catalogVM.products.firstOrNull { it.id == productId } }
     val snackbarHostState = remember { SnackbarHostState() }
 
     // Estado + efecto para snackbar (como en Home)
@@ -70,13 +69,7 @@ fun ProductDetailScreen(
                 )
             }
         ) { inner ->
-            Box(
-                Modifier
-                    .fillMaxSize()
-                    .padding(inner)
-                    .background(MaterialTheme.colorScheme.background),
-                contentAlignment = Alignment.Center
-            ) { Text("No encontramos este producto.") }
+            @@ -80,51 +79,68 @@ fun ProductDetailScreen(
         }
         return
     }
@@ -102,16 +95,33 @@ fun ProductDetailScreen(
                 .background(MaterialTheme.colorScheme.background),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            Image(
-                painter = painterResource(product.imageRes),
-                contentDescription = product.name,
-                contentScale = ContentScale.Crop,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(220.dp)
-            )
+            if (product.imageRes != null) {
+                Image(
+                    painter = painterResource(product.imageRes),
+                    contentDescription = product.name,
+                    contentScale = ContentScale.Crop,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(220.dp)
+                )
+            } else {
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(220.dp)
+                        .background(MaterialTheme.colorScheme.surfaceVariant),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text(
+                        text = "Imagen próximamente",
+                        style = MaterialTheme.typography.bodyLarge,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
+            }
 
             Text(product.name, style = MaterialTheme.typography.headlineSmall, fontWeight = FontWeight.Bold)
+            Text(product.category, style = MaterialTheme.typography.labelLarge, color = MaterialTheme.colorScheme.primary)
             Text(product.description, style = MaterialTheme.typography.bodyLarge, color = MaterialTheme.colorScheme.onSurfaceVariant)
             Text(money.format(product.price), style = MaterialTheme.typography.titleLarge)
 

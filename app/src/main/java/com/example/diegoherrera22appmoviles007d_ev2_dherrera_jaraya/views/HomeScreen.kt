@@ -1,10 +1,17 @@
-@file:OptIn(ExperimentalMaterial3Api::class)
+@file:OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
 
 package com.example.diegoherrera22appmoviles007d_ev2_dherrera_jaraya.views
 
 
 
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.FlowRow
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
@@ -75,13 +82,42 @@ fun HomeScreen(
                 Spacer(Modifier.height(8.dp))
             }
 
+            Text("Filtrar por categoría", style = MaterialTheme.typography.titleSmall)
+            FlowRow(
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                verticalArrangement = Arrangement.spacedBy(8.dp),
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                catalogVM.categories.forEach { category ->
+                    FilterChip(
+                        selected = catalogVM.selectedCategories.contains(category),
+                        onClick = { catalogVM.toggleCategory(category) },
+                        label = { Text(category) }
+                    )
+                }
+            }
+
+            Spacer(Modifier.height(12.dp))
+            Text("Rango de precios", style = MaterialTheme.typography.titleSmall)
+            RangeSlider(
+                value = catalogVM.selectedPriceRange,
+                onValueChange = { catalogVM.updatePriceRange(it) },
+                valueRange = catalogVM.priceRangeLimits
+            )
+            Text(
+                "${money.format(catalogVM.selectedPriceRange.start.toInt())} - ${money.format(catalogVM.selectedPriceRange.endInclusive.toInt())}",
+                style = MaterialTheme.typography.bodyMedium
+            )
+
+            Spacer(Modifier.height(12.dp))
+
             LazyVerticalGrid(
                 columns = GridCells.Adaptive(minSize = 220.dp),
                 verticalArrangement = Arrangement.spacedBy(12.dp),
                 horizontalArrangement = Arrangement.spacedBy(12.dp),
                 modifier = Modifier.fillMaxSize()
             ) {
-                items(catalogVM.products, key = { it.id }) { p ->
+                items(catalogVM.filteredProducts, key = { it.id }) { p ->
                     ProductCard(
                         product = p, // <- Producto
                         onAddToCart = { added ->

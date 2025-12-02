@@ -2,6 +2,7 @@ package com.example.diegoherrera22appmoviles007d_ev2_dherrera_jaraya.views
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -84,216 +85,227 @@ fun RegisterScreen(navController: NavController, viewModel: AuthViewModel, regio
     }
 
     CompositionLocalProvider(LocalTextToolbar provides disabledTextToolbar) {
-        Column(
+        Box(
             modifier = Modifier
                 .fillMaxSize()
                 .background(MaterialTheme.colorScheme.background)
-                .padding(horizontal = 20.dp, vertical = 28.dp)
-                .verticalScroll(rememberScrollState()),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(10.dp)
         ) {
-            Text(
-                "Registro",
-                style = MaterialTheme.typography.titleLarge,
-                textAlign = TextAlign.Center,
+            Column(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(bottom = 2.dp)
-        )
-
-        OutlinedTextField(
-            value = nombre,
-            onValueChange = { nombre = it },
-            label = { Text("Nombre") },
-            modifier = Modifier.fillMaxWidth(),
-            singleLine = true,
-            keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
-            colors = pastelOutlinedTextFieldColors()
-        )
-
-        OutlinedTextField(
-            value = apellido,
-            onValueChange = { apellido = it },
-            label = { Text("Apellido") },
-            modifier = Modifier.fillMaxWidth(),
-            singleLine = true,
-            keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
-            colors = pastelOutlinedTextFieldColors()
-        )
-
-        OutlinedTextField(
-            value = rutText,
-            onValueChange = { rutText = it.filter(Char::isDigit) },
-            label = { Text("RUT (solo números, sin DV)") },
-            keyboardOptions = KeyboardOptions(
-                keyboardType = KeyboardType.Number,
-                imeAction = ImeAction.Next
-            ),
-            modifier = Modifier.fillMaxWidth(),
-            colors = pastelOutlinedTextFieldColors()
-        )
-
-        OutlinedTextField(
-            value = direccion,
-            onValueChange = { direccion = it },
-            label = { Text("Dirección") },
-            modifier = Modifier.fillMaxWidth(),
-            keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
-            colors = pastelOutlinedTextFieldColors()
-        )
-
-        ExposedDropdownMenuBox(
-            expanded = regionsExpanded,
-            onExpandedChange = { regionsExpanded = it && regiones.isNotEmpty() }
-        ) {
-            OutlinedTextField(
-                value = region,
-                onValueChange = {},
-                readOnly = true,
-                label = { Text("Región") },
-                trailingIcon = {
-                    ExposedDropdownMenuDefaults.TrailingIcon(expanded = regionsExpanded)
-                },
-                modifier = Modifier
-                    .menuAnchor()
-                    .fillMaxWidth(),
-                colors = pastelOutlinedTextFieldColors(),
-                enabled = regiones.isNotEmpty()
-            )
-            ExposedDropdownMenu(
-                expanded = regionsExpanded,
-                onDismissRequest = { regionsExpanded = false }
+                    .align(Alignment.TopCenter)
+                    .padding(horizontal = 20.dp, vertical = 24.dp)
+                    .padding(top = 56.dp)
+                    .verticalScroll(rememberScrollState()),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.spacedBy(4.dp)
             ) {
-                regiones.forEach { r ->
-                    DropdownMenuItem(
-                        text = { Text(r) },
-                        onClick = {
-                            region = r
-                            comuna = ""
-                            regionsExpanded = false
-                        }
-                    )
-                }
-            }
-        }
-
-        ExposedDropdownMenuBox(
-            expanded = comunasExpanded,
-            onExpandedChange = { expanded ->
-                if (region.isNotBlank()) comunasExpanded = expanded
-            }
-        ) {
-            OutlinedTextField(
-                value = comuna,
-                onValueChange = {},
-                readOnly = true,
-                label = { Text("Comuna") },
-                trailingIcon = {
-                    ExposedDropdownMenuDefaults.TrailingIcon(expanded = comunasExpanded)
-                },
-                supportingText = {
-                    if (region.isBlank()) Text("Selecciona primero una región")
-                },
-                modifier = Modifier
-                    .menuAnchor()
-                    .fillMaxWidth(),
-                colors = pastelOutlinedTextFieldColors(),
-                enabled = region.isNotBlank()
-            )
-            ExposedDropdownMenu(
-                expanded = comunasExpanded,
-                onDismissRequest = { comunasExpanded = false }
-            ) {
-                comunas.forEach { c ->
-                    DropdownMenuItem(
-                        text = { Text(c) },
-                        onClick = {
-                            comuna = c
-                            comunasExpanded = false
-                        }
-                    )
-                }
-            }
-        }
-
-        OutlinedTextField(
-            value = email,
-            onValueChange = {
-                email = it
-                emailError = null
-            },
-            isError = emailError != null,
-            label = { Text("Email") },
-            supportingText = {
-                if (emailError != null) Text(emailError!!)
-                else Text("Solo @duoc.cl o @admin.cl")
-            },
-            modifier = Modifier.fillMaxWidth(),
-            singleLine = true,
-            keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
-            colors = pastelOutlinedTextFieldColors()
-        )
-
-        OutlinedTextField(
-            value = password,
-            onValueChange = { password = it },
-            label = { Text("Contraseña") },
-            modifier = Modifier.fillMaxWidth(),
-            singleLine = true,
-            keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
-            visualTransformation = PasswordVisualTransformation(),
-            colors = pastelOutlinedTextFieldColors()
-        )
-
-        Button(
-            onClick = {
-                if (!isAllowedEmail(email)) {
-                    emailError = "Solo se permiten correos @duoc.cl o @admin.cl"
-                    return@Button
-                }
-                val rut = rutText.toIntOrNull() ?: 0
-                val registrado = viewModel.registrar(
-                    nombre = nombre,
-                    apellido = apellido,
-                    rut = rut,
-                    direccion = direccion,
-                    region = region,
-                    comuna = comuna,
-                    email = email,
-                    password = password
+                Text(
+                    "Registro",
+                    style = MaterialTheme.typography.titleLarge,
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(bottom = 2.dp)
                 )
-                if (registrado) {
-                    navController.navigate("login") {
-                        popUpTo("login") { inclusive = true }
+
+                OutlinedTextField(
+                    value = nombre,
+                    onValueChange = { nombre = it },
+                    label = { Text("Nombre") },
+                    modifier = Modifier.fillMaxWidth(),
+                    singleLine = true,
+                    keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
+                    colors = pastelOutlinedTextFieldColors()
+                )
+
+                OutlinedTextField(
+                    value = apellido,
+                    onValueChange = { apellido = it },
+                    label = { Text("Apellido") },
+                    modifier = Modifier.fillMaxWidth(),
+                    singleLine = true,
+                    keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
+                    colors = pastelOutlinedTextFieldColors()
+                )
+
+                OutlinedTextField(
+                    value = rutText,
+                    onValueChange = { rutText = it.filter(Char::isDigit) },
+                    label = { Text("RUT (solo números, sin DV)") },
+                    keyboardOptions = KeyboardOptions(
+                        keyboardType = KeyboardType.Number,
+                        imeAction = ImeAction.Next
+                    ),
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = pastelOutlinedTextFieldColors()
+                )
+
+                OutlinedTextField(
+                    value = direccion,
+                    onValueChange = { direccion = it },
+                    label = { Text("Dirección") },
+                    modifier = Modifier.fillMaxWidth(),
+                    keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
+                    colors = pastelOutlinedTextFieldColors()
+                )
+
+                ExposedDropdownMenuBox(
+                    expanded = regionsExpanded,
+                    onExpandedChange = { regionsExpanded = it && regiones.isNotEmpty() }
+                ) {
+                    OutlinedTextField(
+                        value = region,
+                        onValueChange = {},
+                        readOnly = true,
+                        label = { Text("Región") },
+                        trailingIcon = {
+                            ExposedDropdownMenuDefaults.TrailingIcon(expanded = regionsExpanded)
+                        },
+                        modifier = Modifier
+                            .menuAnchor()
+                            .fillMaxWidth(),
+                        colors = pastelOutlinedTextFieldColors(),
+                        enabled = regiones.isNotEmpty()
+                    )
+                    ExposedDropdownMenu(
+                        expanded = regionsExpanded,
+                        onDismissRequest = { regionsExpanded = false }
+                    ) {
+                        regiones.forEach { r ->
+                            DropdownMenuItem(
+                                text = { Text(r) },
+                                onClick = {
+                                    region = r
+                                    comuna = ""
+                                    regionsExpanded = false
+                                }
+                            )
+                        }
                     }
                 }
-            },
-            modifier = Modifier.fillMaxWidth(),
-            colors = pastelButtonColors()
-        ) {
-            Text("Registrar")
-        }
 
-        Text(viewModel.mensaje.value, modifier = Modifier.padding(top = 6.dp))
-
-        TextButton(
-            onClick = {
-                navController.navigate("login") {
-                    popUpTo("login") { inclusive = true }
+                ExposedDropdownMenuBox(
+                    expanded = comunasExpanded,
+                    onExpandedChange = { expanded ->
+                        if (region.isNotBlank()) comunasExpanded = expanded
+                    }
+                ) {
+                    OutlinedTextField(
+                        value = comuna,
+                        onValueChange = {},
+                        readOnly = true,
+                        label = { Text("Comuna") },
+                        trailingIcon = {
+                            ExposedDropdownMenuDefaults.TrailingIcon(expanded = comunasExpanded)
+                        },
+                        supportingText = {
+                            if (region.isBlank()) Text("Selecciona primero una región")
+                        },
+                        modifier = Modifier
+                            .menuAnchor()
+                            .fillMaxWidth(),
+                        colors = pastelOutlinedTextFieldColors(),
+                        enabled = region.isNotBlank()
+                    )
+                    ExposedDropdownMenu(
+                        expanded = comunasExpanded,
+                        onDismissRequest = { comunasExpanded = false }
+                    ) {
+                        comunas.forEach { c ->
+                            DropdownMenuItem(
+                                text = { Text(c) },
+                                onClick = {
+                                    comuna = c
+                                    comunasExpanded = false
+                                }
+                            )
+                        }
+                    }
                 }
-            },
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(top = 2.dp),
-            colors = pastelTextButtonColors()
-        ) {
-            Text(
-                "¿Ya tienes cuenta? Inicia sesión",
-                textAlign = TextAlign.Center,
-                modifier = Modifier.fillMaxWidth()
-            )
+
+                Spacer(modifier = Modifier.height(2.dp))
+
+                OutlinedTextField(
+                    value = email,
+                    onValueChange = {
+                        email = it
+                        emailError = null
+                    },
+                    isError = emailError != null,
+                    label = { Text("Email") },
+                    supportingText = {
+                        if (emailError != null) Text(emailError!!)
+                        else Text("Solo @duoc.cl o @admin.cl")
+                    },
+                    modifier = Modifier.fillMaxWidth(),
+                    singleLine = true,
+                    keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
+                    colors = pastelOutlinedTextFieldColors()
+                )
+
+                Spacer(modifier = Modifier.height(2.dp))
+
+                OutlinedTextField(
+                    value = password,
+                    onValueChange = { password = it },
+                    label = { Text("Contraseña") },
+                    modifier = Modifier.fillMaxWidth(),
+                    singleLine = true,
+                    keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
+                    visualTransformation = PasswordVisualTransformation(),
+                    colors = pastelOutlinedTextFieldColors()
+                )
+
+                Button(
+                    onClick = {
+                        if (!isAllowedEmail(email)) {
+                            emailError = "Solo se permiten correos @duoc.cl o @admin.cl"
+                            return@Button
+                        }
+                        val rut = rutText.toIntOrNull() ?: 0
+                        val registrado = viewModel.registrar(
+                            nombre = nombre,
+                            apellido = apellido,
+                            rut = rut,
+                            direccion = direccion,
+                            region = region,
+                            comuna = comuna,
+                            email = email,
+                            password = password
+                        )
+                        if (registrado) {
+                            navController.navigate("login") {
+                                popUpTo("login") { inclusive = true }
+                            }
+                        }
+                    },
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = pastelButtonColors()
+                ) {
+                    Text("Registrar")
+                }
+
+                TextButton(
+                    onClick = {
+                        navController.navigate("login") {
+                            popUpTo("login") { inclusive = true }
+                        }
+                    },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(top = 10.dp),
+                    colors = pastelTextButtonColors()
+                ) {
+                    Text(
+                        "¿Ya tienes cuenta? Inicia sesión",
+                        textAlign = TextAlign.Center,
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                }
+
+                Text(viewModel.mensaje.value, modifier = Modifier.padding(top = 6.dp))
+            }
         }
     }
-}
 }

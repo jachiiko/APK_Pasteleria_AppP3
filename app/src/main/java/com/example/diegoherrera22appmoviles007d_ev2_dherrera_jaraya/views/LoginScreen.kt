@@ -77,7 +77,7 @@ fun LoginScreen(navController: NavController, viewModel: AuthViewModel) {
             )
 
             Text(
-                text = "Pasteleria 100\nSabores",
+                text = "Pasteleria 1000\nSabores",
                 style = MaterialTheme.typography.displaySmall.copy(
                     fontSize = 44.sp,
                     lineHeight = 48.sp,

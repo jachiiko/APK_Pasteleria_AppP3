@@ -4,7 +4,16 @@ package com.example.diegoherrera22appmoviles007d_ev2_dherrera_jaraya.views
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -15,45 +24,48 @@ import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.navigation.NavController
-import androidx.navigation.NavBackStackEntry
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.example.diegoherrera22appmoviles007d_ev2_dherrera_jaraya.viewmodel.CatalogViewModel
+import androidx.navigation.NavBackStackEntry
+import androidx.navigation.NavController
 import com.example.diegoherrera22appmoviles007d_ev2_dherrera_jaraya.model.Producto
+import com.example.diegoherrera22appmoviles007d_ev2_dherrera_jaraya.repository.ProductRepository
 import com.example.diegoherrera22appmoviles007d_ev2_dherrera_jaraya.ui.theme.pastelButtonColors
+import com.example.diegoherrera22appmoviles007d_ev2_dherrera_jaraya.viewmodel.CatalogViewModel
 import java.text.NumberFormat
 import java.util.Locale
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
 
 @Composable
 fun ProductDetailScreen(
     productId: String,
     navController: NavController,
     parentEntry: NavBackStackEntry
-
 ) {
-
     val catalogVM: CatalogViewModel = viewModel(parentEntry)
 
-    val product = remember(productId) { catalogVM.products.firstOrNull { it.id == productId } }
+    val product = remember(productId) {
+        catalogVM.products.firstOrNull { it.id == productId } ?: ProductRepository.getById(productId)
+    }
     val snackbarHostState = remember { SnackbarHostState() }
 
-    // Estado + efecto para snackbar (como en Home)
     var lastAdded by remember { mutableStateOf<Producto?>(null) }
     LaunchedEffect(lastAdded) {
         lastAdded?.let { snackbarHostState.showSnackbar("Agregado: ${it.name}") }
     }
 
     val money = remember {
-        NumberFormat.getCurrencyInstance(Locale("es","CL")).apply { maximumFractionDigits = 0 }
+        NumberFormat.getCurrencyInstance(Locale("es", "CL")).apply { maximumFractionDigits = 0 }
     }
 
     if (product == null) {
@@ -69,7 +81,13 @@ fun ProductDetailScreen(
                 )
             }
         ) { inner ->
-            @@ -80,51 +79,68 @@ fun ProductDetailScreen(
+            Box(
+                Modifier
+                    .fillMaxSize()
+                    .padding(inner)
+                    .background(MaterialTheme.colorScheme.background),
+                contentAlignment = Alignment.Center
+            ) { Text("No encontramos este producto.") }
         }
         return
     }
@@ -130,7 +148,7 @@ fun ProductDetailScreen(
             Button(
                 onClick = {
                     catalogVM.addToCart(product)
-                    lastAdded = product   //
+                    lastAdded = product
                 },
                 modifier = Modifier.fillMaxWidth(),
                 colors = pastelButtonColors()

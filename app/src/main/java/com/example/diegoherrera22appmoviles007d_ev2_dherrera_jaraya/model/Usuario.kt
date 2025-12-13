@@ -5,7 +5,7 @@ class Usuario (
     val apellido: String,
     val rut: String,
     val direccion: String,
-    val region: String,
+    val region: Region,
     val comuna: String,
     val email: String,
     val password: String

@@ -27,7 +27,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.diegoherrera22appmoviles007d_ev2_dherrera_jaraya.model.Region
 import androidx.navigation.NavController
 
 import com.example.diegoherrera22appmoviles007d_ev2_dherrera_jaraya.ui.theme.pastelButtonColors
@@ -56,7 +56,7 @@ fun RegisterScreen(
     var apellido by remember { mutableStateOf("") }
     var rutText by remember { mutableStateOf("") }
     var direccion by remember { mutableStateOf("") }
-    var region by remember { mutableStateOf("") }
+    var selectedRegion by remember { mutableStateOf<Region?>(null) }
     var comuna by remember { mutableStateOf("") }
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
@@ -65,8 +65,7 @@ fun RegisterScreen(
 
     // Regiones y comunas desde el ViewModel correcto
     val regionesState by regionViewModel.regiones.collectAsState()
-    val regiones = regionesState.map { it.nombre }
-    val comunas = regionViewModel.comunasDe(region)
+    val comunas = selectedRegion?.comunas ?: emptyList()
 
     var regionsExpanded by remember { mutableStateOf(false) }
     var comunasExpanded by remember { mutableStateOf(false) }
@@ -161,7 +160,7 @@ fun RegisterScreen(
                     onExpandedChange = { regionsExpanded = !regionsExpanded }
                 ) {
                     OutlinedTextField(
-                        value = region,
+                        value = selectedRegion?.nombre ?: "",
                         onValueChange = {},
                         readOnly = true,
                         label = { Text("Región") },
@@ -178,11 +177,11 @@ fun RegisterScreen(
                         expanded = regionsExpanded,
                         onDismissRequest = { regionsExpanded = false }
                     ) {
-                        regiones.forEach { r ->
+                        regionesState.forEach { region ->
                             DropdownMenuItem(
-                                text = { Text(r) },
+                                text = { Text(region.nombre) },
                                 onClick = {
-                                    region = r
+                                    selectedRegion = region
                                     comuna = ""
                                     regionsExpanded = false
                                 }
@@ -195,7 +194,7 @@ fun RegisterScreen(
                 ExposedDropdownMenuBox(
                     expanded = comunasExpanded,
                     onExpandedChange = {
-                        if (region.isNotBlank()) comunasExpanded = !comunasExpanded
+                        if (selectedRegion != null) comunasExpanded = !comunasExpanded
                     }
                 ) {
                     OutlinedTextField(
@@ -268,13 +267,14 @@ fun RegisterScreen(
                             emailError = "Solo se permiten correos @duoc.cl o @admin.cl"
                             return@Button
                         }
+                        val regionSeleccionada = selectedRegion ?: return@Button
 
                         val registrado = viewModel.registrar(
                             nombre = nombre,
                             apellido = apellido,
                             rut = rutText,
                             direccion = direccion,
-                            region = region,
+                            region = regionSeleccionada,
                             comuna = comuna,
                             email = email,
                             password = password

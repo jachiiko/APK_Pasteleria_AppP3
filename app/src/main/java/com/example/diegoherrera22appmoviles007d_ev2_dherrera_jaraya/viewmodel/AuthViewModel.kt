@@ -3,6 +3,7 @@ package com.example.diegoherrera22appmoviles007d_ev2_dherrera_jaraya.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.compose.runtime.mutableStateOf
 import com.example.diegoherrera22appmoviles007d_ev2_dherrera_jaraya.model.FakeDatabase
+import com.example.diegoherrera22appmoviles007d_ev2_dherrera_jaraya.model.Region
 import com.example.diegoherrera22appmoviles007d_ev2_dherrera_jaraya.model.Usuario
 
 class AuthViewModel : ViewModel() {
@@ -15,7 +16,7 @@ class AuthViewModel : ViewModel() {
         apellido: String,
         rut: String,
         direccion: String,
-        region: String,
+        region: Region,
         comuna: String,
         email: String,
         password: String

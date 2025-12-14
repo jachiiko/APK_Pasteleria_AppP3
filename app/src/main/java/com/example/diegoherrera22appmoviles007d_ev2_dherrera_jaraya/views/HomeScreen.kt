@@ -25,6 +25,7 @@ import androidx.compose.material.icons.filled.ArrowDropUp
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -116,7 +117,8 @@ fun HomeScreen(
                     DropdownMenu(
                         expanded = showCategoryMenu,
                         onDismissRequest = { showCategoryMenu = false },
-                        offset = DpOffset(0.dp, 8.dp)
+                        offset = DpOffset(0.dp, 8.dp),
+                        containerColor = Color.White
                     ) {
                         Column(
                             modifier = Modifier
@@ -164,7 +166,8 @@ fun HomeScreen(
                     DropdownMenu(
                         expanded = showPriceMenu,
                         onDismissRequest = { showPriceMenu = false },
-                        offset = DpOffset(0.dp, 8.dp)
+                        offset = DpOffset(0.dp, 8.dp),
+                        containerColor = Color.White
                     ) {
                         Column(
                             modifier = Modifier

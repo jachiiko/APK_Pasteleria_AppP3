@@ -19,6 +19,7 @@ import androidx.compose.material3.TextButton
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalTextToolbar
 import androidx.compose.ui.platform.TextToolbar
 import androidx.compose.ui.platform.TextToolbarStatus
@@ -39,9 +40,15 @@ import com.example.diegoherrera22appmoviles007d_ev2_dherrera_jaraya.viewmodel.Re
 
 
 
-private fun isAllowedEmail(email: String): Boolean {
-    val e = email.trim().lowercase()
-    return e.endsWith("@duoc.cl") || e.endsWith("@admin.cl")
+private fun isValidEmail(email: String): Boolean {
+    val cleanedEmail = email.trim()
+    if (cleanedEmail.isEmpty()) return false
+
+    val parts = cleanedEmail.split("@")
+    if (parts.size != 2) return false
+
+    val domain = parts[1]
+    return domain.contains(".") && domain.none { it.isWhitespace() }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -176,7 +183,8 @@ fun RegisterScreen(
 
                     ExposedDropdownMenu(
                         expanded = regionsExpanded,
-                        onDismissRequest = { regionsExpanded = false }
+                        onDismissRequest = { regionsExpanded = false },
+                        containerColor = Color.White
                     ) {
                         regiones.forEach { r ->
                             DropdownMenuItem(
@@ -214,7 +222,8 @@ fun RegisterScreen(
 
                     ExposedDropdownMenu(
                         expanded = comunasExpanded,
-                        onDismissRequest = { comunasExpanded = false }
+                        onDismissRequest = { comunasExpanded = false },
+                        containerColor = Color.White
                     ) {
                         comunas.forEach { c ->
                             DropdownMenuItem(
@@ -241,7 +250,7 @@ fun RegisterScreen(
                     label = { Text("Email") },
                     supportingText = {
                         if (emailError != null) Text(emailError!!)
-                        else Text("Solo @duoc.cl o @admin.cl")
+                        else Text("Ingresa un correo electrónico válido")
                     },
                     modifier = Modifier.fillMaxWidth(),
                     singleLine = true,
@@ -264,8 +273,8 @@ fun RegisterScreen(
                 // BOTÓN REGISTRO
                 Button(
                     onClick = {
-                        if (!isAllowedEmail(email)) {
-                            emailError = "Solo se permiten correos @duoc.cl o @admin.cl"
+                        if (!isValidEmail(email)) {
+                            emailError = "Ingresa un correo electrónico válido"
                             return@Button
                         }
 

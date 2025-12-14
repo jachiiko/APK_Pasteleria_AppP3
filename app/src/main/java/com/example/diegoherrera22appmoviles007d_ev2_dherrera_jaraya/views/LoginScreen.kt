@@ -77,7 +77,7 @@ fun LoginScreen(navController: NavController, viewModel: AuthViewModel) {
                 )
 
                 Text(
-                    text = "Pasteleria 100\nSabores",
+                    text = "Pasteleria 1000\nSabores",
                     style = MaterialTheme.typography.displaySmall.copy(
                         fontSize = 44.sp,
                         lineHeight = 48.sp,
@@ -131,13 +131,10 @@ fun LoginScreen(navController: NavController, viewModel: AuthViewModel) {
                     if (!ok) return@Button
 
                     val e = email.trim().lowercase()
-                    val destination = when {
-                        e.endsWith("@admin.cl") -> "backoffice"
-                        e.endsWith("@duoc.cl") -> "home/$email"
-                        else -> {
-                            viewModel.mensaje.value = "Dominio no permitido (usa @duoc.cl o @admin.cl)"
-                            return@Button
-                        }
+                    val destination = if (e.endsWith("@admin.cl")) {
+                        "backoffice"
+                    } else {
+                        "home/${email.trim()}"
                     }
                     navController.navigate(destination) {
                         popUpTo("login") { inclusive = true }

@@ -39,9 +39,12 @@ class MainActivity : ComponentActivity() {
         // Asegura que las barras del sistema (incluida la barra de navegación con
         // los botones de back, apps recientes e inicio) permanezcan visibles.
         WindowCompat.setDecorFitsSystemWindows(window, true)
-        WindowCompat.getInsetsController(window, window.decorView)?.apply {
-            systemBarsBehavior = WindowInsetsControllerCompat.BEHAVIOR_SHOW_BARS_BY_TOUCH
-            show(WindowInsetsCompat.Type.systemBars())
+        // Espera a que la decorView esté adjunta para evitar excepciones al mostrar las barras.
+        window.decorView.post {
+            WindowCompat.getInsetsController(window, window.decorView)?.let { controller ->
+                controller.systemBarsBehavior = WindowInsetsControllerCompat.BEHAVIOR_DEFAULT
+                controller.show(WindowInsetsCompat.Type.systemBars())
+            }
         }
         setContent {
             DiegoHerrera22AppMoviles007D_EV2_DHerrera_JArayaTheme {

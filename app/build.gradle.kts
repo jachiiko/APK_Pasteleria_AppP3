@@ -86,20 +86,18 @@ dependencies {
 // JUnit 5
     testImplementation(libs.junit.jupiter)
 
-// MockK
+    // MockK
     testImplementation(libs.mockk)
 
-// Compose UI Test
+    // Compose UI Test
     androidTestImplementation(libs.androidx.ui.test.junit4)
     debugImplementation(libs.androidx.ui.test.manifest)
 
-
     debugImplementation(libs.androidx.compose.ui.tooling)
     debugImplementation(libs.androidx.compose.ui.test.manifest)
+}
 
-    tasks.withType<Test>().configureEach {
-        useJUnitPlatform()
-    }
-
+tasks.withType<Test>().configureEach {
+    useJUnitPlatform()
 }
 

@@ -10,29 +10,27 @@ import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
-import androidx.navigation.NavType
-import androidx.navigation.compose.NavHost
-import androidx.navigation.compose.composable
-import androidx.navigation.navArgument
-import androidx.navigation.compose.rememberNavController
-import com.example.diegoherrera22appmoviles007d_ev2_dherrera_jaraya.ui.theme.DiegoHerrera22AppMoviles007D_EV2_DHerrera_JArayaTheme
-import com.example.diegoherrera22appmoviles007d_ev2_dherrera_jaraya.viewmodel.AuthViewModel
-import com.example.diegoherrera22appmoviles007d_ev2_dherrera_jaraya.views.HomeScreen
-import com.example.diegoherrera22appmoviles007d_ev2_dherrera_jaraya.views.LoginScreen
-import com.example.diegoherrera22appmoviles007d_ev2_dherrera_jaraya.views.RegisterScreen
-import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.navigation.compose.navigation
-import com.example.diegoherrera22appmoviles007d_ev2_dherrera_jaraya.views.ProductDetailScreen
-import androidx.navigation.navigation
-import androidx.navigation.navArgument
-import com.example.diegoherrera22appmoviles007d_ev2_dherrera_jaraya.viewmodel.RegionViewModel
-import com.example.diegoherrera22appmoviles007d_ev2_dherrera_jaraya.views.CartScreen
-import com.example.diegoherrera22appmoviles007d_ev2_dherrera_jaraya.views.CheckoutResultTabsScreen
-import com.example.diegoherrera22appmoviles007d_ev2_dherrera_jaraya.views.backoffice.AddProductScreen
-import com.example.diegoherrera22appmoviles007d_ev2_dherrera_jaraya.views.backoffice.BackOfficeListScreen
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
+import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavType
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.navigation
+import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
+import com.example.diegoherrera22appmoviles007d_ev2_dherrera_jaraya.ui.theme.DiegoHerrera22AppMoviles007D_EV2_DHerrera_JArayaTheme
+import com.example.diegoherrera22appmoviles007d_ev2_dherrera_jaraya.viewmodel.AuthViewModel
+import com.example.diegoherrera22appmoviles007d_ev2_dherrera_jaraya.viewmodel.RegionViewModel
+import com.example.diegoherrera22appmoviles007d_ev2_dherrera_jaraya.views.CartScreen
+import com.example.diegoherrera22appmoviles007d_ev2_dherrera_jaraya.views.CheckoutResultTabsScreen
+import com.example.diegoherrera22appmoviles007d_ev2_dherrera_jaraya.views.HomeScreen
+import com.example.diegoherrera22appmoviles007d_ev2_dherrera_jaraya.views.LoginScreen
+import com.example.diegoherrera22appmoviles007d_ev2_dherrera_jaraya.views.ProductDetailScreen
+import com.example.diegoherrera22appmoviles007d_ev2_dherrera_jaraya.views.RegisterScreen
+import com.example.diegoherrera22appmoviles007d_ev2_dherrera_jaraya.views.backoffice.AddProductScreen
+import com.example.diegoherrera22appmoviles007d_ev2_dherrera_jaraya.views.backoffice.BackOfficeListScreen
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -41,9 +39,10 @@ class MainActivity : ComponentActivity() {
         // Asegura que las barras del sistema (incluida la barra de navegación con
         // los botones de back, apps recientes e inicio) permanezcan visibles.
         WindowCompat.setDecorFitsSystemWindows(window, true)
-        WindowInsetsControllerCompat(window, window.decorView).show(
-            WindowInsetsCompat.Type.systemBars()
-        )
+        WindowCompat.getInsetsController(window, window.decorView)?.apply {
+            systemBarsBehavior = WindowInsetsControllerCompat.BEHAVIOR_SHOW_BARS_BY_TOUCH
+            show(WindowInsetsCompat.Type.systemBars())
+        }
         setContent {
             DiegoHerrera22AppMoviles007D_EV2_DHerrera_JArayaTheme {
                 Surface(

@@ -4,7 +4,6 @@ package com.example.diegoherrera22appmoviles007d_ev2_dherrera_jaraya
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -31,11 +30,20 @@ import com.example.diegoherrera22appmoviles007d_ev2_dherrera_jaraya.views.CartSc
 import com.example.diegoherrera22appmoviles007d_ev2_dherrera_jaraya.views.CheckoutResultTabsScreen
 import com.example.diegoherrera22appmoviles007d_ev2_dherrera_jaraya.views.backoffice.AddProductScreen
 import com.example.diegoherrera22appmoviles007d_ev2_dherrera_jaraya.views.backoffice.BackOfficeListScreen
+import androidx.core.view.WindowCompat
+import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.WindowInsetsControllerCompat
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
+
+        // Asegura que las barras del sistema (incluida la barra de navegación con
+        // los botones de back, apps recientes e inicio) permanezcan visibles.
+        WindowCompat.setDecorFitsSystemWindows(window, true)
+        WindowInsetsControllerCompat(window, window.decorView).show(
+            WindowInsetsCompat.Type.systemBars()
+        )
         setContent {
             DiegoHerrera22AppMoviles007D_EV2_DHerrera_JArayaTheme {
                 Surface(

@@ -25,6 +25,15 @@ android {
     }
 
     kotlinOptions { jvmTarget = "11" }
+
+    packaging {
+        jniLibs {
+            // Evita la compresión de las bibliotecas nativas y las alinea a 16 KB
+            // para asegurar compatibilidad con dispositivos que usan ese tamaño
+            // de página (requisito de Play a partir de Android 15+).
+            useLegacyPackaging = false
+        }
+    }
 }
 
 dependencies {

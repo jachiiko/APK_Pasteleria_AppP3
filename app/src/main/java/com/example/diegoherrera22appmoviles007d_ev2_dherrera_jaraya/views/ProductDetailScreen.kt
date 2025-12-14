@@ -46,6 +46,7 @@ import com.example.diegoherrera22appmoviles007d_ev2_dherrera_jaraya.model.Produc
 import com.example.diegoherrera22appmoviles007d_ev2_dherrera_jaraya.repository.ProductRepository
 import com.example.diegoherrera22appmoviles007d_ev2_dherrera_jaraya.ui.theme.pastelButtonColors
 import com.example.diegoherrera22appmoviles007d_ev2_dherrera_jaraya.viewmodel.CatalogViewModel
+import com.example.diegoherrera22appmoviles007d_ev2_dherrera_jaraya.views.components.CartSummaryButton
 import java.text.NumberFormat
 import java.util.Locale
 
@@ -185,6 +186,13 @@ fun ProductDetailScreen(
                 modifier = Modifier.fillMaxWidth(),
                 colors = pastelButtonColors()
             ) { Text("Agregar al carrito") }
+
+            CartSummaryButton(
+                catalogVM = catalogVM,
+                moneyFormatter = money,
+                onNavigateToCart = { navController.navigate("cart") },
+                modifier = Modifier.fillMaxWidth()
+            )
         }
     }
 }

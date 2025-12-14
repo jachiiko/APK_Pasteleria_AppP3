@@ -22,17 +22,41 @@ import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.ArrowDropUp
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material3.AssistChip
+import androidx.compose.material3.AssistChipDefaults
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FilterChip
+import androidx.compose.material3.FilterChipDefaults
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.RangeSlider
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.diegoherrera22appmoviles007d_ev2_dherrera_jaraya.model.Producto
 import com.example.diegoherrera22appmoviles007d_ev2_dherrera_jaraya.viewmodel.CatalogViewModel
+import com.example.diegoherrera22appmoviles007d_ev2_dherrera_jaraya.views.components.CartSummaryButton
 import com.example.diegoherrera22appmoviles007d_ev2_dherrera_jaraya.views.components.ProductCard
+import kotlin.math.max
+import kotlin.math.min
 import java.text.NumberFormat
 import java.util.Locale
 
@@ -50,18 +74,6 @@ fun HomeScreen(
     // Usa la MISMA instancia de CatalogViewModel en Home y Detalle
     val catalogVM: CatalogViewModel = viewModel(parentEntry)
 
-    val snackbarHostState = remember { SnackbarHostState() }
-
-    // Estado para último producto agregado (ya con tu tipo Producto)
-    var lastAdded by remember { mutableStateOf<Producto?>(null) }
-
-    // Mostrar snackbar cuando cambie lastAdded
-    LaunchedEffect(lastAdded) {
-        lastAdded?.let { product ->
-            snackbarHostState.showSnackbar("Agregado: ${product.name}")
-        }
-    }
-
     val money = remember {
         NumberFormat.getCurrencyInstance(Locale("es", "CL")).apply { maximumFractionDigits = 0 }
     }
@@ -69,16 +81,9 @@ fun HomeScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Catálogo de Pastelería") },
-                actions = {
-                    AssistChip(
-                        onClick = { navController.navigate("cart") },
-                        label = { Text("Carrito: ${catalogVM.itemsCount()} • ${money.format(catalogVM.totalCLP())}") }
-                    )
-                }
+                title = { Text("Catálogo de Pastelería") }
             )
-        },
-        snackbarHost = { SnackbarHost(hostState = snackbarHostState) }
+        }
     ) { inner ->
         Column(
             modifier = Modifier
@@ -162,35 +167,81 @@ fun HomeScreen(
                         },
                         colors = categoryChipColors
                     )
-
-                    DropdownMenu(
-                        expanded = showPriceMenu,
-                        onDismissRequest = { showPriceMenu = false },
-                        offset = DpOffset(0.dp, 8.dp),
-                        containerColor = Color.White
-                    ) {
-                        Column(
-                            modifier = Modifier
-                                .padding(12.dp)
-                                .widthIn(min = 220.dp, max = 360.dp),
-                            verticalArrangement = Arrangement.spacedBy(12.dp)
-                        ) {
-                            Text("Rango de precios", style = MaterialTheme.typography.titleSmall)
-                            RangeSlider(
-                                value = catalogVM.selectedPriceRange,
-                                onValueChange = { catalogVM.updatePriceRange(it) },
-                                valueRange = catalogVM.priceRangeLimits
-                            )
-                            Text(
-                                "${money.format(catalogVM.selectedPriceRange.start.toInt())} - ${money.format(catalogVM.selectedPriceRange.endInclusive.toInt())}",
-                                style = MaterialTheme.typography.bodyMedium
-                            )
-                        }
-                    }
                 }
             }
 
             Spacer(Modifier.height(8.dp))
+
+            var minInput by remember { mutableStateOf(catalogVM.selectedPriceRange.start.toInt().toString()) }
+            var maxInput by remember { mutableStateOf(catalogVM.selectedPriceRange.endInclusive.toInt().toString()) }
+
+            LaunchedEffect(catalogVM.selectedPriceRange) {
+                minInput = catalogVM.selectedPriceRange.start.toInt().toString()
+                maxInput = catalogVM.selectedPriceRange.endInclusive.toInt().toString()
+            }
+
+            if (showPriceMenu) {
+                Card(
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = CardDefaults.cardColors(containerColor = Color.White)
+                ) {
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(12.dp),
+                        verticalArrangement = Arrangement.spacedBy(12.dp)
+                    ) {
+                        Text("Rango de precios", style = MaterialTheme.typography.titleSmall)
+                        RangeSlider(
+                            value = catalogVM.selectedPriceRange,
+                            onValueChange = { range -> catalogVM.updatePriceRange(range) },
+                            valueRange = catalogVM.priceRangeLimits
+                        )
+                        Row(horizontalArrangement = Arrangement.spacedBy(12.dp), modifier = Modifier.fillMaxWidth()) {
+                            OutlinedTextField(
+                                value = minInput,
+                                onValueChange = { newValue ->
+                                    minInput = newValue
+                                    commitPriceRangeFromInput(
+                                        newValue,
+                                        maxInput,
+                                        catalogVM.priceMinLimit,
+                                        catalogVM.priceMaxLimit
+                                    ) { min, max ->
+                                        catalogVM.updatePriceRange(min..max)
+                                    }
+                                },
+                                label = { Text("Mínimo") },
+                                singleLine = true,
+                                keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number),
+                                modifier = Modifier.weight(1f)
+                            )
+                            OutlinedTextField(
+                                value = maxInput,
+                                onValueChange = { newValue ->
+                                    maxInput = newValue
+                                    commitPriceRangeFromInput(
+                                        minInput,
+                                        newValue,
+                                        catalogVM.priceMinLimit,
+                                        catalogVM.priceMaxLimit
+                                    ) { min, max ->
+                                        catalogVM.updatePriceRange(min..max)
+                                    }
+                                },
+                                label = { Text("Máximo") },
+                                singleLine = true,
+                                keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number),
+                                modifier = Modifier.weight(1f)
+                            )
+                        }
+                        Text(
+                            "${money.format(catalogVM.selectedPriceRange.start.toInt())} - ${money.format(catalogVM.selectedPriceRange.endInclusive.toInt())}",
+                            style = MaterialTheme.typography.bodyMedium
+                        )
+                    }
+                }
+            }
 
             Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                 Text(
@@ -228,14 +279,15 @@ fun HomeScreen(
                 columns = GridCells.Adaptive(minSize = 220.dp),
                 verticalArrangement = Arrangement.spacedBy(12.dp),
                 horizontalArrangement = Arrangement.spacedBy(12.dp),
-                modifier = Modifier.fillMaxSize()
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .weight(1f)
             ) {
                 items(catalogVM.filteredProducts, key = { it.id }) { p ->
                     ProductCard(
                         product = p, // <- Producto
                         onAddToCart = { added ->
                             catalogVM.addToCart(added)
-                            lastAdded = added
                         },
                         onClick = { clicked ->
                             // Estás dentro del graph "shop", así que esta ruta funciona:
@@ -245,6 +297,33 @@ fun HomeScreen(
                     )
                 }
             }
+
+            Spacer(Modifier.height(12.dp))
+
+            CartSummaryButton(
+                catalogVM = catalogVM,
+                moneyFormatter = money,
+                onNavigateToCart = { navController.navigate("cart") }
+            )
         }
+    }
+}
+
+private fun commitPriceRangeFromInput(
+    minText: String,
+    maxText: String,
+    minLimit: Float,
+    maxLimit: Float,
+    onValidRange: (Float, Float) -> Unit
+) {
+    val minValue = minText.toFloatOrNull()
+    val maxValue = maxText.toFloatOrNull()
+
+    if (minValue != null && maxValue != null) {
+        val clampedMin = minValue.coerceIn(minLimit, maxLimit)
+        val clampedMax = maxValue.coerceIn(minLimit, maxLimit)
+        val safeMin = min(clampedMin, clampedMax)
+        val safeMax = max(clampedMin, clampedMax)
+        onValidRange(safeMin, safeMax)
     }
 }

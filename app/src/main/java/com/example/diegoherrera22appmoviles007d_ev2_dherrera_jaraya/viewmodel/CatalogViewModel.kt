@@ -48,6 +48,8 @@ class CatalogViewModel : ViewModel() {
         private set
 
     val priceRangeLimits: ClosedFloatingPointRange<Float> get() = priceMin..priceMax
+    val priceMinLimit: Float get() = priceMin
+    val priceMaxLimit: Float get() = priceMax
 
     val filteredProducts: List<Producto>
         get() {

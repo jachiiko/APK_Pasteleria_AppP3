@@ -94,6 +94,15 @@ fun HomeScreen(
             var showCategoryMenu by remember { mutableStateOf(false) }
             var showPriceMenu by remember { mutableStateOf(false) }
 
+            val categoryChipColors = FilterChipDefaults.filterChipColors(
+                containerColor = Color.White,
+                selectedContainerColor = MaterialTheme.colorScheme.primary,
+                labelColor = MaterialTheme.colorScheme.onSurface,
+                selectedLabelColor = MaterialTheme.colorScheme.onSurface,
+                iconColor = MaterialTheme.colorScheme.onSurface,
+                selectedLeadingIconColor = MaterialTheme.colorScheme.onSurface
+            )
+
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 Box {
                     FilterChip(
@@ -106,12 +115,7 @@ fun HomeScreen(
                                 contentDescription = null
                             )
                         },
-                        colors = FilterChipDefaults.filterChipColors(
-                            labelColor = MaterialTheme.colorScheme.secondary,
-                            selectedLabelColor = MaterialTheme.colorScheme.secondary,
-                            iconColor = MaterialTheme.colorScheme.secondary,
-                            selectedLeadingIconColor = MaterialTheme.colorScheme.secondary
-                        )
+                        colors = categoryChipColors
                     )
 
                     DropdownMenu(
@@ -136,7 +140,8 @@ fun HomeScreen(
                                     FilterChip(
                                         selected = catalogVM.selectedCategories.contains(category),
                                         onClick = { catalogVM.toggleCategory(category) },
-                                        label = { Text(category) }
+                                        label = { Text(category) },
+                                        colors = categoryChipColors
                                     )
                                 }
                             }
@@ -155,12 +160,7 @@ fun HomeScreen(
                                 contentDescription = null
                             )
                         },
-                        colors = FilterChipDefaults.filterChipColors(
-                            labelColor = MaterialTheme.colorScheme.secondary,
-                            selectedLabelColor = MaterialTheme.colorScheme.secondary,
-                            iconColor = MaterialTheme.colorScheme.secondary,
-                            selectedLeadingIconColor = MaterialTheme.colorScheme.secondary
-                        )
+                        colors = categoryChipColors
                     )
 
                     DropdownMenu(
@@ -184,6 +184,38 @@ fun HomeScreen(
                             Text(
                                 "${money.format(catalogVM.selectedPriceRange.start.toInt())} - ${money.format(catalogVM.selectedPriceRange.endInclusive.toInt())}",
                                 style = MaterialTheme.typography.bodyMedium
+                            )
+                        }
+                    }
+                }
+            }
+
+            Spacer(Modifier.height(8.dp))
+
+            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                Text(
+                    text = if (catalogVM.selectedCategories.isEmpty())
+                        "Categorías seleccionadas: Todas"
+                    else "Categorías seleccionadas:",
+                    style = MaterialTheme.typography.titleSmall,
+                    color = MaterialTheme.colorScheme.onSurface
+                )
+
+                if (catalogVM.selectedCategories.isNotEmpty()) {
+                    FlowRow(
+                        horizontalArrangement = Arrangement.spacedBy(8.dp),
+                        verticalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        catalogVM.selectedCategories.forEach { selected ->
+                            AssistChip(
+                                onClick = { catalogVM.toggleCategory(selected) },
+                                label = { Text(selected) },
+                                colors = AssistChipDefaults.assistChipColors(
+                                    containerColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.25f),
+                                    labelColor = MaterialTheme.colorScheme.onSurface,
+                                    leadingIconContentColor = MaterialTheme.colorScheme.onSurface,
+                                    trailingIconContentColor = MaterialTheme.colorScheme.onSurface
+                                )
                             )
                         }
                     }

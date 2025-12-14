@@ -36,10 +36,8 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        // Asegura que las barras del sistema (incluida la barra de navegación con
-        // los botones de back, apps recientes e inicio) permanezcan visibles.
         WindowCompat.setDecorFitsSystemWindows(window, true)
-        // Espera a que la decorView esté adjunta para evitar excepciones al mostrar las barras.
+
         window.decorView.post {
             WindowCompat.getInsetsController(window, window.decorView)?.let { controller ->
                 controller.systemBarsBehavior = WindowInsetsControllerCompat.BEHAVIOR_DEFAULT

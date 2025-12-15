@@ -5,6 +5,7 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.font.FontWeight
 import com.example.diegoherrera22appmoviles007d_ev2_dherrera_jaraya.ui.theme.pastelButtonColors
 import com.example.diegoherrera22appmoviles007d_ev2_dherrera_jaraya.viewmodel.CatalogViewModel
 import java.text.NumberFormat
@@ -25,6 +26,9 @@ fun CartSummaryButton(
         enabled = items > 0,
         colors = pastelButtonColors()
     ) {
-        Text("Ir al carrito: $items • ${moneyFormatter.format(total)}")
+        Text(
+            "Ir al carrito: $items • ${moneyFormatter.format(total)}",
+            style = androidx.compose.material3.MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold)
+        )
     }
 }

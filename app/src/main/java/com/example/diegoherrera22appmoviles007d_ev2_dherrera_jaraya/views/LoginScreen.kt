@@ -143,7 +143,10 @@ fun LoginScreen(navController: NavController, viewModel: AuthViewModel) {
                 colors = pastelButtonColors(),
                 modifier = Modifier.fillMaxWidth()
             ) {
-                Text("Entrar")
+                Text(
+                    "Entrar",
+                    style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold)
+                )
             }
 
             Text(viewModel.mensaje.value, modifier = Modifier.padding(top = 10.dp))

@@ -23,6 +23,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.example.diegoherrera22appmoviles007d_ev2_dherrera_jaraya.model.Producto
 import com.example.diegoherrera22appmoviles007d_ev2_dherrera_jaraya.ui.theme.pastelButtonColors
 import java.text.NumberFormat
@@ -73,8 +74,15 @@ fun ProductCard (
                 }
             }
 
-            Text(product.name, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
-            Text(product.category, style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.primary)
+            Text(
+                product.name,
+                style = MaterialTheme.typography.titleLarge.copy(fontSize = 20.sp, fontWeight = FontWeight.Bold)
+            )
+            Text(
+                product.category,
+                style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.SemiBold),
+                color = MaterialTheme.colorScheme.primary
+            )
             Text(product.description, style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
 
             Row(
@@ -83,7 +91,12 @@ fun ProductCard (
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(money.format(product.price), style = MaterialTheme.typography.titleMedium)
-                Button(onClick = { onAddToCart(product) }, colors = pastelButtonColors()) { Text("Agregar") }
+                Button(onClick = { onAddToCart(product) }, colors = pastelButtonColors()) {
+                    Text(
+                        "Agregar",
+                        style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold)
+                    )
+                }
             }
         }
     }

@@ -41,5 +41,10 @@ val Typography = Typography(
         fontFamily = latoFamily,
         fontWeight = FontWeight.Normal,
         fontSize = 16.sp
+    ),
+    labelLarge = TextStyle(
+        fontFamily = latoFamily,
+        fontWeight = FontWeight.Bold,
+        fontSize = 17.sp
     )
 )

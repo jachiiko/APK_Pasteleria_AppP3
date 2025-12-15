@@ -14,7 +14,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Remove
 import androidx.compose.material3.Button
@@ -23,15 +23,12 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.SnackbarHost
-import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -42,7 +39,6 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavController
-import com.example.diegoherrera22appmoviles007d_ev2_dherrera_jaraya.model.Producto
 import com.example.diegoherrera22appmoviles007d_ev2_dherrera_jaraya.repository.ProductRepository
 import com.example.diegoherrera22appmoviles007d_ev2_dherrera_jaraya.ui.theme.pastelButtonColors
 import com.example.diegoherrera22appmoviles007d_ev2_dherrera_jaraya.viewmodel.CatalogViewModel
@@ -62,12 +58,6 @@ fun ProductDetailScreen(
         catalogVM.products.firstOrNull { it.id == productId } ?: ProductRepository.getById(productId)
     }
     val detailDescription = remember(productId) { ProductRepository.getDetailDescription(productId) }
-    val snackbarHostState = remember { SnackbarHostState() }
-
-    var lastAdded by remember { mutableStateOf<Pair<Producto, Int>?>(null) }
-    LaunchedEffect(lastAdded) {
-        lastAdded?.let { (p, qty) -> snackbarHostState.showSnackbar("Agregado: ${p.name} x$qty") }
-    }
 
     val money = remember {
         NumberFormat.getCurrencyInstance(Locale("es", "CL")).apply { maximumFractionDigits = 0 }
@@ -80,7 +70,7 @@ fun ProductDetailScreen(
                     title = { Text("Producto no encontrado") },
                     navigationIcon = {
                         IconButton(onClick = { navController.popBackStack() }) {
-                            Icon(Icons.Filled.ArrowBack, contentDescription = "Volver")
+                            Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Volver")
                         }
                     }
                 )
@@ -103,12 +93,11 @@ fun ProductDetailScreen(
                 title = { Text(product.name) },
                 navigationIcon = {
                     IconButton(onClick = { navController.popBackStack() }) {
-                        Icon(Icons.Filled.ArrowBack, contentDescription = "Volver")
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Volver")
                     }
                 }
             )
         },
-        snackbarHost = { SnackbarHost(hostState = snackbarHostState) }
     ) { inner ->
         Column(
             modifier = Modifier
@@ -144,7 +133,11 @@ fun ProductDetailScreen(
             }
 
             Text(product.name, style = MaterialTheme.typography.headlineSmall, fontWeight = FontWeight.Bold)
-            Text(product.category, style = MaterialTheme.typography.labelLarge, color = MaterialTheme.colorScheme.primary)
+            Text(
+                product.category,
+                style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.SemiBold),
+                color = MaterialTheme.colorScheme.primary
+            )
             Text(detailDescription ?: product.description, style = MaterialTheme.typography.bodyLarge, color = MaterialTheme.colorScheme.onSurfaceVariant)
             Text(money.format(product.price), style = MaterialTheme.typography.titleLarge)
 
@@ -180,7 +173,6 @@ fun ProductDetailScreen(
             Button(
                 onClick = {
                     catalogVM.addToCart(product, quantity)
-                    lastAdded = product to quantity
                     quantity = 1
                 },
                 modifier = Modifier.fillMaxWidth(),

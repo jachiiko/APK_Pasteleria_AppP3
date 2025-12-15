@@ -55,7 +55,12 @@ fun BackOfficeListScreen(
             TopAppBar(
                 title = { Text("Back Office – Productos") },
                 actions = {
-                    TextButton(onClick = onAddProduct, colors = pastelTextButtonColors()) { Text("Agregar") }
+                    TextButton(onClick = onAddProduct, colors = pastelTextButtonColors()) {
+                        Text(
+                            "Agregar",
+                            style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold)
+                        )
+                    }
                 }
             )
         }
@@ -95,10 +100,20 @@ fun BackOfficeListScreen(
                             toDelete = null
                         },
                         colors = pastelTextButtonColors()
-                    ) { Text("Eliminar") }
+                    ) {
+                        Text(
+                            "Eliminar",
+                            style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold)
+                        )
+                    }
                 },
                 dismissButton = {
-                    TextButton(onClick = { toDelete = null }, colors = pastelTextButtonColors()) { Text("Cancelar") }
+                    TextButton(onClick = { toDelete = null }, colors = pastelTextButtonColors()) {
+                        Text(
+                            "Cancelar",
+                            style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold)
+                        )
+                    }
                 }
             )
         }

@@ -22,6 +22,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalTextToolbar
 import androidx.compose.ui.platform.TextToolbar
 import androidx.compose.ui.platform.TextToolbarStatus
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
@@ -29,15 +30,11 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
-
 import com.example.diegoherrera22appmoviles007d_ev2_dherrera_jaraya.ui.theme.pastelButtonColors
 import com.example.diegoherrera22appmoviles007d_ev2_dherrera_jaraya.ui.theme.pastelOutlinedTextFieldColors
 import com.example.diegoherrera22appmoviles007d_ev2_dherrera_jaraya.ui.theme.pastelTextButtonColors
-
 import com.example.diegoherrera22appmoviles007d_ev2_dherrera_jaraya.viewmodel.AuthViewModel
 import com.example.diegoherrera22appmoviles007d_ev2_dherrera_jaraya.viewmodel.RegionViewModel
-
-
 
 private fun isValidEmail(email: String): Boolean {
     val cleanedEmail = email.trim()
@@ -138,8 +135,19 @@ fun RegisterScreen(
                 OutlinedTextField(
                     value = rutText,
                     onValueChange = {
-                        rutText = it.uppercase().filter { char ->
-                            char.isDigit() || char == 'K' || char == '-'
+                        val cleaned = it
+                            .uppercase()
+                            .filter { char -> char.isDigit() || char == 'K' }
+
+                        val cuerpo = cleaned.takeWhile { ch -> ch.isDigit() }.take(8)
+                        val dv = cleaned.drop(cuerpo.length).firstOrNull()?.takeIf { ch -> ch.isDigit() || ch == 'K' }
+
+                        rutText = buildString {
+                            append(cuerpo)
+                            if (cuerpo.isNotEmpty() && dv != null) {
+                                append('-')
+                                append(dv)
+                            }
                         }
                     },
                     label = { Text("RUT (ej: 12345678-9)") },
@@ -297,7 +305,10 @@ fun RegisterScreen(
                     modifier = Modifier.fillMaxWidth(),
                     colors = pastelButtonColors()
                 ) {
-                    Text("Registrar")
+                    Text(
+                        "Registrar",
+                        style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold)
+                    )
                 }
 
                 // BOTÓN PARA IR AL LOGIN

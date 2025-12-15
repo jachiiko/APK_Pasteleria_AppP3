@@ -45,12 +45,15 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import com.example.diegoherrera22appmoviles007d_ev2_dherrera_jaraya.model.FakeDatabase
 import com.example.diegoherrera22appmoviles007d_ev2_dherrera_jaraya.model.Producto
 import com.example.diegoherrera22appmoviles007d_ev2_dherrera_jaraya.viewmodel.CatalogViewModel
 import com.example.diegoherrera22appmoviles007d_ev2_dherrera_jaraya.views.components.CartSummaryButton
@@ -81,7 +84,12 @@ fun HomeScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Catálogo de Pastelería") }
+                title = {
+                    Text(
+                        "Catálogo de Pastelería",
+                        style = MaterialTheme.typography.headlineMedium.copy(fontWeight = FontWeight.ExtraBold)
+                    )
+                }
             )
         }
     ) { inner ->
@@ -89,15 +97,40 @@ fun HomeScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(inner)
-                .padding(16.dp)
+                .padding(horizontal = 16.dp, vertical = 12.dp)
         ) {
-            if (!email.isNullOrBlank()) {
-                Text("Bienvenido, $email", style = MaterialTheme.typography.titleMedium)
-                Spacer(Modifier.height(8.dp))
+            val displayName = remember(email) {
+                email?.let { mail ->
+                    FakeDatabase.obtenerPorEmail(mail.trim())?.let { usuario ->
+                        "${usuario.nombre} ${usuario.apellido}".trim()
+                    }
+                }
+            }
+
+            if (!displayName.isNullOrBlank()) {
+                Text(
+                    "Bienvenido, $displayName",
+                    style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold)
+                )
+                Spacer(Modifier.height(6.dp))
+            } else if (!email.isNullOrBlank()) {
+                Text(
+                    "Bienvenido, $email",
+                    style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold)
+                )
+                Spacer(Modifier.height(6.dp))
             }
 
             var showCategoryMenu by remember { mutableStateOf(false) }
             var showPriceMenu by remember { mutableStateOf(false) }
+
+            var minInput by remember { mutableStateOf(catalogVM.selectedPriceRange.start.toInt().toString()) }
+            var maxInput by remember { mutableStateOf(catalogVM.selectedPriceRange.endInclusive.toInt().toString()) }
+
+            LaunchedEffect(catalogVM.selectedPriceRange) {
+                minInput = catalogVM.selectedPriceRange.start.toInt().toString()
+                maxInput = catalogVM.selectedPriceRange.endInclusive.toInt().toString()
+            }
 
             val categoryChipColors = FilterChipDefaults.filterChipColors(
                 containerColor = Color.White,
@@ -108,12 +141,15 @@ fun HomeScreen(
                 selectedLeadingIconColor = MaterialTheme.colorScheme.onSurface
             )
 
+            val chipLabelStyle = MaterialTheme.typography.titleSmall.copy(fontWeight = FontWeight.Medium)
+            val chipLabelColor = MaterialTheme.colorScheme.onSurface
+
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 Box {
                     FilterChip(
                         selected = showCategoryMenu,
                         onClick = { showCategoryMenu = !showCategoryMenu },
-                        label = { Text("Categorías") },
+                        label = { Text("Categorías", style = chipLabelStyle, color = chipLabelColor) },
                         leadingIcon = {
                             Icon(
                                 imageVector = if (showCategoryMenu) Icons.Filled.ArrowDropUp else Icons.Filled.ArrowDropDown,
@@ -135,7 +171,7 @@ fun HomeScreen(
                                 .widthIn(min = 220.dp, max = 360.dp),
                             verticalArrangement = Arrangement.spacedBy(12.dp)
                         ) {
-                            Text("Filtrar por categoría", style = MaterialTheme.typography.titleSmall)
+                            Text("Filtrar por categoría", style = chipLabelStyle, color = chipLabelColor)
                             FlowRow(
                                 horizontalArrangement = Arrangement.spacedBy(8.dp),
                                 verticalArrangement = Arrangement.spacedBy(8.dp),
@@ -145,7 +181,7 @@ fun HomeScreen(
                                     FilterChip(
                                         selected = catalogVM.selectedCategories.contains(category),
                                         onClick = { catalogVM.toggleCategory(category) },
-                                        label = { Text(category) },
+                                        label = { Text(category, style = chipLabelStyle, color = chipLabelColor) },
                                         colors = categoryChipColors
                                     )
                                 }
@@ -158,7 +194,7 @@ fun HomeScreen(
                     FilterChip(
                         selected = showPriceMenu,
                         onClick = { showPriceMenu = !showPriceMenu },
-                        label = { Text("Precio") },
+                        label = { Text("Precio", style = chipLabelStyle, color = chipLabelColor) },
                         leadingIcon = {
                             Icon(
                                 imageVector = if (showPriceMenu) Icons.Filled.ArrowDropUp else Icons.Filled.ArrowDropDown,
@@ -167,78 +203,75 @@ fun HomeScreen(
                         },
                         colors = categoryChipColors
                     )
-                }
-            }
 
-            Spacer(Modifier.height(8.dp))
-
-            var minInput by remember { mutableStateOf(catalogVM.selectedPriceRange.start.toInt().toString()) }
-            var maxInput by remember { mutableStateOf(catalogVM.selectedPriceRange.endInclusive.toInt().toString()) }
-
-            LaunchedEffect(catalogVM.selectedPriceRange) {
-                minInput = catalogVM.selectedPriceRange.start.toInt().toString()
-                maxInput = catalogVM.selectedPriceRange.endInclusive.toInt().toString()
-            }
-
-            if (showPriceMenu) {
-                Card(
-                    modifier = Modifier.fillMaxWidth(),
-                    colors = CardDefaults.cardColors(containerColor = Color.White)
-                ) {
-                    Column(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(12.dp),
-                        verticalArrangement = Arrangement.spacedBy(12.dp)
+                    DropdownMenu(
+                        expanded = showPriceMenu,
+                        onDismissRequest = { showPriceMenu = false },
+                        offset = DpOffset(0.dp, 8.dp),
+                        containerColor = Color.White
                     ) {
-                        Text("Rango de precios", style = MaterialTheme.typography.titleSmall)
-                        RangeSlider(
-                            value = catalogVM.selectedPriceRange,
-                            onValueChange = { range -> catalogVM.updatePriceRange(range) },
-                            valueRange = catalogVM.priceRangeLimits
-                        )
-                        Row(horizontalArrangement = Arrangement.spacedBy(12.dp), modifier = Modifier.fillMaxWidth()) {
-                            OutlinedTextField(
-                                value = minInput,
-                                onValueChange = { newValue ->
-                                    minInput = newValue
-                                    commitPriceRangeFromInput(
-                                        newValue,
-                                        maxInput,
-                                        catalogVM.priceMinLimit,
-                                        catalogVM.priceMaxLimit
-                                    ) { min, max ->
-                                        catalogVM.updatePriceRange(min..max)
-                                    }
-                                },
-                                label = { Text("Mínimo") },
-                                singleLine = true,
-                                keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number),
-                                modifier = Modifier.weight(1f)
-                            )
-                            OutlinedTextField(
-                                value = maxInput,
-                                onValueChange = { newValue ->
-                                    maxInput = newValue
-                                    commitPriceRangeFromInput(
-                                        minInput,
-                                        newValue,
-                                        catalogVM.priceMinLimit,
-                                        catalogVM.priceMaxLimit
-                                    ) { min, max ->
-                                        catalogVM.updatePriceRange(min..max)
-                                    }
-                                },
-                                label = { Text("Máximo") },
-                                singleLine = true,
-                                keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number),
-                                modifier = Modifier.weight(1f)
-                            )
+                        Card(
+                            modifier = Modifier
+                                .fillMaxWidth(),
+                            colors = CardDefaults.cardColors(containerColor = Color.White)
+                        ) {
+                            Column(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(12.dp),
+                                verticalArrangement = Arrangement.spacedBy(12.dp)
+                            ) {
+                                Text("Rango de precios", style = chipLabelStyle, color = chipLabelColor)
+                                RangeSlider(
+                                    value = catalogVM.selectedPriceRange,
+                                    onValueChange = { range -> catalogVM.updatePriceRange(range) },
+                                    valueRange = catalogVM.priceRangeLimits
+                                )
+                                Row(horizontalArrangement = Arrangement.spacedBy(12.dp), modifier = Modifier.fillMaxWidth()) {
+                                    OutlinedTextField(
+                                        value = minInput,
+                                        onValueChange = { newValue ->
+                                            minInput = newValue
+                                            commitPriceRangeFromInput(
+                                                newValue,
+                                                maxInput,
+                                                catalogVM.priceMinLimit,
+                                                catalogVM.priceMaxLimit
+                                            ) { min, max ->
+                                                catalogVM.updatePriceRange(min..max)
+                                            }
+                                        },
+                                        label = { Text("Mínimo", style = chipLabelStyle, color = chipLabelColor) },
+                                        singleLine = true,
+                                        keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number),
+                                        modifier = Modifier.weight(1f)
+                                    )
+                                    OutlinedTextField(
+                                        value = maxInput,
+                                        onValueChange = { newValue ->
+                                            maxInput = newValue
+                                            commitPriceRangeFromInput(
+                                                minInput,
+                                                newValue,
+                                                catalogVM.priceMinLimit,
+                                                catalogVM.priceMaxLimit
+                                            ) { min, max ->
+                                                catalogVM.updatePriceRange(min..max)
+                                            }
+                                        },
+                                        label = { Text("Máximo", style = chipLabelStyle, color = chipLabelColor) },
+                                        singleLine = true,
+                                        keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number),
+                                        modifier = Modifier.weight(1f)
+                                    )
+                                }
+                                Text(
+                                    "${money.format(catalogVM.selectedPriceRange.start.toInt())} - ${money.format(catalogVM.selectedPriceRange.endInclusive.toInt())}",
+                                    style = chipLabelStyle,
+                                    color = chipLabelColor
+                                )
+                            }
                         }
-                        Text(
-                            "${money.format(catalogVM.selectedPriceRange.start.toInt())} - ${money.format(catalogVM.selectedPriceRange.endInclusive.toInt())}",
-                            style = MaterialTheme.typography.bodyMedium
-                        )
                     }
                 }
             }
@@ -260,13 +293,14 @@ fun HomeScreen(
                         catalogVM.selectedCategories.forEach { selected ->
                             AssistChip(
                                 onClick = { catalogVM.toggleCategory(selected) },
-                                label = { Text(selected) },
+                                label = { Text(selected, style = chipLabelStyle) },
                                 colors = AssistChipDefaults.assistChipColors(
-                                    containerColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.25f),
+                                    containerColor = Color.White,
                                     labelColor = MaterialTheme.colorScheme.onSurface,
                                     leadingIconContentColor = MaterialTheme.colorScheme.onSurface,
                                     trailingIconContentColor = MaterialTheme.colorScheme.onSurface
-                                )
+                                ),
+                                border = BorderStroke(1.2.dp, MaterialTheme.colorScheme.primary)
                             )
                         }
                     }

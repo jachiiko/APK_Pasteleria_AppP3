@@ -13,6 +13,10 @@ object FakeDatabase {
         return usuarios.any { it.email == email && it.password == password }
     }
 
+    fun obtenerPorEmail(email: String): Usuario? {
+        return usuarios.firstOrNull { it.email.equals(email, ignoreCase = true) }
+    }
+
     /**
      * Limpia los datos almacenados. Pensado para pruebas unitarias. //esto nos sirve por ahora, Esto se va a borrar una vez conectemos con la base de datos
      */

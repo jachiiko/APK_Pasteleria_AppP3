@@ -1,4 +1,6 @@
-package com.example.diegoherrera22appmoviles007d_ev2_dherrera_jaraya.model
+package com.example.diegoherrera22appmoviles007d_ev2_dherrera_jaraya.dto
+
+import com.example.diegoherrera22appmoviles007d_ev2_dherrera_jaraya.model.Region
 
 data class RegisterRequest (
     val nombre: String,

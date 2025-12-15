@@ -2,9 +2,9 @@ package com.example.diegoherrera22appmoviles007d_ev2_dherrera_jaraya.viewmodel
 
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
-import com.example.diegoherrera22appmoviles007d_ev2_dherrera_jaraya.model.LoginRequest
+import com.example.diegoherrera22appmoviles007d_ev2_dherrera_jaraya.dto.LoginRequest
 import com.example.diegoherrera22appmoviles007d_ev2_dherrera_jaraya.model.Region
-import com.example.diegoherrera22appmoviles007d_ev2_dherrera_jaraya.model.RegisterRequest
+import com.example.diegoherrera22appmoviles007d_ev2_dherrera_jaraya.dto.RegisterRequest
 import com.example.diegoherrera22appmoviles007d_ev2_dherrera_jaraya.repository.ApiClient
 import com.example.diegoherrera22appmoviles007d_ev2_dherrera_jaraya.repository.api.AuthApi
 import kotlinx.coroutines.Dispatchers

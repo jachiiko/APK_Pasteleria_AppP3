@@ -1,9 +1,9 @@
 package com.example.diegoherrera22appmoviles007d_ev2_dherrera_jaraya.repository.api
 
-import com.example.diegoherrera22appmoviles007d_ev2_dherrera_jaraya.model.LoginRequest
-import com.example.diegoherrera22appmoviles007d_ev2_dherrera_jaraya.model.LoginResponse
-import com.example.diegoherrera22appmoviles007d_ev2_dherrera_jaraya.model.RegisterRequest
-import com.example.diegoherrera22appmoviles007d_ev2_dherrera_jaraya.model.RegisterResponse
+import com.example.diegoherrera22appmoviles007d_ev2_dherrera_jaraya.dto.LoginRequest
+import com.example.diegoherrera22appmoviles007d_ev2_dherrera_jaraya.dto.LoginResponse
+import com.example.diegoherrera22appmoviles007d_ev2_dherrera_jaraya.dto.RegisterRequest
+import com.example.diegoherrera22appmoviles007d_ev2_dherrera_jaraya.dto.RegisterResponse
 import retrofit2.http.Body
 import retrofit2.http.POST
 

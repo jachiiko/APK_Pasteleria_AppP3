@@ -24,7 +24,8 @@ import com.example.diegoherrera22appmoviles007d_ev2_dherrera_jaraya.ui.theme.Die
 import com.example.diegoherrera22appmoviles007d_ev2_dherrera_jaraya.viewmodel.AuthViewModel
 import com.example.diegoherrera22appmoviles007d_ev2_dherrera_jaraya.viewmodel.RegionViewModel
 import com.example.diegoherrera22appmoviles007d_ev2_dherrera_jaraya.views.CartScreen
-import com.example.diegoherrera22appmoviles007d_ev2_dherrera_jaraya.views.CheckoutResultTabsScreen
+import com.example.diegoherrera22appmoviles007d_ev2_dherrera_jaraya.views.CheckoutFailureScreen
+import com.example.diegoherrera22appmoviles007d_ev2_dherrera_jaraya.views.CheckoutSuccessScreen
 import com.example.diegoherrera22appmoviles007d_ev2_dherrera_jaraya.views.HomeScreen
 import com.example.diegoherrera22appmoviles007d_ev2_dherrera_jaraya.views.LoginScreen
 import com.example.diegoherrera22appmoviles007d_ev2_dherrera_jaraya.views.ProductDetailScreen
@@ -125,9 +126,14 @@ fun AppNavigation() {
                 CartScreen(navController = navController, parentEntry = parentEntry)
             }
 
-            composable("checkout/results") { backStackEntry ->
+            composable("checkout/success") { backStackEntry ->
                 val parentEntry = remember(backStackEntry) { navController.getBackStackEntry("shop") }
-                CheckoutResultTabsScreen(navController = navController, parentEntry = parentEntry)
+                CheckoutSuccessScreen(navController = navController, parentEntry = parentEntry)
+            }
+
+            composable("checkout/failure") { backStackEntry ->
+                val parentEntry = remember(backStackEntry) { navController.getBackStackEntry("shop") }
+                CheckoutFailureScreen(navController = navController, parentEntry = parentEntry)
             }
         }
     }

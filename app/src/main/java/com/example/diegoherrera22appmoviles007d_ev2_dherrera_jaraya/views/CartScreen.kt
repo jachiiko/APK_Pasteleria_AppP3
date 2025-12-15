@@ -131,15 +131,28 @@ fun CartScreen(
                     )
                 }
 
-                Button(
-                    onClick = { navController.navigate("checkout/results") },
-                    modifier = Modifier.fillMaxWidth(),
-                    colors = pastelButtonColors()
-                ) {
-                    Text(
-                        "Finalizar compra",
-                        style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold)
-                    )
+                Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    Button(
+                        onClick = { navController.navigate("checkout/success") },
+                        modifier = Modifier.fillMaxWidth(),
+                        colors = pastelButtonColors()
+                    ) {
+                        Text(
+                            "Finalizar compra",
+                            style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold)
+                        )
+                    }
+
+                    Button(
+                        onClick = { navController.navigate("checkout/failure") },
+                        modifier = Modifier.fillMaxWidth(),
+                        colors = pastelButtonColors()
+                    ) {
+                        Text(
+                            "Compra rechazada",
+                            style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold)
+                        )
+                    }
                 }
             }
         }

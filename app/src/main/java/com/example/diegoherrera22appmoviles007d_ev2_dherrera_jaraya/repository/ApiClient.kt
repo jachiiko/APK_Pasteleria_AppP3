@@ -1,5 +1,6 @@
 package com.example.diegoherrera22appmoviles007d_ev2_dherrera_jaraya.repository
 
+import com.example.diegoherrera22appmoviles007d_ev2_dherrera_jaraya.repository.api.AuthApi
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 
@@ -14,4 +15,6 @@ object ApiClient {
 
     val regionApi: RegionComunaRepository =
         retrofit.create(RegionComunaRepository::class.java)
+
+    val authApi: AuthApi = retrofit.create(AuthApi::class.java)
 }

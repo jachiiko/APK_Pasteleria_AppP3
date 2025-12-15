@@ -1,6 +1,6 @@
 package com.example.diegoherrera22appmoviles007d_ev2_dherrera_jaraya.model
 
-class Usuario (
+data class RegisterRequest (
     val nombre: String,
     val apellido: String,
     val rut: String,

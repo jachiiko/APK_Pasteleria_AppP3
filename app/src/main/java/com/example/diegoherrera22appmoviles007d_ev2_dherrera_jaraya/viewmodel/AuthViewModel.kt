@@ -1,15 +1,24 @@
 package com.example.diegoherrera22appmoviles007d_ev2_dherrera_jaraya.viewmodel
 
-import androidx.lifecycle.ViewModel
 import androidx.compose.runtime.mutableStateOf
-import com.example.diegoherrera22appmoviles007d_ev2_dherrera_jaraya.model.FakeDatabase
+import androidx.lifecycle.ViewModel
+import com.example.diegoherrera22appmoviles007d_ev2_dherrera_jaraya.model.LoginRequest
 import com.example.diegoherrera22appmoviles007d_ev2_dherrera_jaraya.model.Region
-import com.example.diegoherrera22appmoviles007d_ev2_dherrera_jaraya.model.Usuario
+import com.example.diegoherrera22appmoviles007d_ev2_dherrera_jaraya.model.RegisterRequest
+import com.example.diegoherrera22appmoviles007d_ev2_dherrera_jaraya.repository.ApiClient
+import com.example.diegoherrera22appmoviles007d_ev2_dherrera_jaraya.repository.api.AuthApi
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.withContext
+import retrofit2.HttpException
 
-class AuthViewModel : ViewModel() {
+class AuthViewModel(
+    private val authApi: AuthApi = ApiClient.authApi
+) : ViewModel() {
 
     var mensaje = mutableStateOf("")
     var usuarioActual = mutableStateOf<String?>(null)
+    var token = mutableStateOf<String?>(null)
 
     fun registrar(
         nombre: String,
@@ -26,13 +35,37 @@ class AuthViewModel : ViewModel() {
             return false
         }
 
-        val nuevo = Usuario(nombre, apellido, rut, direccion, region, comuna, email, password)
-        return if (FakeDatabase.registrar(nuevo)) {
-            mensaje.value = "Registro exitoso"
-            true
-        } else {
-            mensaje.value = "El usuario ya existe"
-            false
+        return runBlocking {
+            try {
+                val request = RegisterRequest(
+                    nombre = nombre,
+                    apellido = apellido,
+                    rut = rut,
+                    direccion = direccion,
+                    region = region,
+                    comuna = comuna,
+                    email = email,
+                    password = password
+                )
+
+                withContext(Dispatchers.IO) {
+                    authApi.register(request)
+                }
+
+                mensaje.value = "Registro exitoso"
+                true
+            } catch (e: HttpException) {
+                mensaje.value = when (e.code()) {
+                    400 -> "Datos inválidos o incompletos"
+                    404 -> "Región o comuna inválida"
+                    409 -> "El email ya se encuentra registrado"
+                    else -> "Error del servidor (${e.code()})"
+                }
+                false
+            } catch (e: Exception) {
+                mensaje.value = "Error de conexión. Intenta nuevamente"
+                false
+            }
         }
     }
 
@@ -67,19 +100,27 @@ class AuthViewModel : ViewModel() {
         return dv == dvEsperado && cuerpoNumero > 0
     }
 
-
     fun login(email: String, password: String): Boolean {
-        return if (FakeDatabase.login(email, password)) {
-            usuarioActual.value = email
-            mensaje.value = "Inicio de sesión exitoso"
-            true
-        } else {
-            mensaje.value = "Credenciales inválidas"
-            false
+        return runBlocking {
+            try {
+                val response = withContext(Dispatchers.IO) {
+                    authApi.login(LoginRequest(email, password))
+                }
+                token.value = response.token
+                usuarioActual.value = email
+                mensaje.value = "Inicio de sesión exitoso"
+                true
+            } catch (e: HttpException) {
+                mensaje.value = when (e.code()) {
+                    400 -> "Datos faltantes"
+                    401 -> "Credenciales inválidas"
+                    else -> "Error del servidor (${e.code()})"
+                }
+                false
+            } catch (e: Exception) {
+                mensaje.value = "Error de conexión. Intenta nuevamente"
+                false
+            }
         }
     }
-
-
-
-
 }

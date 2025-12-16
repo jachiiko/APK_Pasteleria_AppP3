@@ -11,9 +11,9 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.widthIn
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Add
@@ -21,6 +21,7 @@ import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.ArrowDropUp
 import androidx.compose.material.icons.filled.Remove
 import androidx.compose.material3.Button
+import androidx.compose.material3.Divider
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilterChip
@@ -52,6 +53,7 @@ import com.example.diegoherrera22appmoviles007d_ev2_dherrera_jaraya.repository.P
 import com.example.diegoherrera22appmoviles007d_ev2_dherrera_jaraya.repository.ProductSpecifications
 import com.example.diegoherrera22appmoviles007d_ev2_dherrera_jaraya.repository.NutrientInfo
 import com.example.diegoherrera22appmoviles007d_ev2_dherrera_jaraya.ui.theme.pastelButtonColors
+import com.example.diegoherrera22appmoviles007d_ev2_dherrera_jaraya.ui.theme.SoftPink
 import com.example.diegoherrera22appmoviles007d_ev2_dherrera_jaraya.viewmodel.CatalogViewModel
 import com.example.diegoherrera22appmoviles007d_ev2_dherrera_jaraya.views.components.CartSummaryButton
 import java.text.NumberFormat
@@ -105,7 +107,7 @@ fun ProductDetailScreen(
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(inner)
-                    .padding(16.dp)
+                    .padding(horizontal = 16.dp, top = 4.dp, bottom = 16.dp)
                     .background(MaterialTheme.colorScheme.background),
                 verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {
@@ -158,13 +160,19 @@ fun ProductDetailScreen(
                         )
                         Text(money.format(contentProduct.price), style = MaterialTheme.typography.titleLarge)
 
+                        Text(
+                            detailDescription ?: contentProduct.description,
+                            style = MaterialTheme.typography.bodyLarge,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+
                         Box {
                             val chipLabelStyle = MaterialTheme.typography.titleSmall.copy(fontWeight = FontWeight.Medium)
 
                             FilterChip(
                                 selected = showSpecifications,
                                 onClick = { showSpecifications = !showSpecifications },
-                                label = { Text("|Especificaciones", style = chipLabelStyle) },
+                                label = { Text("Especificaciones", style = chipLabelStyle) },
                                 leadingIcon = {
                                     Icon(
                                         imageVector = if (showSpecifications) Icons.Filled.ArrowDropUp else Icons.Filled.ArrowDropDown,
@@ -173,11 +181,11 @@ fun ProductDetailScreen(
                                 },
                                 colors = FilterChipDefaults.filterChipColors(
                                     containerColor = Color.White,
-                                    selectedContainerColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.15f),
+                                    selectedContainerColor = SoftPink,
                                     labelColor = MaterialTheme.colorScheme.onSurface,
-                                    selectedLabelColor = MaterialTheme.colorScheme.onSurface,
+                                    selectedLabelColor = MaterialTheme.colorScheme.onPrimary,
                                     iconColor = MaterialTheme.colorScheme.onSurface,
-                                    selectedLeadingIconColor = MaterialTheme.colorScheme.onSurface
+                                    selectedLeadingIconColor = MaterialTheme.colorScheme.onPrimary
                                 )
                             )
 
@@ -200,44 +208,57 @@ fun ProductDetailScreen(
                                     )
 
                                     if (specifications != null) {
-                                        Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                                        Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
                                             Text(
                                                 "SKU: ${specifications.sku}",
                                                 style = MaterialTheme.typography.bodyMedium,
-                                                fontWeight = FontWeight.Medium
+                                                fontWeight = FontWeight.Bold
                                             )
                                             Text(
                                                 "Lote: ${specifications.lotNumber}",
                                                 style = MaterialTheme.typography.bodyMedium,
-                                                fontWeight = FontWeight.Medium
+                                                fontWeight = FontWeight.Bold
                                             )
                                         }
 
-                                        Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                                        Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
                                             val headerStyle = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.SemiBold)
                                             Row(modifier = Modifier.fillMaxWidth()) {
-                                                Text("Nutriente", modifier = Modifier.weight(1f), style = headerStyle)
-                                                Text("Por porción", modifier = Modifier.weight(1f), style = headerStyle)
+                                                Text("Nutirentes", modifier = Modifier.weight(1f), style = headerStyle)
+                                                Text(
+                                                    "Por porción",
+                                                    modifier = Modifier.weight(1f),
+                                                    style = headerStyle,
+                                                    softWrap = false
+                                                )
                                                 Text("Total producto", modifier = Modifier.weight(1f), style = headerStyle)
                                             }
 
-                                            specifications.nutritionalInfo.forEach { nutrient: NutrientInfo ->
-                                                Row(modifier = Modifier.fillMaxWidth()) {
-                                                    Text(
-                                                        nutrient.name,
-                                                        modifier = Modifier.weight(1f),
-                                                        style = MaterialTheme.typography.bodyMedium
-                                                    )
-                                                    Text(
-                                                        nutrient.perServing,
-                                                        modifier = Modifier.weight(1f),
-                                                        style = MaterialTheme.typography.bodyMedium
-                                                    )
-                                                    Text(
-                                                        nutrient.totalProduct,
-                                                        modifier = Modifier.weight(1f),
-                                                        style = MaterialTheme.typography.bodyMedium
-                                                    )
+                                            Divider()
+
+                                            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                                                specifications.nutritionalInfo.forEach { nutrient: NutrientInfo ->
+                                                    Row(
+                                                        modifier = Modifier
+                                                            .fillMaxWidth()
+                                                            .padding(vertical = 4.dp)
+                                                    ) {
+                                                        Text(
+                                                            nutrient.name,
+                                                            modifier = Modifier.weight(1f),
+                                                            style = MaterialTheme.typography.bodyMedium
+                                                        )
+                                                        Text(
+                                                            nutrient.perServing,
+                                                            modifier = Modifier.weight(1f),
+                                                            style = MaterialTheme.typography.bodyMedium
+                                                        )
+                                                        Text(
+                                                            nutrient.totalProduct,
+                                                            modifier = Modifier.weight(1f),
+                                                            style = MaterialTheme.typography.bodyMedium
+                                                        )
+                                                    }
                                                 }
                                             }
                                         }
@@ -250,12 +271,6 @@ fun ProductDetailScreen(
                                 }
                             }
                         }
-
-                        Text(
-                            detailDescription ?: contentProduct.description,
-                            style = MaterialTheme.typography.bodyLarge,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
-                        )
 
                         Row(
                             modifier = Modifier.fillMaxWidth(),

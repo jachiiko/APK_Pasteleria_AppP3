@@ -3,7 +3,35 @@ package com.example.diegoherrera22appmoviles007d_ev2_dherrera_jaraya.repository
 import com.example.diegoherrera22appmoviles007d_ev2_dherrera_jaraya.model.Producto
 import com.example.diegoherrera22appmoviles007d_ev2_dherrera_jaraya.R
 
+data class NutrientInfo(
+    val name: String,
+    val perServing: String,
+    val totalProduct: String
+)
+
+data class ProductSpecifications(
+    val sku: String,
+    val lotNumber: String,
+    val nutritionalInfo: List<NutrientInfo>
+)
+
 object ProductRepository {
+    private val productSpecifications = mapOf(
+        "TC001" to ProductSpecifications(
+            sku = "TQ-CHOC-GAN-2500",
+            lotNumber = "L-202512-TQ",
+            nutritionalInfo = listOf(
+                NutrientInfo("Energía", "460 kcal", "5.520 kcal"),
+                NutrientInfo("Proteínas", "6 g", "72 g"),
+                NutrientInfo("Grasas totales", "26 g", "312 g"),
+                NutrientInfo("Grasas saturadas", "8 g", "96 g"),
+                NutrientInfo("Carbohidratos", "52 g", "624 g"),
+                NutrientInfo("Azúcares", "38 g", "456 g"),
+                NutrientInfo("Sodio", "180 mg", "2.160 mg"),
+            )
+        )
+    )
+
     private val detailDescriptions = mapOf(
         "TC001" to """
             Porciones: 12 personas

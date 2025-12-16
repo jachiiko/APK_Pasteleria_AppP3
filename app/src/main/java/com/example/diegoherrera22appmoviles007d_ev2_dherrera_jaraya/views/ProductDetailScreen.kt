@@ -13,12 +13,18 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.ArrowDropDown
+import androidx.compose.material.icons.filled.ArrowDropUp
 import androidx.compose.material.icons.filled.Remove
 import androidx.compose.material3.Button
+import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FilterChip
+import androidx.compose.material3.FilterChipDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -37,11 +43,14 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavController
 import com.example.diegoherrera22appmoviles007d_ev2_dherrera_jaraya.repository.ProductRepository
+import com.example.diegoherrera22appmoviles007d_ev2_dherrera_jaraya.repository.ProductSpecifications
+import com.example.diegoherrera22appmoviles007d_ev2_dherrera_jaraya.repository.NutrientInfo
 import com.example.diegoherrera22appmoviles007d_ev2_dherrera_jaraya.ui.theme.pastelButtonColors
 import com.example.diegoherrera22appmoviles007d_ev2_dherrera_jaraya.viewmodel.CatalogViewModel
 import com.example.diegoherrera22appmoviles007d_ev2_dherrera_jaraya.views.components.CartSummaryButton
@@ -60,12 +69,14 @@ fun ProductDetailScreen(
         catalogVM.products.firstOrNull { it.id == productId } ?: ProductRepository.getById(productId)
     }
     val detailDescription = remember(productId) { ProductRepository.getDetailDescription(productId) }
+    val specifications: ProductSpecifications? = remember(productId) { catalogVM.getSpecifications(productId) }
 
     val money = remember {
         NumberFormat.getCurrencyInstance(Locale("es", "CL")).apply { maximumFractionDigits = 0 }
     }
 
     var quantity by remember { mutableStateOf(1) }
+    var showSpecifications by remember { mutableStateOf(false) }
 
     if (product == null) {
         Scaffold(
@@ -158,12 +169,106 @@ fun ProductDetailScreen(
                         style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.SemiBold),
                         color = MaterialTheme.colorScheme.primary
                     )
+                    Text(money.format(product.price), style = MaterialTheme.typography.titleLarge)
+
+                    Box {
+                        val chipLabelStyle = MaterialTheme.typography.titleSmall.copy(fontWeight = FontWeight.Medium)
+
+                        FilterChip(
+                            selected = showSpecifications,
+                            onClick = { showSpecifications = !showSpecifications },
+                            label = { Text("|Especificaciones", style = chipLabelStyle) },
+                            leadingIcon = {
+                                Icon(
+                                    imageVector = if (showSpecifications) Icons.Filled.ArrowDropUp else Icons.Filled.ArrowDropDown,
+                                    contentDescription = null
+                                )
+                            },
+                            colors = FilterChipDefaults.filterChipColors(
+                                containerColor = Color.White,
+                                selectedContainerColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.15f),
+                                labelColor = MaterialTheme.colorScheme.onSurface,
+                                selectedLabelColor = MaterialTheme.colorScheme.onSurface,
+                                iconColor = MaterialTheme.colorScheme.onSurface,
+                                selectedLeadingIconColor = MaterialTheme.colorScheme.onSurface
+                            )
+                        )
+
+                        DropdownMenu(
+                            expanded = showSpecifications,
+                            onDismissRequest = { showSpecifications = false },
+                            offset = DpOffset(0.dp, 8.dp),
+                            containerColor = Color.White
+                        ) {
+                            Column(
+                                modifier = Modifier
+                                    .padding(12.dp)
+                                    .widthIn(min = 280.dp, max = 360.dp),
+                                verticalArrangement = Arrangement.spacedBy(12.dp)
+                            ) {
+                                Text(
+                                    "Especificaciones Producto",
+                                    style = MaterialTheme.typography.titleMedium,
+                                    fontWeight = FontWeight.Bold
+                                )
+
+                                if (specifications != null) {
+                                    Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                                        Text(
+                                            "SKU: ${specifications.sku}",
+                                            style = MaterialTheme.typography.bodyMedium,
+                                            fontWeight = FontWeight.Medium
+                                        )
+                                        Text(
+                                            "Lote: ${specifications.lotNumber}",
+                                            style = MaterialTheme.typography.bodyMedium,
+                                            fontWeight = FontWeight.Medium
+                                        )
+                                    }
+
+                                    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                                        val headerStyle = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.SemiBold)
+                                        Row(modifier = Modifier.fillMaxWidth()) {
+                                            Text("Nutriente", modifier = Modifier.weight(1f), style = headerStyle)
+                                            Text("Por porción", modifier = Modifier.weight(1f), style = headerStyle)
+                                            Text("Total producto", modifier = Modifier.weight(1f), style = headerStyle)
+                                        }
+
+                                        specifications.nutritionalInfo.forEach { nutrient: NutrientInfo ->
+                                            Row(modifier = Modifier.fillMaxWidth()) {
+                                                Text(
+                                                    nutrient.name,
+                                                    modifier = Modifier.weight(1f),
+                                                    style = MaterialTheme.typography.bodyMedium
+                                                )
+                                                Text(
+                                                    nutrient.perServing,
+                                                    modifier = Modifier.weight(1f),
+                                                    style = MaterialTheme.typography.bodyMedium
+                                                )
+                                                Text(
+                                                    nutrient.totalProduct,
+                                                    modifier = Modifier.weight(1f),
+                                                    style = MaterialTheme.typography.bodyMedium
+                                                )
+                                            }
+                                        }
+                                    }
+                                } else {
+                                    Text(
+                                        "Pronto agregaremos las especificaciones para este producto.",
+                                        style = MaterialTheme.typography.bodyMedium
+                                    )
+                                }
+                            }
+                        }
+                    }
+
                     Text(
                         detailDescription ?: product.description,
                         style = MaterialTheme.typography.bodyLarge,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
-                    Text(money.format(product.price), style = MaterialTheme.typography.titleLarge)
 
                     Row(
                         modifier = Modifier.fillMaxWidth(),

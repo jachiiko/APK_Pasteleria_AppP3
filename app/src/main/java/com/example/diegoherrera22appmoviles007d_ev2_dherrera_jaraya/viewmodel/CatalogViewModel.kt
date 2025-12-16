@@ -10,6 +10,7 @@ import androidx.compose.runtime.snapshots.SnapshotStateMap
 import androidx.lifecycle.ViewModel
 import com.example.diegoherrera22appmoviles007d_ev2_dherrera_jaraya.model.Producto
 import com.example.diegoherrera22appmoviles007d_ev2_dherrera_jaraya.repository.ProductRepository
+import com.example.diegoherrera22appmoviles007d_ev2_dherrera_jaraya.repository.ProductSpecifications
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -98,6 +99,9 @@ class CatalogViewModel : ViewModel() {
     fun totalCLP(): Int = _cart.values.sumOf { it.product.price * it.qty }
     fun itemsCount(): Int = _cart.values.sumOf { it.qty }
     fun distinctCount(): Int = _cart.size
+
+    fun getSpecifications(productId: String): ProductSpecifications? =
+        ProductRepository.getSpecifications(productId)
 
     fun buildOrderSummary(): OrderSummary {
         val items = cartLines.map {

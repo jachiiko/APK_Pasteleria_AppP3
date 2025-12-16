@@ -349,23 +349,21 @@ fun ProductDetailScreen(
                     }
                 }
 
-                Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                    Button(
-                        onClick = {
-                            catalogVM.addToCart(contentProduct, quantity)
-                            quantity = 1
-                        },
-                        modifier = Modifier.fillMaxWidth(),
-                        colors = pastelButtonColors()
-                    ) { Text("Agregar al carrito") }
+                Button(
+                    onClick = {
+                        catalogVM.addToCart(contentProduct, quantity)
+                        quantity = 1
+                    },
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = pastelButtonColors()
+                ) { Text("Agregar al carrito") }
 
-                    CartSummaryButton(
-                        catalogVM = catalogVM,
-                        moneyFormatter = money,
-                        onNavigateToCart = { navController.navigate("cart") },
-                        modifier = Modifier.fillMaxWidth()
-                    )
-                }
+                CartSummaryButton(
+                    catalogVM = catalogVM,
+                    moneyFormatter = money,
+                    onNavigateToCart = { navController.navigate("cart") },
+                    modifier = Modifier.fillMaxWidth()
+                )
             }
         }
     }

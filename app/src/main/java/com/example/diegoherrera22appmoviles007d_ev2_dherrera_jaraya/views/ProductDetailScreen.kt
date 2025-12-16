@@ -13,6 +13,9 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.widthIn
+import androidx.compose.foundation.layout.calculateEndPadding
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.calculateStartPadding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
@@ -42,6 +45,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.DpOffset
@@ -94,11 +98,22 @@ fun ProductDetailScreen(
             )
         },
     ) { inner ->
+        val layoutDirection = LocalLayoutDirection.current
+        val startPadding = inner.calculateStartPadding(layoutDirection)
+        val endPadding = inner.calculateEndPadding(layoutDirection)
+        val topPadding = inner.calculateTopPadding()
+        val bottomPadding = inner.calculateBottomPadding()
+
         if (contentProduct == null) {
             Box(
                 Modifier
                     .fillMaxSize()
-                    .padding(inner)
+                    .padding(
+                        start = startPadding,
+                        top = topPadding,
+                        end = endPadding,
+                        bottom = bottomPadding
+                    )
                     .background(MaterialTheme.colorScheme.background),
                 contentAlignment = Alignment.Center
             ) { Text("No encontramos este producto.") }
@@ -106,8 +121,13 @@ fun ProductDetailScreen(
             Column(
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(inner)
-                    .padding(horizontal = 16.dp, top = 4.dp, bottom = 16.dp)
+                    .padding(
+                        start = startPadding,
+                        top = topPadding,
+                        end = endPadding,
+                        bottom = bottomPadding
+                    )
+                    .padding(start = 16.dp, end = 16.dp, top = 4.dp, bottom = 16.dp)
                     .background(MaterialTheme.colorScheme.background),
                 verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {
@@ -209,39 +229,64 @@ fun ProductDetailScreen(
 
                                     if (specifications != null) {
                                         Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
-                                            Text(
-                                                "SKU: ${specifications.sku}",
-                                                style = MaterialTheme.typography.bodyMedium,
-                                                fontWeight = FontWeight.Bold
-                                            )
-                                            Text(
-                                                "Lote: ${specifications.lotNumber}",
-                                                style = MaterialTheme.typography.bodyMedium,
-                                                fontWeight = FontWeight.Bold
-                                            )
+                                            Row(modifier = Modifier.fillMaxWidth()) {
+                                                Text(
+                                                    "SKU:",
+                                                    style = MaterialTheme.typography.bodyMedium,
+                                                    fontWeight = FontWeight.Bold
+                                                )
+                                                Text(
+                                                    specifications.sku,
+                                                    style = MaterialTheme.typography.bodyMedium,
+                                                    modifier = Modifier.padding(start = 4.dp)
+                                                )
+                                            }
+                                            Row(modifier = Modifier.fillMaxWidth()) {
+                                                Text(
+                                                    "Lote:",
+                                                    style = MaterialTheme.typography.bodyMedium,
+                                                    fontWeight = FontWeight.Bold
+                                                )
+                                                Text(
+                                                    specifications.lotNumber,
+                                                    style = MaterialTheme.typography.bodyMedium,
+                                                    modifier = Modifier.padding(start = 4.dp)
+                                                )
+                                            }
                                         }
 
                                         Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
                                             val headerStyle = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.SemiBold)
+                                            val dataColumnIndent = 12.dp
                                             Row(modifier = Modifier.fillMaxWidth()) {
                                                 Text("Nutirentes", modifier = Modifier.weight(1f), style = headerStyle)
                                                 Text(
                                                     "Por porción",
-                                                    modifier = Modifier.weight(1f),
+                                                    modifier = Modifier
+                                                        .weight(1f)
+                                                        .padding(start = dataColumnIndent),
                                                     style = headerStyle,
                                                     softWrap = false
                                                 )
-                                                Text("Total producto", modifier = Modifier.weight(1f), style = headerStyle)
+                                                Text(
+                                                    "Total producto",
+                                                    modifier = Modifier
+                                                        .weight(1f)
+                                                        .padding(start = dataColumnIndent),
+                                                    style = headerStyle
+                                                )
                                             }
 
                                             Divider()
 
-                                            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                                            Spacer(modifier = Modifier.height(8.dp))
+
+                                            Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
                                                 specifications.nutritionalInfo.forEach { nutrient: NutrientInfo ->
                                                     Row(
                                                         modifier = Modifier
                                                             .fillMaxWidth()
-                                                            .padding(vertical = 4.dp)
+                                                            .padding(vertical = 6.dp)
                                                     ) {
                                                         Text(
                                                             nutrient.name,
@@ -250,12 +295,16 @@ fun ProductDetailScreen(
                                                         )
                                                         Text(
                                                             nutrient.perServing,
-                                                            modifier = Modifier.weight(1f),
+                                                            modifier = Modifier
+                                                                .weight(1f)
+                                                                .padding(start = dataColumnIndent),
                                                             style = MaterialTheme.typography.bodyMedium
                                                         )
                                                         Text(
                                                             nutrient.totalProduct,
-                                                            modifier = Modifier.weight(1f),
+                                                            modifier = Modifier
+                                                                .weight(1f)
+                                                                .padding(start = dataColumnIndent),
                                                             style = MaterialTheme.typography.bodyMedium
                                                         )
                                                     }
@@ -300,21 +349,23 @@ fun ProductDetailScreen(
                     }
                 }
 
-                Button(
-                    onClick = {
-                        catalogVM.addToCart(contentProduct, quantity)
-                        quantity = 1
-                    },
-                    modifier = Modifier.fillMaxWidth(),
-                    colors = pastelButtonColors()
-                ) { Text("Agregar al carrito") }
+                Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    Button(
+                        onClick = {
+                            catalogVM.addToCart(contentProduct, quantity)
+                            quantity = 1
+                        },
+                        modifier = Modifier.fillMaxWidth(),
+                        colors = pastelButtonColors()
+                    ) { Text("Agregar al carrito") }
 
-                CartSummaryButton(
-                    catalogVM = catalogVM,
-                    moneyFormatter = money,
-                    onNavigateToCart = { navController.navigate("cart") },
-                    modifier = Modifier.fillMaxWidth()
-                )
+                    CartSummaryButton(
+                        catalogVM = catalogVM,
+                        moneyFormatter = money,
+                        onNavigateToCart = { navController.navigate("cart") },
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                }
             }
         }
     }

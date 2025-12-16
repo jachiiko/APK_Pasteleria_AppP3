@@ -13,9 +13,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.widthIn
-import androidx.compose.foundation.layout.calculateEndPadding
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.calculateStartPadding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
@@ -101,23 +99,38 @@ fun ProductDetailScreen(
                 }
             )
         },
-    ) { inner ->
-        val layoutDirection = LocalLayoutDirection.current
-        val startPadding = inner.calculateStartPadding(layoutDirection)
-        val endPadding = inner.calculateEndPadding(layoutDirection)
-        val topPadding = inner.calculateTopPadding()
-        val bottomPadding = inner.calculateBottomPadding()
+        bottomBar = {
+            contentProduct?.let { product ->
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp, vertical = 12.dp),
+                    verticalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    Button(
+                        onClick = {
+                            catalogVM.addToCart(product, quantity)
+                            quantity = 1
+                        },
+                        modifier = Modifier.fillMaxWidth(),
+                        colors = pastelButtonColors()
+                    ) { Text("Agregar al carrito") }
 
+                    CartSummaryButton(
+                        catalogVM = catalogVM,
+                        moneyFormatter = money,
+                        onNavigateToCart = { navController.navigate("cart") },
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                }
+            }
+        }
+    ) { inner ->
         if (contentProduct == null) {
             Box(
                 Modifier
                     .fillMaxSize()
-                    .padding(
-                        start = startPadding,
-                        top = topPadding,
-                        end = endPadding,
-                        bottom = bottomPadding
-                    )
+                    .padding(inner)
                     .background(MaterialTheme.colorScheme.background),
                 contentAlignment = Alignment.Center
             ) { Text("No encontramos este producto.") }
@@ -125,218 +138,221 @@ fun ProductDetailScreen(
             Column(
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(
-                        start = startPadding,
-                        top = topPadding,
-                        end = endPadding,
-                        bottom = bottomPadding
-                    )
-                    .padding(start = 16.dp, end = 16.dp, top = 4.dp, bottom = 16.dp)
+                    .padding(inner)
+                    .padding(start = 16.dp, end = 16.dp, top = 4.dp, bottom = 8.dp)
                     .background(MaterialTheme.colorScheme.background),
                 verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {
                 val cardShape = RoundedCornerShape(16.dp)
 
-                Column(
+                Surface(
                     modifier = Modifier
+                        .fillMaxWidth()
                         .weight(1f)
-                        .verticalScroll(rememberScrollState()),
-                    verticalArrangement = Arrangement.spacedBy(16.dp)
+                        .shadow(4.dp, cardShape, clip = false)
+                        .clip(cardShape),
+                    shape = cardShape,
+                    color = Color.White
                 ) {
-                    Surface(
+                    Column(
                         modifier = Modifier
-                            .fillMaxWidth()
-                            .shadow(4.dp, cardShape, clip = false)
-                            .clip(cardShape),
-                        shape = cardShape,
-                        color = Color.White
+                            .fillMaxSize()
+                            .padding(horizontal = 16.dp, vertical = 12.dp)
                     ) {
                         Column(
                             modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(16.dp),
-                            verticalArrangement = Arrangement.spacedBy(16.dp)
+                                .weight(1f)
+                                .verticalScroll(rememberScrollState()),
+                            verticalArrangement = Arrangement.spacedBy(12.dp)
                         ) {
-                            if (contentProduct.imageRes != null) {
-                                Image(
-                                    painter = painterResource(contentProduct.imageRes),
-                                    contentDescription = contentProduct.name,
-                                    contentScale = ContentScale.Crop,
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .height(220.dp)
-                                )
-                            } else {
-                                Box(
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .height(220.dp)
-                                        .background(MaterialTheme.colorScheme.surfaceVariant),
-                                    contentAlignment = Alignment.Center
-                                ) {
-                                    Text(
-                                        text = "Imagen próximamente",
-                                        style = MaterialTheme.typography.bodyLarge,
-                                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                                    )
-                                }
-                            }
 
-                            Text(
-                                contentProduct.name,
-                                style = MaterialTheme.typography.headlineSmall,
-                                fontWeight = FontWeight.Bold
-                            )
-                            Text(
-                                contentProduct.category,
-                                style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.SemiBold),
-                                color = MaterialTheme.colorScheme.primary
-                            )
-                            Text(money.format(contentProduct.price), style = MaterialTheme.typography.titleLarge)
-
-                            Text(
-                                detailDescription ?: contentProduct.description,
-                                style = MaterialTheme.typography.bodyLarge,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant
-                            )
-
-                            Box {
-                                val chipLabelStyle = MaterialTheme.typography.titleSmall.copy(fontWeight = FontWeight.Medium)
-
-                                FilterChip(
-                                    selected = showSpecifications,
-                                    onClick = { showSpecifications = !showSpecifications },
-                                    label = { Text("Especificaciones", style = chipLabelStyle) },
-                                    leadingIcon = {
-                                        Icon(
-                                            imageVector = if (showSpecifications) Icons.Filled.ArrowDropUp else Icons.Filled.ArrowDropDown,
-                                            contentDescription = null
-                                        )
-                                    },
-                                    colors = FilterChipDefaults.filterChipColors(
-                                        containerColor = Color.White,
-                                        selectedContainerColor = SoftPink,
-                                        labelColor = MaterialTheme.colorScheme.onSurface,
-                                        selectedLabelColor = MaterialTheme.colorScheme.onPrimary,
-                                        iconColor = MaterialTheme.colorScheme.onSurface,
-                                        selectedLeadingIconColor = MaterialTheme.colorScheme.onPrimary
-                                    )
-                                )
-
-                                DropdownMenu(
-                                    expanded = showSpecifications,
-                                    onDismissRequest = { showSpecifications = false },
-                                    offset = DpOffset(0.dp, 8.dp),
-                                    containerColor = Color.White
-                                ) {
-                                    Column(
+                        if (contentProduct.imageRes != null) {
+                                    Image(
+                                        painter = painterResource(contentProduct.imageRes),
+                                        contentDescription = contentProduct.name,
+                                        contentScale = ContentScale.Crop,
                                         modifier = Modifier
-                                            .padding(12.dp)
-                                            .widthIn(min = 280.dp, max = 360.dp),
-                                        verticalArrangement = Arrangement.spacedBy(12.dp)
+                                            .fillMaxWidth()
+                                            .height(220.dp)
+                                            .clip(cardShape)
+                                    )
+                                } else {
+                                    Box(
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .height(220.dp)
+                                            .clip(cardShape)
+                                            .background(MaterialTheme.colorScheme.surfaceVariant),
+                                        contentAlignment = Alignment.Center
                                     ) {
                                         Text(
-                                            "Especificaciones Producto",
-                                            style = MaterialTheme.typography.titleMedium,
-                                            fontWeight = FontWeight.Bold
+                                            text = "Imagen próximamente",
+                                            style = MaterialTheme.typography.bodyLarge,
+                                            color = MaterialTheme.colorScheme.onSurfaceVariant
                                         )
+                                    }
+                                }
 
-                                        if (specifications != null) {
-                                            Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
-                                                Row(modifier = Modifier.fillMaxWidth()) {
-                                                    Text(
-                                                        "SKU:",
-                                                        style = MaterialTheme.typography.bodyMedium,
-                                                        fontWeight = FontWeight.Bold
-                                                    )
-                                                    Text(
-                                                        specifications.sku,
-                                                        style = MaterialTheme.typography.bodyMedium,
-                                                        modifier = Modifier.padding(start = 4.dp)
-                                                    )
+                                Text(
+                                    contentProduct.name,
+                                    style = MaterialTheme.typography.headlineSmall,
+                                    fontWeight = FontWeight.Bold
+                                )
+                                Text(
+                                    contentProduct.category,
+                                    style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.SemiBold),
+                                    color = MaterialTheme.colorScheme.primary
+                                )
+                                Text(money.format(contentProduct.price), style = MaterialTheme.typography.titleLarge)
+
+                                Text(
+                                    detailDescription ?: contentProduct.description,
+                                    style = MaterialTheme.typography.bodyLarge,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                                )
+
+                                Box {
+                                    val chipLabelStyle = MaterialTheme.typography.titleSmall.copy(fontWeight = FontWeight.Medium)
+
+                                    FilterChip(
+                                        selected = showSpecifications,
+                                        onClick = { showSpecifications = !showSpecifications },
+                                        label = { Text("Especificaciones", style = chipLabelStyle) },
+                                        leadingIcon = {
+                                            Icon(
+                                                imageVector = if (showSpecifications) Icons.Filled.ArrowDropUp else Icons.Filled.ArrowDropDown,
+                                                contentDescription = null
+                                            )
+                                        },
+                                        colors = FilterChipDefaults.filterChipColors(
+                                            containerColor = Color.White,
+                                            selectedContainerColor = SoftPink,
+                                            labelColor = MaterialTheme.colorScheme.onSurface,
+                                            selectedLabelColor = MaterialTheme.colorScheme.onPrimary,
+                                            iconColor = MaterialTheme.colorScheme.onSurface,
+                                            selectedLeadingIconColor = MaterialTheme.colorScheme.onPrimary
+                                        )
+                                    )
+
+                                    DropdownMenu(
+                                        expanded = showSpecifications,
+                                        onDismissRequest = { showSpecifications = false },
+                                        offset = DpOffset(0.dp, 8.dp),
+                                        containerColor = Color.White
+                                    ) {
+                                        Column(
+                                            modifier = Modifier
+                                                .padding(12.dp)
+                                                .widthIn(min = 280.dp, max = 360.dp),
+                                            verticalArrangement = Arrangement.spacedBy(12.dp)
+                                        ) {
+                                            Text(
+                                                "Especificaciones Producto",
+                                                style = MaterialTheme.typography.titleMedium,
+                                                fontWeight = FontWeight.Bold
+                                            )
+
+                                            if (specifications != null) {
+                                                Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                                                    Row(modifier = Modifier.fillMaxWidth()) {
+                                                        Text(
+                                                            "SKU:",
+                                                            style = MaterialTheme.typography.bodyMedium,
+                                                            fontWeight = FontWeight.Bold
+                                                        )
+                                                        Text(
+                                                            specifications.sku,
+                                                            style = MaterialTheme.typography.bodyMedium,
+                                                            modifier = Modifier.padding(start = 4.dp)
+                                                        )
+                                                    }
+                                                    Row(modifier = Modifier.fillMaxWidth()) {
+                                                        Text(
+                                                            "Lote:",
+                                                            style = MaterialTheme.typography.bodyMedium,
+                                                            fontWeight = FontWeight.Bold
+                                                        )
+                                                        Text(
+                                                            specifications.lotNumber,
+                                                            style = MaterialTheme.typography.bodyMedium,
+                                                            modifier = Modifier.padding(start = 4.dp)
+                                                        )
+                                                    }
                                                 }
-                                                Row(modifier = Modifier.fillMaxWidth()) {
-                                                    Text(
-                                                        "Lote:",
-                                                        style = MaterialTheme.typography.bodyMedium,
-                                                        fontWeight = FontWeight.Bold
-                                                    )
-                                                    Text(
-                                                        specifications.lotNumber,
-                                                        style = MaterialTheme.typography.bodyMedium,
-                                                        modifier = Modifier.padding(start = 4.dp)
-                                                    )
-                                                }
-                                            }
 
-                                            Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                                                val headerStyle = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.SemiBold)
-                                                val dataColumnIndent = 12.dp
-                                                Row(modifier = Modifier.fillMaxWidth()) {
-                                                    Text("Nutirentes", modifier = Modifier.weight(1f), style = headerStyle)
-                                                    Text(
-                                                        "Por porción",
-                                                        modifier = Modifier
-                                                            .weight(1f)
-                                                            .padding(start = dataColumnIndent),
-                                                        style = headerStyle,
-                                                        softWrap = false
-                                                    )
-                                                    Text(
-                                                        "Total producto",
-                                                        modifier = Modifier
-                                                            .weight(1f)
-                                                            .padding(start = dataColumnIndent),
-                                                        style = headerStyle
-                                                    )
-                                                }
-
-                                                Divider()
-
-                                                Spacer(modifier = Modifier.height(8.dp))
-
-                                                Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
-                                                    specifications.nutritionalInfo.forEach { nutrient: NutrientInfo ->
-                                                        Row(
+                                                Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                                                    val headerStyle = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.SemiBold)
+                                                    val dataColumnIndent = 12.dp
+                                                    Row(modifier = Modifier.fillMaxWidth()) {
+                                                        Text("Nutirentes", modifier = Modifier.weight(1f), style = headerStyle)
+                                                        Text(
+                                                            "Por porción",
                                                             modifier = Modifier
-                                                                .fillMaxWidth()
-                                                                .padding(vertical = 6.dp)
-                                                        ) {
-                                                            Text(
-                                                                nutrient.name,
-                                                                modifier = Modifier.weight(1f),
-                                                                style = MaterialTheme.typography.bodyMedium
-                                                            )
-                                                            Text(
-                                                                nutrient.perServing,
+                                                                .weight(1f)
+                                                                .padding(start = dataColumnIndent),
+                                                            style = headerStyle,
+                                                            softWrap = false
+                                                        )
+                                                        Text(
+                                                            "Total producto",
+                                                            modifier = Modifier
+                                                                .weight(1f)
+                                                                .padding(start = dataColumnIndent),
+                                                            style = headerStyle
+                                                        )
+                                                    }
+
+                                                    Divider()
+
+                                                    Spacer(modifier = Modifier.height(8.dp))
+
+                                                    Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                                                        specifications.nutritionalInfo.forEach { nutrient: NutrientInfo ->
+                                                            Row(
                                                                 modifier = Modifier
-                                                                    .weight(1f)
-                                                                    .padding(start = dataColumnIndent),
-                                                                style = MaterialTheme.typography.bodyMedium
-                                                            )
-                                                            Text(
-                                                                nutrient.totalProduct,
-                                                                modifier = Modifier
-                                                                    .weight(1f)
-                                                                    .padding(start = dataColumnIndent),
-                                                                style = MaterialTheme.typography.bodyMedium
-                                                            )
+                                                                    .fillMaxWidth()
+                                                                    .padding(vertical = 6.dp)
+                                                            ) {
+                                                                Text(
+                                                                    nutrient.name,
+                                                                    modifier = Modifier.weight(1f),
+                                                                    style = MaterialTheme.typography.bodyMedium
+                                                                )
+                                                                Text(
+                                                                    nutrient.perServing,
+                                                                    modifier = Modifier
+                                                                        .weight(1f)
+                                                                        .padding(start = dataColumnIndent),
+                                                                    style = MaterialTheme.typography.bodyMedium
+                                                                )
+                                                                Text(
+                                                                    nutrient.totalProduct,
+                                                                    modifier = Modifier
+                                                                        .weight(1f)
+                                                                        .padding(start = dataColumnIndent),
+                                                                    style = MaterialTheme.typography.bodyMedium
+                                                                )
+                                                            }
                                                         }
                                                     }
                                                 }
+                                            } else {
+                                                Text(
+                                                    "Pronto agregaremos las especificaciones para este producto.",
+                                                    style = MaterialTheme.typography.bodyMedium
+                                                )
                                             }
-                                        } else {
-                                            Text(
-                                                "Pronto agregaremos las especificaciones para este producto.",
-                                                style = MaterialTheme.typography.bodyMedium
-                                            )
                                         }
                                     }
                                 }
                             }
 
+                            Divider()
+
                             Row(
-                                modifier = Modifier.fillMaxWidth(),
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(top = 8.dp),
                                 horizontalArrangement = Arrangement.SpaceBetween,
                                 verticalAlignment = Alignment.CenterVertically
                             ) {
@@ -363,25 +379,6 @@ fun ProductDetailScreen(
                         }
                     }
                 }
-
-                Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                    Button(
-                        onClick = {
-                            catalogVM.addToCart(contentProduct, quantity)
-                            quantity = 1
-                        },
-                        modifier = Modifier.fillMaxWidth(),
-                        colors = pastelButtonColors()
-                    ) { Text("Agregar al carrito") }
-
-                    CartSummaryButton(
-                        catalogVM = catalogVM,
-                        moneyFormatter = money,
-                        onNavigateToCart = { navController.navigate("cart") },
-                        modifier = Modifier.fillMaxWidth()
-                    )
-                }
             }
         }
     }
-}

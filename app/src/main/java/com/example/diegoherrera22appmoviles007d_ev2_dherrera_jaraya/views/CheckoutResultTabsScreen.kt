@@ -148,8 +148,11 @@ fun CheckoutSuccessScreen(
             Button(
                 onClick = {
                     catalogVM.clearCart()
-                    navController.popBackStack()
-                    navController.popBackStack()
+                    val emailArg = catalogVM.userEmail ?: ""
+                    navController.navigate("home/$emailArg") {
+                        popUpTo("shop") { inclusive = false }
+                        launchSingleTop = true
+                    }
                 },
                 modifier = Modifier.fillMaxWidth(),
                 colors = pastelButtonColors(),
@@ -166,6 +169,8 @@ fun CheckoutFailureScreen(
     navController: NavController,
     parentEntry: NavBackStackEntry
 ) {
+    val catalogVM: CatalogViewModel = viewModel(parentEntry)
+
     Scaffold(
         topBar = {
             TopAppBar(
@@ -212,8 +217,11 @@ fun CheckoutFailureScreen(
 
             Button(
                 onClick = {
-                    navController.popBackStack()
-                    navController.popBackStack()
+                    val emailArg = catalogVM.userEmail ?: ""
+                    navController.navigate("home/$emailArg") {
+                        popUpTo("shop") { inclusive = false }
+                        launchSingleTop = true
+                    }
                 },
                 modifier = Modifier.fillMaxWidth(),
                 colors = pastelButtonColors(),

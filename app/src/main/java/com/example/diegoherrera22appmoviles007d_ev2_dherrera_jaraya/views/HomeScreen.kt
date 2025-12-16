@@ -77,6 +77,10 @@ fun HomeScreen(
     // Usa la MISMA instancia de CatalogViewModel en Home y Detalle
     val catalogVM: CatalogViewModel = viewModel(parentEntry)
 
+    LaunchedEffect(email) {
+        catalogVM.updateUserEmail(email?.trim())
+    }
+
     val money = remember {
         NumberFormat.getCurrencyInstance(Locale("es", "CL")).apply { maximumFractionDigits = 0 }
     }

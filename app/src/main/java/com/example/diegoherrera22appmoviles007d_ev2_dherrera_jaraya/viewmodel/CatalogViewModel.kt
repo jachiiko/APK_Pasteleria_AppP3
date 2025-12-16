@@ -38,6 +38,9 @@ class CatalogViewModel : ViewModel() {
     val products: List<Producto> = ProductRepository.getCatalog()
     val categories: List<String> = products.map { it.category }.distinct().sorted()
 
+    var userEmail: String? by mutableStateOf(null)
+        private set
+
     private val priceMin = products.minOf { it.price }.toFloat()
     private val priceMax = products.maxOf { it.price }.toFloat()
 
@@ -62,6 +65,10 @@ class CatalogViewModel : ViewModel() {
 
     private val _cart: SnapshotStateMap<String, CartLine> = mutableStateMapOf()
     val cartLines: List<CartLine> get() = _cart.values.toList()
+
+    fun updateUserEmail(email: String?) {
+        userEmail = email
+    }
 
     fun toggleCategory(category: String) {
         if (_selectedCategories.contains(category)) {

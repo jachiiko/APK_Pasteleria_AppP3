@@ -60,8 +60,8 @@ object ProductRepository {
             Empanada rellena de manzanas especiadas.
         """.trimIndent(),
         "PT002" to """
-            Porciones: 6 personas
-            Peso: 700 g (0,7 kg)
+            Porciones: 1 personas
+            Peso: 130 g (0,13 kg)
             Refrigerado dura: 7 días
             Tarta tradicional española de almendras.
         """.trimIndent(),
@@ -173,7 +173,7 @@ object ProductRepository {
             "Pastelería Tradicional",
             "Empanada de Manzana",
             "Pastelería tradicional rellena de manzanas especiadas, perfecta para un dulce desayuno o merienda.",
-            3000,
+            3500,
             R.drawable.pt001
         ),
         Producto(
@@ -181,7 +181,7 @@ object ProductRepository {
             "Pastelería Tradicional",
             "Tarta de Santiago",
             "Tradicional tarta española hecha con almendras, azúcar, y huevos, una delicia para los amantes de los postres clásicos.",
-            6000,
+            3000,
             R.drawable.pt002
         ),
         Producto(

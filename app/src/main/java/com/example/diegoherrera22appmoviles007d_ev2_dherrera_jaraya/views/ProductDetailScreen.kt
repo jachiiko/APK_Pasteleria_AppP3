@@ -78,34 +78,12 @@ fun ProductDetailScreen(
     var quantity by remember { mutableStateOf(1) }
     var showSpecifications by remember { mutableStateOf(false) }
 
-    if (product == null) {
-        Scaffold(
-            topBar = {
-                TopAppBar(
-                    title = { Text("Producto no encontrado") },
-                    navigationIcon = {
-                        IconButton(onClick = { navController.popBackStack() }) {
-                            Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Volver")
-                        }
-                    }
-                )
-            }
-        ) { inner ->
-            Box(
-                Modifier
-                    .fillMaxSize()
-                    .padding(inner)
-                    .background(MaterialTheme.colorScheme.background),
-                contentAlignment = Alignment.Center
-            ) { Text("No encontramos este producto.") }
-        }
-        return
-    }
+    val contentProduct = product
 
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Producto") },
+                title = { Text(if (contentProduct == null) "Producto no encontrado" else "Producto") },
                 navigationIcon = {
                     IconButton(onClick = { navController.popBackStack() }) {
                         Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Volver")
@@ -114,205 +92,215 @@ fun ProductDetailScreen(
             )
         },
     ) { inner ->
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(inner)
-                .padding(16.dp)
-                .background(MaterialTheme.colorScheme.background),
-            verticalArrangement = Arrangement.spacedBy(16.dp)
-        ) {
-            Surface(
-                modifier = Modifier.fillMaxWidth(),
-                shape = RoundedCornerShape(16.dp),
-                color = Color.White,
-                shadowElevation = 4.dp
+        if (contentProduct == null) {
+            Box(
+                Modifier
+                    .fillMaxSize()
+                    .padding(inner)
+                    .background(MaterialTheme.colorScheme.background),
+                contentAlignment = Alignment.Center
+            ) { Text("No encontramos este producto.") }
+        } else {
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(inner)
+                    .padding(16.dp)
+                    .background(MaterialTheme.colorScheme.background),
+                verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {
-                Column(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(16.dp),
-                    verticalArrangement = Arrangement.spacedBy(16.dp)
+                Surface(
+                    modifier = Modifier.fillMaxWidth(),
+                    shape = RoundedCornerShape(16.dp),
+                    color = Color.White,
+                    shadowElevation = 4.dp
                 ) {
-                    if (product.imageRes != null) {
-                        Image(
-                            painter = painterResource(product.imageRes),
-                            contentDescription = product.name,
-                            contentScale = ContentScale.Crop,
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .height(220.dp)
-                        )
-                    } else {
-                        Box(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .height(220.dp)
-                                .background(MaterialTheme.colorScheme.surfaceVariant),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            Text(
-                                text = "Imagen próximamente",
-                                style = MaterialTheme.typography.bodyLarge,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant
-                            )
-                        }
-                    }
-
-                    Text(
-                        product.name,
-                        style = MaterialTheme.typography.headlineSmall,
-                        fontWeight = FontWeight.Bold
-                    )
-                    Text(
-                        product.category,
-                        style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.SemiBold),
-                        color = MaterialTheme.colorScheme.primary
-                    )
-                    Text(money.format(product.price), style = MaterialTheme.typography.titleLarge)
-
-                    Box {
-                        val chipLabelStyle = MaterialTheme.typography.titleSmall.copy(fontWeight = FontWeight.Medium)
-
-                        FilterChip(
-                            selected = showSpecifications,
-                            onClick = { showSpecifications = !showSpecifications },
-                            label = { Text("|Especificaciones", style = chipLabelStyle) },
-                            leadingIcon = {
-                                Icon(
-                                    imageVector = if (showSpecifications) Icons.Filled.ArrowDropUp else Icons.Filled.ArrowDropDown,
-                                    contentDescription = null
-                                )
-                            },
-                            colors = FilterChipDefaults.filterChipColors(
-                                containerColor = Color.White,
-                                selectedContainerColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.15f),
-                                labelColor = MaterialTheme.colorScheme.onSurface,
-                                selectedLabelColor = MaterialTheme.colorScheme.onSurface,
-                                iconColor = MaterialTheme.colorScheme.onSurface,
-                                selectedLeadingIconColor = MaterialTheme.colorScheme.onSurface
-                            )
-                        )
-
-                        DropdownMenu(
-                            expanded = showSpecifications,
-                            onDismissRequest = { showSpecifications = false },
-                            offset = DpOffset(0.dp, 8.dp),
-                            containerColor = Color.White
-                        ) {
-                            Column(
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(16.dp),
+                        verticalArrangement = Arrangement.spacedBy(16.dp)
+                    ) {
+                        if (contentProduct.imageRes != null) {
+                            Image(
+                                painter = painterResource(contentProduct.imageRes),
+                                contentDescription = contentProduct.name,
+                                contentScale = ContentScale.Crop,
                                 modifier = Modifier
-                                    .padding(12.dp)
-                                    .widthIn(min = 280.dp, max = 360.dp),
-                                verticalArrangement = Arrangement.spacedBy(12.dp)
+                                    .fillMaxWidth()
+                                    .height(220.dp)
+                            )
+                        } else {
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .height(220.dp)
+                                    .background(MaterialTheme.colorScheme.surfaceVariant),
+                                contentAlignment = Alignment.Center
                             ) {
                                 Text(
-                                    "Especificaciones Producto",
-                                    style = MaterialTheme.typography.titleMedium,
-                                    fontWeight = FontWeight.Bold
+                                    text = "Imagen próximamente",
+                                    style = MaterialTheme.typography.bodyLarge,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant
                                 )
+                            }
+                        }
 
-                                if (specifications != null) {
-                                    Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
-                                        Text(
-                                            "SKU: ${specifications.sku}",
-                                            style = MaterialTheme.typography.bodyMedium,
-                                            fontWeight = FontWeight.Medium
-                                        )
-                                        Text(
-                                            "Lote: ${specifications.lotNumber}",
-                                            style = MaterialTheme.typography.bodyMedium,
-                                            fontWeight = FontWeight.Medium
-                                        )
-                                    }
+                        Text(
+                            contentProduct.name,
+                            style = MaterialTheme.typography.headlineSmall,
+                            fontWeight = FontWeight.Bold
+                        )
+                        Text(
+                            contentProduct.category,
+                            style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.SemiBold),
+                            color = MaterialTheme.colorScheme.primary
+                        )
+                        Text(money.format(contentProduct.price), style = MaterialTheme.typography.titleLarge)
 
-                                    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                                        val headerStyle = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.SemiBold)
-                                        Row(modifier = Modifier.fillMaxWidth()) {
-                                            Text("Nutriente", modifier = Modifier.weight(1f), style = headerStyle)
-                                            Text("Por porción", modifier = Modifier.weight(1f), style = headerStyle)
-                                            Text("Total producto", modifier = Modifier.weight(1f), style = headerStyle)
+                        Box {
+                            val chipLabelStyle = MaterialTheme.typography.titleSmall.copy(fontWeight = FontWeight.Medium)
+
+                            FilterChip(
+                                selected = showSpecifications,
+                                onClick = { showSpecifications = !showSpecifications },
+                                label = { Text("|Especificaciones", style = chipLabelStyle) },
+                                leadingIcon = {
+                                    Icon(
+                                        imageVector = if (showSpecifications) Icons.Filled.ArrowDropUp else Icons.Filled.ArrowDropDown,
+                                        contentDescription = null
+                                    )
+                                },
+                                colors = FilterChipDefaults.filterChipColors(
+                                    containerColor = Color.White,
+                                    selectedContainerColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.15f),
+                                    labelColor = MaterialTheme.colorScheme.onSurface,
+                                    selectedLabelColor = MaterialTheme.colorScheme.onSurface,
+                                    iconColor = MaterialTheme.colorScheme.onSurface,
+                                    selectedLeadingIconColor = MaterialTheme.colorScheme.onSurface
+                                )
+                            )
+
+                            DropdownMenu(
+                                expanded = showSpecifications,
+                                onDismissRequest = { showSpecifications = false },
+                                offset = DpOffset(0.dp, 8.dp),
+                                containerColor = Color.White
+                            ) {
+                                Column(
+                                    modifier = Modifier
+                                        .padding(12.dp)
+                                        .widthIn(min = 280.dp, max = 360.dp),
+                                    verticalArrangement = Arrangement.spacedBy(12.dp)
+                                ) {
+                                    Text(
+                                        "Especificaciones Producto",
+                                        style = MaterialTheme.typography.titleMedium,
+                                        fontWeight = FontWeight.Bold
+                                    )
+
+                                    if (specifications != null) {
+                                        Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                                            Text(
+                                                "SKU: ${specifications.sku}",
+                                                style = MaterialTheme.typography.bodyMedium,
+                                                fontWeight = FontWeight.Medium
+                                            )
+                                            Text(
+                                                "Lote: ${specifications.lotNumber}",
+                                                style = MaterialTheme.typography.bodyMedium,
+                                                fontWeight = FontWeight.Medium
+                                            )
                                         }
 
-                                        specifications.nutritionalInfo.forEach { nutrient: NutrientInfo ->
+                                        Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                                            val headerStyle = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.SemiBold)
                                             Row(modifier = Modifier.fillMaxWidth()) {
-                                                Text(
-                                                    nutrient.name,
-                                                    modifier = Modifier.weight(1f),
-                                                    style = MaterialTheme.typography.bodyMedium
-                                                )
-                                                Text(
-                                                    nutrient.perServing,
-                                                    modifier = Modifier.weight(1f),
-                                                    style = MaterialTheme.typography.bodyMedium
-                                                )
-                                                Text(
-                                                    nutrient.totalProduct,
-                                                    modifier = Modifier.weight(1f),
-                                                    style = MaterialTheme.typography.bodyMedium
-                                                )
+                                                Text("Nutriente", modifier = Modifier.weight(1f), style = headerStyle)
+                                                Text("Por porción", modifier = Modifier.weight(1f), style = headerStyle)
+                                                Text("Total producto", modifier = Modifier.weight(1f), style = headerStyle)
+                                            }
+
+                                            specifications.nutritionalInfo.forEach { nutrient: NutrientInfo ->
+                                                Row(modifier = Modifier.fillMaxWidth()) {
+                                                    Text(
+                                                        nutrient.name,
+                                                        modifier = Modifier.weight(1f),
+                                                        style = MaterialTheme.typography.bodyMedium
+                                                    )
+                                                    Text(
+                                                        nutrient.perServing,
+                                                        modifier = Modifier.weight(1f),
+                                                        style = MaterialTheme.typography.bodyMedium
+                                                    )
+                                                    Text(
+                                                        nutrient.totalProduct,
+                                                        modifier = Modifier.weight(1f),
+                                                        style = MaterialTheme.typography.bodyMedium
+                                                    )
+                                                }
                                             }
                                         }
+                                    } else {
+                                        Text(
+                                            "Pronto agregaremos las especificaciones para este producto.",
+                                            style = MaterialTheme.typography.bodyMedium
+                                        )
                                     }
-                                } else {
-                                    Text(
-                                        "Pronto agregaremos las especificaciones para este producto.",
-                                        style = MaterialTheme.typography.bodyMedium
-                                    )
+                                }
+                            }
+                        }
+
+                        Text(
+                            detailDescription ?: contentProduct.description,
+                            style = MaterialTheme.typography.bodyLarge,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Text("Cantidad", style = MaterialTheme.typography.titleMedium)
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.spacedBy(8.dp)
+                            ) {
+                                IconButton(
+                                    onClick = { if (quantity > 1) quantity-- }
+                                ) { Icon(Icons.Filled.Remove, contentDescription = "Disminuir cantidad") }
+
+                                Text(
+                                    quantity.toString(),
+                                    style = MaterialTheme.typography.titleMedium,
+                                    modifier = Modifier.padding(horizontal = 4.dp)
+                                )
+
+                                IconButton(onClick = { quantity++ }) {
+                                    Icon(Icons.Filled.Add, contentDescription = "Aumentar cantidad")
                                 }
                             }
                         }
                     }
-
-                    Text(
-                        detailDescription ?: product.description,
-                        style = MaterialTheme.typography.bodyLarge,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
-
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Text("Cantidad", style = MaterialTheme.typography.titleMedium)
-                        Row(
-                            verticalAlignment = Alignment.CenterVertically,
-                            horizontalArrangement = Arrangement.spacedBy(8.dp)
-                        ) {
-                            IconButton(
-                                onClick = { if (quantity > 1) quantity-- }
-                            ) { Icon(Icons.Filled.Remove, contentDescription = "Disminuir cantidad") }
-
-                            Text(
-                                quantity.toString(),
-                                style = MaterialTheme.typography.titleMedium,
-                                modifier = Modifier.padding(horizontal = 4.dp)
-                            )
-
-                            IconButton(onClick = { quantity++ }) {
-                                Icon(Icons.Filled.Add, contentDescription = "Aumentar cantidad")
-                            }
-                        }
-                    }
                 }
+
+                Button(
+                    onClick = {
+                        catalogVM.addToCart(contentProduct, quantity)
+                        quantity = 1
+                    },
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = pastelButtonColors()
+                ) { Text("Agregar al carrito") }
+
+                CartSummaryButton(
+                    catalogVM = catalogVM,
+                    moneyFormatter = money,
+                    onNavigateToCart = { navController.navigate("cart") },
+                    modifier = Modifier.fillMaxWidth()
+                )
             }
-
-            Button(
-                onClick = {
-                    catalogVM.addToCart(product, quantity)
-                    quantity = 1
-                },
-                modifier = Modifier.fillMaxWidth(),
-                colors = pastelButtonColors()
-            ) { Text("Agregar al carrito") }
-
-            CartSummaryButton(
-                catalogVM = catalogVM,
-                moneyFormatter = money,
-                onNavigateToCart = { navController.navigate("cart") },
-                modifier = Modifier.fillMaxWidth()
-            )
         }
     }
 }

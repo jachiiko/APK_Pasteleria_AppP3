@@ -266,5 +266,7 @@ object ProductRepository {
     fun getById(id: String): Producto? =
         getCatalog().firstOrNull { it.id == id }
 
+    fun getProductSpecifications(id: String): ProductSpecifications? = productSpecifications[id]
+
     fun getDetailDescription(id: String): String? = detailDescriptions[id]
 }

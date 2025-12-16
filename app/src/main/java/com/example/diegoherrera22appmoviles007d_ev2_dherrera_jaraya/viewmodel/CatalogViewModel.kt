@@ -5,7 +5,6 @@ import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
-import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.runtime.snapshots.SnapshotStateMap
 import androidx.lifecycle.ViewModel
 import com.example.diegoherrera22appmoviles007d_ev2_dherrera_jaraya.model.Producto
@@ -100,8 +99,10 @@ class CatalogViewModel : ViewModel() {
     fun itemsCount(): Int = _cart.values.sumOf { it.qty }
     fun distinctCount(): Int = _cart.size
 
-    fun getSpecifications(productId: String): ProductSpecifications? =
-        ProductRepository.getSpecifications(productId)
+    fun getSpecifications(productId: String): ProductSpecifications? {
+        return ProductRepository.getProductSpecifications(productId)
+    }
+
 
     fun buildOrderSummary(): OrderSummary {
         val items = cartLines.map {

@@ -5,7 +5,6 @@ package com.example.diegoherrera22appmoviles007d_ev2_dherrera_jaraya.views
 
 
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -35,7 +34,8 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.FilterChipDefaults
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
+import androidx.compose.material3.IconButtonDefaults
+import androidx.compose.material3.FilledIconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.RangeSlider
@@ -62,7 +62,6 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.compose.ui.res.painterResource
 import com.example.diegoherrera22appmoviles007d_ev2_dherrera_jaraya.model.FakeDatabase
-import com.example.diegoherrera22appmoviles007d_ev2_dherrera_jaraya.model.Producto
 import com.example.diegoherrera22appmoviles007d_ev2_dherrera_jaraya.viewmodel.CatalogViewModel
 import com.example.diegoherrera22appmoviles007d_ev2_dherrera_jaraya.views.components.CartSummaryButton
 import com.example.diegoherrera22appmoviles007d_ev2_dherrera_jaraya.views.components.ProductCard
@@ -106,13 +105,15 @@ fun HomeScreen(
                     )
                 },
                 actions = {
-                    IconButton(
+                    FilledIconButton(
                         onClick = { navController.navigate("profile/$profileEmail") },
                         modifier = Modifier
                             .padding(end = 4.dp)
-                            .size(42.dp)
-                            .clip(CircleShape)
-                            .background(Color.White)
+                            .size(42.dp),
+                        colors = IconButtonDefaults.filledIconButtonColors(
+                            containerColor = MaterialTheme.colorScheme.primary
+                        ),
+                        shape = CircleShape
                     ) {
                         Image(
                             painter = painterResource(id = R.drawable.avatar),

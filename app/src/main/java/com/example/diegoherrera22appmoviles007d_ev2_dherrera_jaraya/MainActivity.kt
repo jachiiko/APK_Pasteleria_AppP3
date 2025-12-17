@@ -24,6 +24,7 @@ import com.example.diegoherrera22appmoviles007d_ev2_dherrera_jaraya.ui.theme.Die
 import com.example.diegoherrera22appmoviles007d_ev2_dherrera_jaraya.viewmodel.AuthViewModel
 import com.example.diegoherrera22appmoviles007d_ev2_dherrera_jaraya.viewmodel.RegionViewModel
 import com.example.diegoherrera22appmoviles007d_ev2_dherrera_jaraya.views.CartScreen
+import com.example.diegoherrera22appmoviles007d_ev2_dherrera_jaraya.views.CheckoutDetailsScreen
 import com.example.diegoherrera22appmoviles007d_ev2_dherrera_jaraya.views.CheckoutFailureScreen
 import com.example.diegoherrera22appmoviles007d_ev2_dherrera_jaraya.views.CheckoutSuccessScreen
 import com.example.diegoherrera22appmoviles007d_ev2_dherrera_jaraya.views.HomeScreen
@@ -124,6 +125,11 @@ fun AppNavigation() {
             composable("cart") { backStackEntry ->
                 val parentEntry = remember(backStackEntry) { navController.getBackStackEntry("shop") }
                 CartScreen(navController = navController, parentEntry = parentEntry)
+            }
+
+            composable("checkout/details") { backStackEntry ->
+                val parentEntry = remember(backStackEntry) { navController.getBackStackEntry("shop") }
+                CheckoutDetailsScreen(navController = navController, parentEntry = parentEntry)
             }
 
             composable("checkout/success") { backStackEntry ->

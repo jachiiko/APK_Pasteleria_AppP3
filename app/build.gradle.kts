@@ -83,6 +83,9 @@ dependencies {
     androidTestImplementation(libs.androidx.espresso.core)
     androidTestImplementation(platform(libs.androidx.compose.bom))
 
+    // Force a stable annotations artifact version to avoid the deprecated 24.1.0 build error
+    implementation("org.jetbrains:annotations:24.0.1")
+
     // Kotest
     testImplementation(libs.kotest.runner.junit5)
     testImplementation(libs.kotest.assertions.core)

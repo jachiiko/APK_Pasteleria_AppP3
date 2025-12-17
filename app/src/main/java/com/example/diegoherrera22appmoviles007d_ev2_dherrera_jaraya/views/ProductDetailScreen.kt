@@ -283,6 +283,8 @@ fun ProductDetailScreen(
                                                 Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
                                                     val headerStyle = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.SemiBold)
                                                     val dataColumnIndent = 12.dp
+                                                    val showTotalProductColumn =
+                                                        specifications.nutritionalInfo.any { it.totalProduct.isNotBlank() }
                                                     Row(modifier = Modifier.fillMaxWidth()) {
                                                         Text("Nutirentes", modifier = Modifier.weight(1f), style = headerStyle)
                                                         Text(
@@ -293,13 +295,15 @@ fun ProductDetailScreen(
                                                             style = headerStyle,
                                                             softWrap = false
                                                         )
-                                                        Text(
-                                                            "Total producto",
-                                                            modifier = Modifier
-                                                                .weight(1f)
-                                                                .padding(start = dataColumnIndent),
-                                                            style = headerStyle
-                                                        )
+                                                        if (showTotalProductColumn) {
+                                                            Text(
+                                                                "Total producto",
+                                                                modifier = Modifier
+                                                                    .weight(1f)
+                                                                    .padding(start = dataColumnIndent),
+                                                                style = headerStyle
+                                                            )
+                                                        }
                                                     }
 
                                                     Divider()
@@ -325,13 +329,15 @@ fun ProductDetailScreen(
                                                                         .padding(start = dataColumnIndent),
                                                                     style = MaterialTheme.typography.bodyMedium
                                                                 )
-                                                                Text(
-                                                                    nutrient.totalProduct,
-                                                                    modifier = Modifier
-                                                                        .weight(1f)
-                                                                        .padding(start = dataColumnIndent),
-                                                                    style = MaterialTheme.typography.bodyMedium
-                                                                )
+                                                                if (showTotalProductColumn) {
+                                                                    Text(
+                                                                        nutrient.totalProduct,
+                                                                        modifier = Modifier
+                                                                            .weight(1f)
+                                                                            .padding(start = dataColumnIndent),
+                                                                        style = MaterialTheme.typography.bodyMedium
+                                                                    )
+                                                                }
                                                             }
                                                         }
                                                     }

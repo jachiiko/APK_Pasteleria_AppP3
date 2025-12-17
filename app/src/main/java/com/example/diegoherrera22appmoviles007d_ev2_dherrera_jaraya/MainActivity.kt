@@ -31,6 +31,7 @@ import com.example.diegoherrera22appmoviles007d_ev2_dherrera_jaraya.views.HomeSc
 import com.example.diegoherrera22appmoviles007d_ev2_dherrera_jaraya.views.LoginScreen
 import com.example.diegoherrera22appmoviles007d_ev2_dherrera_jaraya.views.ProductDetailScreen
 import com.example.diegoherrera22appmoviles007d_ev2_dherrera_jaraya.views.RegisterScreen
+import com.example.diegoherrera22appmoviles007d_ev2_dherrera_jaraya.views.UserProfileScreen
 import com.example.diegoherrera22appmoviles007d_ev2_dherrera_jaraya.views.backoffice.AddProductScreen
 import com.example.diegoherrera22appmoviles007d_ev2_dherrera_jaraya.views.backoffice.BackOfficeListScreen
 
@@ -110,6 +111,15 @@ fun AppNavigation() {
                 }
                 val id = backStackEntry.arguments?.getString("id") ?: return@composable
                 ProductDetailScreen(productId = id, navController = navController, parentEntry = parentEntry)
+            }
+
+            composable(
+                route = "profile/{email}",
+                arguments = listOf(navArgument("email") { type = NavType.StringType })
+            ) { backStackEntry ->
+                val parentEntry = remember(backStackEntry) { navController.getBackStackEntry("shop") }
+                val email = backStackEntry.arguments?.getString("email")
+                UserProfileScreen(email = email, navController = navController, parentEntry = parentEntry)
             }
 
             composable("backoffice") {

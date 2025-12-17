@@ -207,7 +207,7 @@ fun CheckoutDetailsScreen(
                                 .ifBlank { "Dirección no indicada" }
                         }
 
-                        catalogVM.updateCheckoutDetails(
+                        catalogVM.finalizeOrder(
                             recipient = resolvedRecipient,
                             address = resolvedAddress
                         )

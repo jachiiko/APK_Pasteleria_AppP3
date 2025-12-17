@@ -67,6 +67,12 @@ class CatalogViewModel : ViewModel() {
     var userEmail: String? by mutableStateOf(null)
         private set
 
+    private val _orderHistory = mutableStateListOf<OrderSummary>()
+    val orderHistory: List<OrderSummary> get() = _orderHistory
+
+    var lastOrderSummary: OrderSummary? by mutableStateOf(null)
+        private set
+
     private val priceMin = products.minOf { it.price }.toFloat()
     private val priceMax = products.maxOf { it.price }.toFloat()
 
@@ -189,6 +195,15 @@ class CatalogViewModel : ViewModel() {
             discountAmount = discountAmount,
             finalTotal = finalTotal
         )
+    }
+
+    fun finalizeOrder(recipient: String, address: String): OrderSummary {
+        checkoutRecipient = recipient
+        checkoutAddress = address
+        val summary = buildOrderSummary()
+        lastOrderSummary = summary
+        _orderHistory.add(0, summary)
+        return summary
     }
 
     fun updateCheckoutDetails(recipient: String?, address: String?) {

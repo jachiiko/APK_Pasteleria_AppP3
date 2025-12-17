@@ -4,6 +4,8 @@ package com.example.diegoherrera22appmoviles007d_ev2_dherrera_jaraya.views
 
 
 
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -15,7 +17,9 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.widthIn
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
@@ -31,6 +35,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.FilterChipDefaults
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.RangeSlider
@@ -44,7 +49,9 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.foundation.BorderStroke
@@ -53,11 +60,13 @@ import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import androidx.compose.ui.res.painterResource
 import com.example.diegoherrera22appmoviles007d_ev2_dherrera_jaraya.model.FakeDatabase
 import com.example.diegoherrera22appmoviles007d_ev2_dherrera_jaraya.model.Producto
 import com.example.diegoherrera22appmoviles007d_ev2_dherrera_jaraya.viewmodel.CatalogViewModel
 import com.example.diegoherrera22appmoviles007d_ev2_dherrera_jaraya.views.components.CartSummaryButton
 import com.example.diegoherrera22appmoviles007d_ev2_dherrera_jaraya.views.components.ProductCard
+import com.example.diegoherrera22appmoviles007d_ev2_dherrera_jaraya.R
 import kotlin.math.max
 import kotlin.math.min
 import java.text.NumberFormat
@@ -85,6 +94,8 @@ fun HomeScreen(
         NumberFormat.getCurrencyInstance(Locale("es", "CL")).apply { maximumFractionDigits = 0 }
     }
 
+    val profileEmail = email ?: catalogVM.userEmail ?: "guest"
+
     Scaffold(
         topBar = {
             TopAppBar(
@@ -93,6 +104,23 @@ fun HomeScreen(
                         "Catálogo de Pastelería",
                         style = MaterialTheme.typography.headlineMedium.copy(fontWeight = FontWeight.ExtraBold)
                     )
+                },
+                actions = {
+                    IconButton(
+                        onClick = { navController.navigate("profile/$profileEmail") },
+                        modifier = Modifier
+                            .padding(end = 4.dp)
+                            .size(42.dp)
+                            .clip(CircleShape)
+                            .background(Color.White)
+                    ) {
+                        Image(
+                            painter = painterResource(id = R.drawable.avatar),
+                            contentDescription = "Perfil",
+                            contentScale = ContentScale.Crop,
+                            modifier = Modifier.clip(CircleShape)
+                        )
+                    }
                 }
             )
         }

@@ -46,7 +46,7 @@ fun CheckoutSuccessScreen(
     parentEntry: NavBackStackEntry
 ) {
     val catalogVM: CatalogViewModel = viewModel(parentEntry)
-    val order = catalogVM.buildOrderSummary()
+    val order = catalogVM.lastOrderSummary ?: catalogVM.buildOrderSummary()
 
     val money = remember {
         NumberFormat.getCurrencyInstance(Locale("es", "CL")).apply { maximumFractionDigits = 0 }

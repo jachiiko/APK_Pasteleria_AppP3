@@ -17,6 +17,25 @@ object FakeDatabase {
         return usuarios.firstOrNull { it.email.equals(email, ignoreCase = true) }
     }
 
+    fun actualizarDireccion(email: String, direccion: String, comuna: String, region: String): Usuario? {
+        val usuario = usuarios.firstOrNull { it.email.equals(email, ignoreCase = true) }
+        if (usuario != null) {
+            val index = usuarios.indexOf(usuario)
+            usuarios[index] = Usuario(
+                nombre = usuario.nombre,
+                apellido = usuario.apellido,
+                rut = usuario.rut,
+                direccion = direccion,
+                region = region,
+                comuna = comuna,
+                email = usuario.email,
+                password = usuario.password
+            )
+            return usuarios[index]
+        }
+        return null
+    }
+
     /**
      * Limpia los datos almacenados. Pensado para pruebas unitarias. //esto nos sirve por ahora, Esto se va a borrar una vez conectemos con la base de datos
      */

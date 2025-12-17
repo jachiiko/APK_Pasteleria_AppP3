@@ -5,11 +5,11 @@ import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.runtime.snapshots.SnapshotStateMap
 import androidx.lifecycle.ViewModel
 import com.example.diegoherrera22appmoviles007d_ev2_dherrera_jaraya.model.Producto
 import com.example.diegoherrera22appmoviles007d_ev2_dherrera_jaraya.repository.ProductRepository
-import com.example.diegoherrera22appmoviles007d_ev2_dherrera_jaraya.repository.ProductSpecifications
 import java.time.ZoneId
 import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
@@ -61,8 +61,8 @@ class CatalogViewModel : ViewModel() {
             "1000SABOR" to 20
         )
     }
-    val products: List<Producto> = ProductRepository.getCatalog()
-    val categories: List<String> = products.map { it.category }.distinct().sorted()
+    val products: SnapshotStateList<Producto> = ProductRepository.observeProducts()
+    val categories: List<String> get() = products.map { it.category }.distinct().sorted()
 
     var userEmail: String? by mutableStateOf(null)
         private set
@@ -73,18 +73,22 @@ class CatalogViewModel : ViewModel() {
     var lastOrderSummary: OrderSummary? by mutableStateOf(null)
         private set
 
-    private val priceMin = products.minOf { it.price }.toFloat()
-    private val priceMax = products.maxOf { it.price }.toFloat()
-
     private val _selectedCategories = mutableStateListOf<String>()
     val selectedCategories: List<String> get() = _selectedCategories
 
-    var selectedPriceRange by mutableStateOf(priceMin..priceMax)
+    private val priceRangeLimitsState: ClosedFloatingPointRange<Float>
+        get() {
+            val min = products.minOfOrNull { it.price }?.toFloat() ?: 0f
+            val max = products.maxOfOrNull { it.price }?.toFloat() ?: 0f
+            return min..max
+        }
+
+    var selectedPriceRange by mutableStateOf(priceRangeLimitsState)
         private set
 
-    val priceRangeLimits: ClosedFloatingPointRange<Float> get() = priceMin..priceMax
-    val priceMinLimit: Float get() = priceMin
-    val priceMaxLimit: Float get() = priceMax
+    val priceRangeLimits: ClosedFloatingPointRange<Float> get() = priceRangeLimitsState
+    val priceMinLimit: Float get() = priceRangeLimitsState.start
+    val priceMaxLimit: Float get() = priceRangeLimitsState.endInclusive
 
     val filteredProducts: List<Producto>
         get() {
@@ -101,6 +105,9 @@ class CatalogViewModel : ViewModel() {
     private val usedDiscountsByUser = mutableStateMapOf<String, MutableSet<String>>()
 
     var appliedDiscount: AppliedDiscount? by mutableStateOf(null)
+        private set
+
+    var errorMessage: String? by mutableStateOf(null)
         private set
 
     private var checkoutRecipient: String? by mutableStateOf(null)
@@ -122,14 +129,22 @@ class CatalogViewModel : ViewModel() {
         selectedPriceRange = range
     }
 
-    fun addToCart(product: Producto, amount: Int = 1) {
+    fun addToCart(product: Producto, amount: Int = 1): Boolean {
         val id = product.id
         val line = _cart[id]
+        val currentQty = line?.qty ?: 0
+        val requested = currentQty + amount
+        if (!ProductRepository.hasStock(id, requested)) {
+            errorMessage = "No hay stock disponible para ${product.name}."
+            return false
+        }
+
         if (line == null) {
             _cart[id] = CartLine(product, amount.coerceAtLeast(1))
         } else {
-            _cart[id] = line.copy(qty = line.qty + amount)
+            _cart[id] = line.copy(qty = requested)
         }
+        return true
     }
 
     fun decrement(productId: String, amount: Int = 1) {
@@ -155,11 +170,6 @@ class CatalogViewModel : ViewModel() {
     fun totalWithDiscount(): Int = totalCLP() - discountAmount()
     fun itemsCount(): Int = _cart.values.sumOf { it.qty }
     fun distinctCount(): Int = _cart.size
-
-    fun getSpecifications(productId: String): ProductSpecifications? {
-        return ProductRepository.getProductSpecifications(productId)
-    }
-
 
     fun buildOrderSummary(): OrderSummary {
         val items = cartLines.map {
@@ -197,12 +207,20 @@ class CatalogViewModel : ViewModel() {
         )
     }
 
-    fun finalizeOrder(recipient: String, address: String): OrderSummary {
+    fun finalizeOrder(recipient: String, address: String): OrderSummary? {
+        val lacking = cartLines.firstOrNull { !ProductRepository.hasStock(it.product.id, it.qty) }
+        if (lacking != null) {
+            errorMessage = "No hay stock de ${lacking.product.name}."
+            return null
+        }
+
+        ProductRepository.consumeStock(cartLines.map { it.product.id to it.qty })
         checkoutRecipient = recipient
         checkoutAddress = address
         val summary = buildOrderSummary()
         lastOrderSummary = summary
         _orderHistory.add(0, summary)
+        clearCart()
         return summary
     }
 
@@ -235,6 +253,26 @@ class CatalogViewModel : ViewModel() {
         usedCodes.add(code)
 
         return DiscountResult(true, "Aplicando ${percent}% de descuento con $code.")
+    }
+
+    fun updateInventory(productId: String, stock: Int, lotNumber: String) {
+        ProductRepository.updateInventory(productId, stock, lotNumber)
+    }
+
+    fun addProduct(product: Producto) {
+        ProductRepository.addProduct(product)
+        selectedPriceRange = priceRangeLimitsState
+    }
+
+    fun removeProduct(productId: String) {
+        ProductRepository.removeProduct(productId)
+        selectedPriceRange = priceRangeLimitsState
+    }
+
+    fun consumeError(): String? {
+        val msg = errorMessage
+        errorMessage = null
+        return msg
     }
 
     private fun priceWithoutIva(priceWithIva: Int): Int {

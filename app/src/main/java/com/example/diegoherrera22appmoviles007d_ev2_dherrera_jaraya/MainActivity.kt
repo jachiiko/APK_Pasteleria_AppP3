@@ -122,14 +122,17 @@ fun AppNavigation() {
                 UserProfileScreen(email = email, navController = navController, parentEntry = parentEntry)
             }
 
-            composable("backoffice") {
+            composable("backoffice") { backStackEntry ->
+                val parentEntry = remember(backStackEntry) { navController.getBackStackEntry("shop") }
                 BackOfficeListScreen(
-                    onAddProduct = { navController.navigate("backoffice/add") }
+                    onAddProduct = { navController.navigate("backoffice/add") },
+                    parentEntry = parentEntry
                 )
             }
 
-            composable("backoffice/add") {
-                AddProductScreen(navController = navController)
+            composable("backoffice/add") { backStackEntry ->
+                val parentEntry = remember(backStackEntry) { navController.getBackStackEntry("shop") }
+                AddProductScreen(navController = navController, parentEntry = parentEntry)
             }
 
             composable("cart") { backStackEntry ->

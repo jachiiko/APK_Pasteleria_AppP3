@@ -27,33 +27,88 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavController
+import com.example.diegoherrera22appmoviles007d_ev2_dherrera_jaraya.model.NutrientInfo
+import com.example.diegoherrera22appmoviles007d_ev2_dherrera_jaraya.model.Producto
 import com.example.diegoherrera22appmoviles007d_ev2_dherrera_jaraya.ui.theme.pastelButtonColors
 import com.example.diegoherrera22appmoviles007d_ev2_dherrera_jaraya.ui.theme.pastelOutlinedTextFieldColors
+import com.example.diegoherrera22appmoviles007d_ev2_dherrera_jaraya.viewmodel.CatalogViewModel
 
 /**
- * Pantalla "Agregar Producto" SOLO VISUAL (no guarda en ningún lado).
+ * Pantalla "Agregar Producto" ahora guarda en el catálogo en memoria.
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun AddProductScreen(navController: NavController) {
+fun AddProductScreen(navController: NavController, parentEntry: NavBackStackEntry) {
+
+    val catalogVM: CatalogViewModel = viewModel(parentEntry)
 
     var name by remember { mutableStateOf("") }
     var price by remember { mutableStateOf("") }
     var description by remember { mutableStateOf("") }
     var category by remember { mutableStateOf("") }
     var imageInfo by remember { mutableStateOf("") }
+    var sku by remember { mutableStateOf("") }
+    var lot by remember { mutableStateOf("") }
+    var stock by remember { mutableStateOf("") }
+    var nutritionalTable by remember { mutableStateOf("") }
+
+    val isValid = name.isNotBlank() && price.toIntOrNull() != null && sku.isNotBlank() && stock.toIntOrNull() != null
 
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Agregar Producto (solo visual)") },
+                title = { Text("Agregar Producto") },
                 navigationIcon = {
                     IconButton(onClick = { navController.popBackStack() }) {
                         Icon(Icons.Default.ArrowBack, contentDescription = "Volver")
                     }
                 }
             )
+        },
+        bottomBar = {
+            Button(
+                onClick = {
+                    val nutritionalInfo = nutritionalTable.lines()
+                        .map { it.trim() }
+                        .filter { it.isNotBlank() }
+                        .map { line ->
+                            val parts = line.split("|").map { it.trim() }
+                            NutrientInfo(
+                                name = parts.getOrElse(0) { "Dato" },
+                                perServing = parts.getOrElse(1) { "" },
+                                totalProduct = parts.getOrElse(2) { "" }
+                            )
+                        }
+
+                    val product = Producto(
+                        id = sku.uppercase(),
+                        category = category.ifBlank { "Sin categoría" },
+                        name = name,
+                        description = description.ifBlank { "Sin descripción" },
+                        price = price.toIntOrNull() ?: 0,
+                        imageRes = null,
+                        stock = stock.toIntOrNull() ?: 0,
+                        sku = sku.uppercase(),
+                        lotNumber = lot,
+                        nutritionalInfo = nutritionalInfo
+                    )
+                    catalogVM.addProduct(product)
+                    navController.popBackStack()
+                },
+                enabled = isValid,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp, vertical = 12.dp),
+                colors = pastelButtonColors(),
+            ) {
+                Text(
+                    "Guardar producto",
+                    style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold)
+                )
+            }
         }
     ) { padding ->
 
@@ -62,7 +117,7 @@ fun AddProductScreen(navController: NavController) {
                 .padding(padding)
                 .fillMaxSize()
                 .background(MaterialTheme.colorScheme.background)
-                .padding(16.dp),
+                .padding(horizontal = 16.dp, vertical = 12.dp),
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
 
@@ -71,16 +126,16 @@ fun AddProductScreen(navController: NavController) {
                 onValueChange = { name = it },
                 label = { Text("Nombre del producto") },
                 modifier = Modifier.fillMaxWidth(),
-                colors = pastelOutlinedTextFieldColors()
+                colors = pastelOutlinedTextFieldColors(),
             )
 
             OutlinedTextField(
                 value = price,
-                onValueChange = { price = it },
+                onValueChange = { price = it.filter { ch -> ch.isDigit() } },
                 label = { Text("Precio (CLP)") },
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                 modifier = Modifier.fillMaxWidth(),
-                colors = pastelOutlinedTextFieldColors()
+                colors = pastelOutlinedTextFieldColors(),
             )
 
             OutlinedTextField(
@@ -88,7 +143,7 @@ fun AddProductScreen(navController: NavController) {
                 onValueChange = { description = it },
                 label = { Text("Descripción") },
                 modifier = Modifier.fillMaxWidth(),
-                colors = pastelOutlinedTextFieldColors()
+                colors = pastelOutlinedTextFieldColors(),
             )
 
             OutlinedTextField(
@@ -96,31 +151,52 @@ fun AddProductScreen(navController: NavController) {
                 onValueChange = { category = it },
                 label = { Text("Categoría") },
                 modifier = Modifier.fillMaxWidth(),
-                colors = pastelOutlinedTextFieldColors()
+                colors = pastelOutlinedTextFieldColors(),
+            )
+
+            OutlinedTextField(
+                value = sku,
+                onValueChange = { sku = it },
+                label = { Text("SKU") },
+                modifier = Modifier.fillMaxWidth(),
+                colors = pastelOutlinedTextFieldColors(),
+                supportingText = { Text("Se usará como identificador del producto") }
+            )
+
+            OutlinedTextField(
+                value = lot,
+                onValueChange = { lot = it },
+                label = { Text("Lote") },
+                modifier = Modifier.fillMaxWidth(),
+                colors = pastelOutlinedTextFieldColors(),
+            )
+
+            OutlinedTextField(
+                value = stock,
+                onValueChange = { stock = it.filter { ch -> ch.isDigit() } },
+                label = { Text("Stock disponible") },
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                modifier = Modifier.fillMaxWidth(),
+                colors = pastelOutlinedTextFieldColors(),
+            )
+
+            OutlinedTextField(
+                value = nutritionalTable,
+                onValueChange = { nutritionalTable = it },
+                label = { Text("Tabla nutricional") },
+                supportingText = { Text("Formato: Nutriente|por porción|total (una línea por nutriente)") },
+                modifier = Modifier.fillMaxWidth(),
+                colors = pastelOutlinedTextFieldColors(),
             )
 
             OutlinedTextField(
                 value = imageInfo,
                 onValueChange = { imageInfo = it },
                 label = { Text("Imagen (referencia visual)") },
-                supportingText = { Text("Ej: nombre del drawable o link (no funcional)") },
+                supportingText = { Text("Ej: nombre del drawable o link") },
                 modifier = Modifier.fillMaxWidth(),
-                colors = pastelOutlinedTextFieldColors()
+                colors = pastelOutlinedTextFieldColors(),
             )
-
-            Button(
-                onClick = {
-                    // SOLO VISUAL: no persiste, volvemos atrás
-                    navController.popBackStack()
-                },
-                modifier = Modifier.fillMaxWidth(),
-                colors = pastelButtonColors()
-            ) {
-                Text(
-                    "Guardar (no funcional)",
-                    style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold)
-                )
-            }
         }
     }
 }

@@ -10,9 +10,11 @@ import androidx.lifecycle.ViewModel
 import com.example.diegoherrera22appmoviles007d_ev2_dherrera_jaraya.model.Producto
 import com.example.diegoherrera22appmoviles007d_ev2_dherrera_jaraya.repository.ProductRepository
 import com.example.diegoherrera22appmoviles007d_ev2_dherrera_jaraya.repository.ProductSpecifications
-import java.text.SimpleDateFormat
-import java.util.Date
+import java.time.ZoneId
+import java.time.ZonedDateTime
+import java.time.format.DateTimeFormatter
 import java.util.Locale
+import kotlin.math.roundToInt
 import kotlin.ranges.ClosedFloatingPointRange
 
 data class CartLine(
@@ -23,6 +25,8 @@ data class CartLine(
 data class OrderItem(
     val name: String,
     val unitPrice: Int,
+    val netPrice: Int,
+    val ivaAmount: Int,
     val qty: Int,
     val subtotal: Int
 )
@@ -35,6 +39,9 @@ data class OrderSummary(
 )
 
 class CatalogViewModel : ViewModel() {
+    companion object {
+        private const val IVA_RATE = 0.19
+    }
     val products: List<Producto> = ProductRepository.getCatalog()
     val categories: List<String> = products.map { it.category }.distinct().sorted()
 
@@ -113,19 +120,31 @@ class CatalogViewModel : ViewModel() {
 
     fun buildOrderSummary(): OrderSummary {
         val items = cartLines.map {
+            val netPrice = priceWithoutIva(it.product.price)
             OrderItem(
                 name = it.product.name,
                 unitPrice = it.product.price,
+                netPrice = netPrice,
+                ivaAmount = it.product.price - netPrice,
                 qty = it.qty,
                 subtotal = it.product.price * it.qty
             )
         }
-        val fmt = SimpleDateFormat("yyyy-MM-dd HH:mm", Locale("es", "CL"))
+        val localeCL = Locale("es", "CL")
+        val chileZone = ZoneId.of("America/Santiago")
+        val zonedDateTime = ZonedDateTime.now(chileZone)
+        val dateFormatter = DateTimeFormatter.ofPattern("EEEE d 'de' MMMM yyyy, HH:mm", localeCL)
+        val zoneFormatter = DateTimeFormatter.ofPattern("z", localeCL)
+        val dateText = "${zonedDateTime.format(dateFormatter)} hr."
         return OrderSummary(
             orderId = "P-${System.currentTimeMillis()}",
-            dateText = fmt.format(Date()),
+            dateText = dateText,
             items = items,
             total = items.sumOf { it.subtotal }
         )
+    }
+
+    private fun priceWithoutIva(priceWithIva: Int): Int {
+        return (priceWithIva / (1 + IVA_RATE)).roundToInt()
     }
 }

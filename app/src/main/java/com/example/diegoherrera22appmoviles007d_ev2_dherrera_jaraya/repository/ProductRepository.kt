@@ -292,7 +292,6 @@ object ProductRepository {
             Peso: 150 g (0,15 kg)
             Refrigerado dura: 5 días
             Calorías por porción: 380 kcal
-            Calorías totales: —
             
             Postre individual de mousse de chocolate cremoso.
             Textura aireada y sabor intenso.
@@ -304,7 +303,6 @@ object ProductRepository {
             Peso: 180 g (0,18 kg)
             Refrigerado dura: 5 días
             Calorías por porción: 450 kcal
-            Calorías totales: —
             
             Postre individual con capas suaves y sabor a café.
             Equilibrio entre dulzor y amargor.
@@ -340,7 +338,6 @@ object ProductRepository {
             Peso: 120 g (0,12 kg)
             Refrigerado dura: 4 día
             Calorías por porción: 320 kcal
-            Calorías totales: —
             
             Empanada dulce rellena con manzana cocida.
             Masa dorada y relleno suave.
@@ -352,7 +349,6 @@ object ProductRepository {
             Peso: 130 g (0,13 kg)
             Refrigerado dura: 7 días
             Calorías por porción: 410 kcal
-            Calorías totales: —
             
             Tarta individual elaborada a base de almendras.
             Textura densa y sabor tradicional.
@@ -364,7 +360,6 @@ object ProductRepository {
             Peso: 140 g (0,14 kg)
             Refrigerado dura: 5 días
             Calorías por porción: 430 kcal
-            Calorías totales: —
             
             Brownie individual sin gluten de textura húmeda.
             Sabor intenso a chocolate.
@@ -400,7 +395,6 @@ object ProductRepository {
             Peso: 90 g (0,09 kg)
             Refrigerado dura: 10 días
             Calorías por porción: 360 kcal
-            Calorías totales: —
             
             Galletas individuales elaboradas con avena.
             Sin ingredientes de origen animal.
@@ -438,7 +432,7 @@ object ProductRepository {
             "Tortas Cuadradas",
             "Torta Cuadrada de Chocolate",
             "Deliciosa torta de chocolate con capas de ganache y un toque de avellanas.",
-            45000,
+            25000,
             R.drawable.tc001
         ),
         Producto(
@@ -446,7 +440,7 @@ object ProductRepository {
             "Tortas Cuadradas",
             "Torta Cuadrada de Frutas",
             "Una mezcla de frutas frescas y crema chantilly sobre un suave bizcocho de vainilla.",
-            50000,
+            27000,
             R.drawable.tc002
         ),
         Producto(
@@ -454,7 +448,7 @@ object ProductRepository {
             "Tortas Circulares",
             "Torta Circular de Vainilla",
             "Bizcocho de vainilla clásico relleno con crema pastelera y cubierto con un glaseado dulce.",
-            40000,
+            22000,
             R.drawable.tt001
         ),
         Producto(
@@ -462,7 +456,7 @@ object ProductRepository {
             "Tortas Circulares",
             "Torta Circular de Manjar",
             "Torta tradicional chilena con manjar y nueces, un deleite de sabores dulces y clásicos.",
-            42000,
+            23000,
             R.drawable.tt002
         ),
         Producto(
@@ -470,7 +464,7 @@ object ProductRepository {
             "Postres Individuales",
             "Mousse de Chocolate",
             "Postre individual cremoso y suave, hecho con chocolate de alta calidad, ideal para los amantes del chocolate.",
-            5000,
+            4500,
             R.drawable.pi001
         ),
         Producto(
@@ -478,7 +472,7 @@ object ProductRepository {
             "Postres Individuales",
             "Tiramisú Clásico",
             "Un postre italiano individual con capas de café, mascarpone y cacao, perfecto para finalizar cualquier comida.",
-            5500,
+            4500,
             R.drawable.pi002
         ),
         Producto(
@@ -486,7 +480,7 @@ object ProductRepository {
             "Productos Sin Azúcar",
             "Torta Sin Azúcar de Naranja",
             "Torta ligera y deliciosa, endulzada naturalmente, ideal para quienes buscan opciones más saludables.",
-            48000,
+            23000,
             R.drawable.psa001
         ),
         Producto(
@@ -494,7 +488,7 @@ object ProductRepository {
             "Productos Sin Azúcar",
             "Cheesecake Sin Azúcar",
             "Suave y cremoso, este cheesecake es una opción perfecta para disfrutar sin culpa.",
-            47000,
+            24000,
             R.drawable.psa002
         ),
         Producto(
@@ -510,7 +504,7 @@ object ProductRepository {
             "Pastelería Tradicional",
             "Tarta de Santiago",
             "Tradicional tarta española hecha con almendras, azúcar, y huevos, una delicia de postres clásicos.",
-            3000,
+            4000,
             R.drawable.pt002
         ),
         Producto(
@@ -518,7 +512,7 @@ object ProductRepository {
             "Productos Sin Gluten",
             "Brownie Sin Gluten",
             "Rico y denso, este brownie es perfecto para quienes necesitan evitar el gluten sin sacrificar el sabor.",
-            4000,
+            4500,
             R.drawable.pg001
         ),
         Producto(
@@ -526,7 +520,7 @@ object ProductRepository {
             "Productos Sin Gluten",
             "Pan Sin Gluten",
             "Suave y esponjoso, ideal para sándwiches o para acompañar cualquier comida.",
-            3500,
+            11000,
             R.drawable.pg002
         ),
         Producto(
@@ -534,7 +528,7 @@ object ProductRepository {
             "Productos Veganos",
             "Torta Vegana de Chocolate",
             "Torta de chocolate húmeda y deliciosa, hecha sin productos de origen animal.",
-            50000,
+            26000,
             R.drawable.pv001
         ),
         Producto(
@@ -542,7 +536,7 @@ object ProductRepository {
             "Productos Veganos",
             "Galletas Veganas de Avena",
             "Crujientes y sabrosas, excelente opción para un snack saludable y vegano.",
-            4500,
+            3000,
             R.drawable.pv002
         ),
         Producto(
@@ -550,7 +544,7 @@ object ProductRepository {
             "Tortas Especiales",
             "Torta Especial de Cumpleaños",
             "Torta de queque diseñada especialmente para celebraciones de cumpleaños.",
-            55000,
+            30000,
             R.drawable.te001
         ),
         Producto(
@@ -558,7 +552,7 @@ object ProductRepository {
             "Tortas Especiales",
             "Torta Especial de Boda",
             "Elegante y deliciosa, esta torta está diseñada para ser el centro de atención en cualquier boda.",
-            60000,
+            70000,
             R.drawable.te002
         )
 

@@ -22,6 +22,7 @@ android {
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11
+        isCoreLibraryDesugaringEnabled = true
     }
 
     kotlinOptions { jvmTarget = "11" }
@@ -58,6 +59,9 @@ dependencies {
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)
 
+    // Desugaring para APIs java.time en minSdk 24+
+    coreLibraryDesugaring(libs.desugar.jdk.libs)
+
     // Networking
     implementation(libs.retrofit)
     implementation(libs.converter.gson)
@@ -83,7 +87,7 @@ dependencies {
     testImplementation(libs.kotest.runner.junit5)
     testImplementation(libs.kotest.assertions.core)
 
-// JUnit 5
+    // JUnit 5
     testImplementation(libs.junit.jupiter)
 
     // MockK

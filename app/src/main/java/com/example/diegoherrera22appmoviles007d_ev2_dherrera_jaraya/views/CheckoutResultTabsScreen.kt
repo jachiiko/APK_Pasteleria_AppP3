@@ -115,6 +115,11 @@ fun CheckoutSuccessScreen(
                                     Column(modifier = Modifier.weight(1f)) {
                                         Text(line.name, fontWeight = FontWeight.SemiBold)
                                         Text(
+                                            "${money.format(line.unitPrice)} = ${money.format(line.netPrice)} + ${money.format(line.ivaAmount)} (19% IVA)",
+                                            style = MaterialTheme.typography.bodySmall,
+                                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                                        )
+                                        Text(
                                             "${line.qty} x ${money.format(line.unitPrice)}",
                                             style = MaterialTheme.typography.bodyMedium,
                                             color = MaterialTheme.colorScheme.onSurfaceVariant

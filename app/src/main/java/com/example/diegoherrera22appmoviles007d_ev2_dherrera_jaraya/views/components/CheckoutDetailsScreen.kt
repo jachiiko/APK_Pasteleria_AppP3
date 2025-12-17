@@ -181,7 +181,39 @@ fun CheckoutDetailsScreen(
 
             Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                 Button(
-                    onClick = { navController.navigate("checkout/success") },
+                    onClick = {
+                        val resolvedRecipient = if (recipientOption == RecipientOption.Me) {
+                            registeredUser?.let { "${it.nombre} ${it.apellido}" }
+                                ?: userEmail
+                                ?: "Destinatario"
+                        } else {
+                            listOf(recipientName, recipientLastname)
+                                .filter { it.isNotBlank() }
+                                .joinToString(" ")
+                                .ifBlank { "Destinatario" }
+                        }
+
+                        val resolvedAddress = if (useSavedAddress && registeredUser != null) {
+                            listOfNotNull(
+                                registeredUser.direccion.takeIf { it.isNotBlank() },
+                                registeredUser.comuna.takeIf { it.isNotBlank() },
+                                registeredUser.region.takeIf { it.isNotBlank() }
+                            ).joinToString(", ")
+                                .ifBlank { "Dirección no indicada" }
+                        } else {
+                            listOf(customAddress, customComuna, customCity)
+                                .filter { it.isNotBlank() }
+                                .joinToString(", ")
+                                .ifBlank { "Dirección no indicada" }
+                        }
+
+                        catalogVM.updateCheckoutDetails(
+                            recipient = resolvedRecipient,
+                            address = resolvedAddress
+                        )
+
+                        navController.navigate("checkout/success")
+                    },
                     modifier = Modifier.fillMaxWidth(),
                     colors = pastelButtonColors()
                 ) {

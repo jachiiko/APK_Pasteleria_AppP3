@@ -34,6 +34,8 @@ data class OrderItem(
 data class OrderSummary(
     val orderId: String,
     val dateText: String,
+    val recipientName: String,
+    val shippingAddress: String,
     val items: List<OrderItem>,
     val total: Int,
     val discountPercent: Int,
@@ -95,6 +97,9 @@ class CatalogViewModel : ViewModel() {
     var appliedDiscount: AppliedDiscount? by mutableStateOf(null)
         private set
 
+    private var checkoutRecipient: String? by mutableStateOf(null)
+    private var checkoutAddress: String? by mutableStateOf(null)
+
     fun updateUserEmail(email: String?) {
         userEmail = email
     }
@@ -132,6 +137,8 @@ class CatalogViewModel : ViewModel() {
     fun clearCart() {
         _cart.clear()
         appliedDiscount = null
+        checkoutRecipient = null
+        checkoutAddress = null
     }
 
     fun totalCLP(): Int = _cart.values.sumOf { it.product.price * it.qty }
@@ -163,6 +170,8 @@ class CatalogViewModel : ViewModel() {
         val discountPercent = appliedDiscount?.percent ?: 0
         val discountAmount = (items.sumOf { it.subtotal } * discountPercent) / 100
         val finalTotal = items.sumOf { it.subtotal } - discountAmount
+        recipientName = recipient,
+        shippingAddress = address,
         val localeCL = Locale("es", "CL")
         val chileZone = ZoneId.of("America/Santiago")
         val zonedDateTime = ZonedDateTime.now(chileZone)
@@ -172,12 +181,19 @@ class CatalogViewModel : ViewModel() {
         return OrderSummary(
             orderId = "P-${System.currentTimeMillis()}",
             dateText = dateText,
+            recipientName = recipient,
+            shippingAddress = address,
             items = items,
             total = items.sumOf { it.subtotal },
             discountPercent = discountPercent,
             discountAmount = discountAmount,
             finalTotal = finalTotal
         )
+    }
+
+    fun updateCheckoutDetails(recipient: String?, address: String?) {
+        checkoutRecipient = recipient
+        checkoutAddress = address
     }
 
     fun applyDiscountCode(input: String): DiscountResult {

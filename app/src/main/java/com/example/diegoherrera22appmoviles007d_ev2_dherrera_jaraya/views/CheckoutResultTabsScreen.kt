@@ -46,7 +46,7 @@ fun CheckoutSuccessScreen(
     parentEntry: NavBackStackEntry
 ) {
     val catalogVM: CatalogViewModel = viewModel(parentEntry)
-    val order = remember(catalogVM.cartLines) { catalogVM.buildOrderSummary() }
+    val order = catalogVM.buildOrderSummary()
 
     val money = remember {
         NumberFormat.getCurrencyInstance(Locale("es", "CL")).apply { maximumFractionDigits = 0 }
@@ -97,6 +97,8 @@ fun CheckoutSuccessScreen(
                         )
                         Text("N° Pedido: ${order.orderId}")
                         Text("Fecha: ${order.dateText}")
+                        Text("Destinatario: ${order.recipientName}")
+                        Text("Dirección: ${order.shippingAddress}")
 
                         Divider()
 

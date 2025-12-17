@@ -81,5 +81,7 @@ class CatalogViewModelTest : StringSpec({
         resumen.discountPercent shouldBe 0
         resumen.discountAmount shouldBe 0
         resumen.finalTotal shouldBe resumen.total
+        resumen.recipientName shouldBe "Destinatario"
+        resumen.shippingAddress shouldBe "Dirección no indicada"
     }
 })

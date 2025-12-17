@@ -20,18 +20,24 @@ class UserRepository(
     }
 
     /**
-     * Actualiza dirección del usuario autenticado.
+     * Actualiza el perfil del usuario autenticado.
      * 1) Trae el usuario actual (incluye id)
      * 2) Hace PUT /users con el payload actualizado
      */
-    suspend fun updateMyAddress(
+    suspend fun updateMyProfile(
+        nombre: String,
+        apellido: String,
+        rut: String,
         direccion: String,
         comuna: String,
         region: Region
-    ): User? {
-        val me = getMe() ?: return null
+    ): Result<User> {
+        val me = getMe() ?: return Result.failure(IllegalStateException("Usuario no disponible"))
 
         val payload = me.copy(
+            nombre = nombre,
+            apellido = apellido,
+            rut = rut,
             direccion = direccion,
             comuna = comuna,
             region = region,
@@ -39,9 +45,9 @@ class UserRepository(
         )
 
         return try {
-            userApi.updateUser(payload)
-        } catch (_: Exception) {
-            null
+            Result.success(userApi.updateUser(payload))
+        } catch (e: Exception) {
+            Result.failure(e)
         }
     }
 

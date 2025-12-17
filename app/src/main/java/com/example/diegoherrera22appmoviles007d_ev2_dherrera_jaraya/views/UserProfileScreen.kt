@@ -39,6 +39,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -71,15 +72,17 @@ fun UserProfileScreen(
     val userViewModel: UserViewModel = viewModel(parentEntry)
     val user by userViewModel.user.collectAsState()
     val message by userViewModel.message.collectAsState()
+    val isLoading by userViewModel.isLoading.collectAsState()
 
-    var nombre by remember(user) { mutableStateOf(user?.nombre.orEmpty()) }
-    var apellido by remember(user) { mutableStateOf(user?.apellido.orEmpty()) }
-    var direccion by remember(user) { mutableStateOf(user?.direccion.orEmpty()) }
-    var comuna by remember(user) { mutableStateOf(user?.comuna.orEmpty()) }
-    var region by remember(user) { mutableStateOf(user?.region?.nombre.orEmpty()) }
+    var nombre by rememberSaveable { mutableStateOf("") }
+    var apellido by rememberSaveable { mutableStateOf("") }
+    var rut by rememberSaveable { mutableStateOf("") }
+    var direccion by rememberSaveable { mutableStateOf("") }
+    var comuna by rememberSaveable { mutableStateOf("") }
+    var region by rememberSaveable { mutableStateOf("") }
     var selectedOrder by remember { mutableStateOf<OrderSummary?>(null) }
     var userDataExpanded by remember { mutableStateOf(false) }
-    var localMessage by remember { mutableStateOf<String?>(null) }
+    var localMessage by rememberSaveable { mutableStateOf<String?>(null) }
 
     val regionesState by regionViewModel.regiones.collectAsState()
     val regiones = regionesState.map { it.nombre }
@@ -95,7 +98,23 @@ fun UserProfileScreen(
         userViewModel.loadMe()
     }
 
+    LaunchedEffect(user?.id) {
+        user?.let {
+            nombre = it.nombre.orEmpty()
+            apellido = it.apellido.orEmpty()
+            rut = it.rut.orEmpty()
+            direccion = it.direccion.orEmpty()
+            comuna = it.comuna.orEmpty()
+            region = it.region?.nombre.orEmpty()
+        }
+    }
 
+    LaunchedEffect(message) {
+        if (message != null) {
+            localMessage = message
+            userViewModel.consumeMessage()
+        }
+    }
     Scaffold(
         topBar = {
             TopAppBar(
@@ -272,32 +291,36 @@ fun UserProfileScreen(
                                     }
                                 }
                             }
+                            val isFormValid = nombre.isNotBlank() && apellido.isNotBlank() && rut.isNotBlank() &&
+                                    direccion.isNotBlank() && region.isNotBlank() && comuna.isNotBlank()
+
                             Button(
                                 onClick = {
-                                    if (!email.isNullOrBlank()) {
-                                        val selectedRegion = regionesState.firstOrNull { it.nombre == region }
-                                        if (selectedRegion != null) {
-                                            userViewModel.updateAddress(
-                                                direccion = direccion.trim(),
-                                                comuna = comuna.trim(),
-                                                region = selectedRegion
-                                            )
-                                            localMessage = null
-                                        } else {
-                                            localMessage = "Selecciona una región válida"
-                                        }
+                                    val selectedRegion = regionesState.firstOrNull { it.nombre == region }
+                                    if (selectedRegion != null) {
+                                        userViewModel.updateProfile(
+                                            nombre = nombre.trim(),
+                                            apellido = apellido.trim(),
+                                            rut = rut.trim(),
+                                            direccion = direccion.trim(),
+                                            comuna = comuna.trim(),
+                                            region = selectedRegion
+                                        )
+                                        localMessage = null
+                                    } else {
+                                        localMessage = "Selecciona una región válida"
                                     }
                                 },
                                 modifier = Modifier.fillMaxWidth(),
                                 colors = pastelButtonColors()
                             ) {
                                 Text(
-                                    "Guardar",
+                                    if (isLoading) "Guardando..." else "Guardar",
                                     modifier = Modifier.fillMaxWidth(),
                                     textAlign = TextAlign.Center
                                 )
                             }
-                            val saveMessage = message ?: localMessage
+                            val saveMessage = localMessage
                             AnimatedVisibility(visible = saveMessage != null) {
                                 Text(
                                     saveMessage.orEmpty(),

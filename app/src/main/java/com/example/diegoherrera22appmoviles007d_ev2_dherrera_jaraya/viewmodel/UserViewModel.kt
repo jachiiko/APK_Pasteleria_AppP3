@@ -9,6 +9,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import retrofit2.HttpException
 
 class UserViewModel(
     private val repository: UserRepository = UserRepository()
@@ -33,19 +34,34 @@ class UserViewModel(
         }
     }
 
-    fun updateAddress(direccion: String, comuna: String, region: Region) {
+    fun updateProfile(
+        nombre: String,
+        apellido: String,
+        rut: String,
+        direccion: String,
+        comuna: String,
+        region: Region
+    ) {
         viewModelScope.launch {
             _isLoading.value = true
-            val updated = repository.updateMyAddress(
+            val updated = repository.updateMyProfile(
+                nombre = nombre,
+                apellido = apellido,
+                rut = rut,
                 direccion = direccion,
                 comuna = comuna,
                 region = region
             )
-            if (updated != null) {
-                _user.value = updated
+            updated.onSuccess {
+                _user.value = it
                 _message.value = "Datos guardados"
-            } else {
-                _message.value = "No se pudo actualizar la dirección"
+            }.onFailure { error ->
+                val errorMessage = when {
+                    error is HttpException && (error.code() == 401 || error.code() == 403) ->
+                        "Sesión expirada"
+                    else -> "No se pudo actualizar el usuario"
+                }
+                _message.value = errorMessage
             }
             _isLoading.value = false
         }

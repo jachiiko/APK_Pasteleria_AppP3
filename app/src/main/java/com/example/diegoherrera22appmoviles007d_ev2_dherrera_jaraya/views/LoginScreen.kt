@@ -65,11 +65,16 @@ fun LoginScreen(navController: NavController, viewModel: AuthViewModel) {
             modifier = Modifier
                 .fillMaxSize()
                 .background(MaterialTheme.colorScheme.background)
-                .padding(horizontal = 24.dp, vertical = 32.dp),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(16.dp, Alignment.CenterVertically)
+                .padding(horizontal = 24.dp, vertical = 24.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 72.dp),
+                verticalArrangement = Arrangement.spacedBy(12.dp)
+            ) {
                 Image(
                     painter = painterResource(id = R.drawable.icono),
                     contentDescription = "Icono de Pastelería",
@@ -77,7 +82,7 @@ fun LoginScreen(navController: NavController, viewModel: AuthViewModel) {
                 )
 
                 Text(
-                    text = "Pasteleria 100\nSabores",
+                    text = "Pasteleria 1000\nSabores",
                     style = MaterialTheme.typography.displaySmall.copy(
                         fontSize = 44.sp,
                         lineHeight = 48.sp,
@@ -86,21 +91,21 @@ fun LoginScreen(navController: NavController, viewModel: AuthViewModel) {
                     ),
                     textAlign = TextAlign.Center,
                     modifier = Modifier
-                        .padding(top = 16.dp)
+                        .padding(top = 6.dp)
                         .fillMaxWidth()
                 )
             }
-
-            Spacer(modifier = Modifier.height(40.dp))
 
             Text(
                 text = "Inicio de sesión",
                 style = MaterialTheme.typography.titleLarge,
                 textAlign = TextAlign.Center,
                 modifier = Modifier
-                    .padding(bottom = 8.dp)
+                    .padding(top = 16.dp, bottom = 4.dp)
                     .fillMaxWidth()
             )
+
+            Spacer(modifier = Modifier.height(8.dp))
 
             OutlinedTextField(
                 value = email,
@@ -111,6 +116,8 @@ fun LoginScreen(navController: NavController, viewModel: AuthViewModel) {
                 keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
                 colors = pastelOutlinedTextFieldColors()
             )
+
+            Spacer(modifier = Modifier.height(12.dp))
 
             OutlinedTextField(
                 value = password,
@@ -123,7 +130,17 @@ fun LoginScreen(navController: NavController, viewModel: AuthViewModel) {
                 colors = pastelOutlinedTextFieldColors()
             )
 
-            Spacer(modifier = Modifier.height(10.dp))
+            if (viewModel.mensaje.value.isNotBlank()) {
+                Text(
+                    viewModel.mensaje.value,
+                    modifier = Modifier
+                        .padding(top = 10.dp)
+                        .fillMaxWidth(),
+                    textAlign = TextAlign.Center
+                )
+            }
+
+            Spacer(modifier = Modifier.weight(1f))
 
             Button(
                 onClick = {
@@ -131,25 +148,23 @@ fun LoginScreen(navController: NavController, viewModel: AuthViewModel) {
                     if (!ok) return@Button
 
                     val e = email.trim().lowercase()
-                    val destination = when {
-                        e.endsWith("@admin.cl") -> "backoffice"
-                        e.endsWith("@duoc.cl") -> "home/$email"
-                        else -> {
-                            viewModel.mensaje.value = "Dominio no permitido (usa @duoc.cl o @admin.cl)"
-                            return@Button
-                        }
+                    val destination = if (e.endsWith("@admin.cl")) {
+                        "backoffice"
+                    } else {
+                        "home/${email.trim()}"
                     }
                     navController.navigate(destination) {
-                        popUpTo("login") { inclusive = true }
+                        popUpTo("login") { inclusive = false }
                     }
                 },
                 colors = pastelButtonColors(),
                 modifier = Modifier.fillMaxWidth()
             ) {
-                Text("Entrar")
+                Text(
+                    "Iniciar sesión",
+                    style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold)
+                )
             }
-
-            Text(viewModel.mensaje.value, modifier = Modifier.padding(top = 10.dp))
 
             TextButton(
                 onClick = { navController.navigate("register") },

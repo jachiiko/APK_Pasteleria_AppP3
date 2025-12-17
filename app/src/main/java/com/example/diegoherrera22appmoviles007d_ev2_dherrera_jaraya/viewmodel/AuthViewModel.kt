@@ -1,21 +1,45 @@
 package com.example.diegoherrera22appmoviles007d_ev2_dherrera_jaraya.viewmodel
 
-import androidx.lifecycle.ViewModel
+import android.content.Context
 import androidx.compose.runtime.mutableStateOf
-import com.example.diegoherrera22appmoviles007d_ev2_dherrera_jaraya.model.FakeDatabase
-import com.example.diegoherrera22appmoviles007d_ev2_dherrera_jaraya.model.Usuario
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.viewModelScope
+import com.example.diegoherrera22appmoviles007d_ev2_dherrera_jaraya.dto.LoginRequest
+import com.example.diegoherrera22appmoviles007d_ev2_dherrera_jaraya.dto.RegisterRequest
+import com.example.diegoherrera22appmoviles007d_ev2_dherrera_jaraya.model.Region
+import com.example.diegoherrera22appmoviles007d_ev2_dherrera_jaraya.repository.ApiClient
+import com.example.diegoherrera22appmoviles007d_ev2_dherrera_jaraya.repository.TokenDataStore
+import com.example.diegoherrera22appmoviles007d_ev2_dherrera_jaraya.repository.api.AuthApi
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.withContext
+import retrofit2.HttpException
 
-class AuthViewModel : ViewModel() {
+class AuthViewModel(
+    private val authApi: AuthApi = ApiClient.authApi,
+    private val tokenDataStore: TokenDataStore
+) : ViewModel() {
 
     var mensaje = mutableStateOf("")
     var usuarioActual = mutableStateOf<String?>(null)
+    var token = mutableStateOf<String?>(null)
+
+    init {
+        viewModelScope.launch {
+            tokenDataStore.tokenFlow.collect { savedToken ->
+                token.value = savedToken
+            }
+        }
+    }
 
     fun registrar(
         nombre: String,
         apellido: String,
         rut: String,
         direccion: String,
-        region: String,
+        region: Region,
         comuna: String,
         email: String,
         password: String
@@ -25,13 +49,37 @@ class AuthViewModel : ViewModel() {
             return false
         }
 
-        val nuevo = Usuario(nombre, apellido, rut, direccion, region, comuna, email, password)
-        return if (FakeDatabase.registrar(nuevo)) {
-            mensaje.value = "Registro exitoso"
-            true
-        } else {
-            mensaje.value = "El usuario ya existe"
-            false
+        return runBlocking {
+            try {
+                val request = RegisterRequest(
+                    nombre = nombre,
+                    apellido = apellido,
+                    rut = rut,
+                    direccion = direccion,
+                    region = region,
+                    comuna = comuna,
+                    email = email,
+                    password = password
+                )
+
+                withContext(Dispatchers.IO) {
+                    authApi.register(request)
+                }
+
+                mensaje.value = "Registro exitoso"
+                true
+            } catch (e: HttpException) {
+                mensaje.value = when (e.code()) {
+                    400 -> "Datos inválidos o incompletos"
+                    404 -> "Región o comuna inválida"
+                    409 -> "El email ya se encuentra registrado"
+                    else -> "Error del servidor (${e.code()})"
+                }
+                false
+            } catch (e: Exception) {
+                mensaje.value = "Error de conexión. Intenta nuevamente"
+                false
+            }
         }
     }
 
@@ -66,19 +114,43 @@ class AuthViewModel : ViewModel() {
         return dv == dvEsperado && cuerpoNumero > 0
     }
 
-
     fun login(email: String, password: String): Boolean {
-        return if (FakeDatabase.login(email, password)) {
-            usuarioActual.value = email
-            mensaje.value = "Inicio de sesión exitoso"
-            true
-        } else {
-            mensaje.value = "Credenciales inválidas"
-            false
+        return runBlocking {
+            try {
+                val response = withContext(Dispatchers.IO) {
+                    authApi.login(LoginRequest(email, password))
+                }
+                token.value = response.token
+                withContext(Dispatchers.IO) {
+                    tokenDataStore.saveToken(response.token)
+                }
+                usuarioActual.value = email
+                mensaje.value = "Inicio de sesión exitoso"
+                true
+            } catch (e: HttpException) {
+                mensaje.value = when (e.code()) {
+                    400 -> "Datos faltantes"
+                    401 -> "Credenciales inválidas"
+                    else -> "Error del servidor (${e.code()})"
+                }
+                false
+            } catch (e: Exception) {
+                mensaje.value = "Error de conexión. Intenta nuevamente"
+                false
+            }
         }
     }
 
-
-
-
+    companion object {
+        fun provideFactory(
+            context: Context,
+            authApi: AuthApi = ApiClient.authApi
+        ): ViewModelProvider.Factory = object : ViewModelProvider.Factory {
+            @Suppress("UNCHECKED_CAST")
+            override fun <T : ViewModel> create(modelClass: Class<T>): T {
+                val dataStore = TokenDataStore(context.applicationContext)
+                return AuthViewModel(authApi, dataStore) as T
+            }
+        }
+    }
 }

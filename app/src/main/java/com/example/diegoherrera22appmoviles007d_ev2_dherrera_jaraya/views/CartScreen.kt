@@ -64,6 +64,12 @@ fun CartScreen(
         NumberFormat.getCurrencyInstance(Locale("es","CL")).apply { maximumFractionDigits = 0 }
     }
 
+    val snackbarHostState = remember { SnackbarHostState() }
+
+    LaunchedEffect(catalogVM.errorMessage) {
+        catalogVM.consumeError()?.let { snackbarHostState.showSnackbar(it) }
+    }
+
     Scaffold(
         topBar = {
             TopAppBar(
@@ -76,12 +82,16 @@ fun CartScreen(
                 actions = {
                     if (lines.isNotEmpty()) {
                         TextButton(onClick = { catalogVM.clearCart() }, colors = pastelTextButtonColors()) {
-                            Text("Vaciar")
+                            Text(
+                                "Vaciar",
+                                style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold)
+                            )
                         }
                     }
                 }
             )
-        }
+        },
+        snackbarHost = { SnackbarHost(hostState = snackbarHostState) }
     ) { inner ->
         if (lines.isEmpty()) {
             Box(
@@ -129,11 +139,14 @@ fun CartScreen(
                 }
 
                 Button(
-                    onClick = { navController.navigate("checkout/results") },
+                    onClick = { navController.navigate("checkout/details") },
                     modifier = Modifier.fillMaxWidth(),
                     colors = pastelButtonColors()
                 ) {
-                    Text("Finalizar compra")
+                    Text(
+                        "Continuar compra",
+                        style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold)
+                    )
                 }
             }
         }

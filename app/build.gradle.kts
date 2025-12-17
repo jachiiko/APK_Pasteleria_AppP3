@@ -22,9 +22,19 @@ android {
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11
+        isCoreLibraryDesugaringEnabled = true
     }
 
     kotlinOptions { jvmTarget = "11" }
+
+    packaging {
+        jniLibs {
+            // Evita la compresión de las bibliotecas nativas y las alinea a 16 KB
+            // para asegurar compatibilidad con dispositivos que usan ese tamaño
+            // de página (requisito de Play a partir de Android 15+).
+            useLegacyPackaging = false
+        }
+    }
 }
 
 dependencies {
@@ -49,11 +59,17 @@ dependencies {
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)
 
+    // Desugaring para APIs java.time en minSdk 24+
+    coreLibraryDesugaring(libs.desugar.jdk.libs)
+
     // Networking
     implementation(libs.retrofit)
     implementation(libs.converter.gson)
     implementation(libs.okhttp)
     implementation(libs.logging.interceptor)
+
+    // DataStore
+    implementation("androidx.datastore:datastore-preferences:1.1.1")
 
     // Room
     implementation(libs.androidx.room.runtime)
@@ -70,27 +86,28 @@ dependencies {
     androidTestImplementation(libs.androidx.espresso.core)
     androidTestImplementation(platform(libs.androidx.compose.bom))
 
+    // Force a stable annotations artifact version to avoid the deprecated 24.1.0 build error
+    implementation("org.jetbrains:annotations:24.0.1")
+
     // Kotest
     testImplementation(libs.kotest.runner.junit5)
     testImplementation(libs.kotest.assertions.core)
 
-// JUnit 5
+    // JUnit 5
     testImplementation(libs.junit.jupiter)
 
-// MockK
+    // MockK
     testImplementation(libs.mockk)
 
-// Compose UI Test
+    // Compose UI Test
     androidTestImplementation(libs.androidx.ui.test.junit4)
     debugImplementation(libs.androidx.ui.test.manifest)
 
-
     debugImplementation(libs.androidx.compose.ui.tooling)
     debugImplementation(libs.androidx.compose.ui.test.manifest)
+}
 
-    tasks.withType<Test>().configureEach {
-        useJUnitPlatform()
-    }
-
+tasks.withType<Test>().configureEach {
+    useJUnitPlatform()
 }
 

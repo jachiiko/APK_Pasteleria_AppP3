@@ -20,8 +20,8 @@ DESARROLLO DE APLICACIONES MOVILES_007D
 3. Ejecuta la app en un emulador/dispositivo. La pantalla inicial es **login**.
 
 ## Flujo y pantallas principales
-- **Login (`LoginScreen`)**: valida credenciales contra un `FakeDatabase` en memoria. Guarda el correo en `AuthViewModel.usuarioActual` tras un inicio exitoso.
-- **Registro (`RegisterScreen`)**: captura datos personales, región y comuna (desde API o *fallback* local), y restringe el correo a dominios `@duoc.cl` o `@admin.cl`. El `AuthViewModel` inserta el usuario en el `FakeDatabase` y muestra mensajes de estado.
+- **Login (`LoginScreen`)**: envía email y contraseña a la API real. Guarda el correo en `AuthViewModel.usuarioActual` y el token JWT en memoria tras un inicio exitoso.
+- **Registro (`RegisterScreen`)**: captura datos personales, región y comuna (desde la API) y restringe el correo a dominios `@duoc.cl` o `@admin.cl`. El `AuthViewModel` llama a `/auth/register`, envía la región completa y muestra el mensaje retornado según el resultado.
 - **Catálogo (`HomeScreen`)**: tras logear navega a `shop/home/{email}`. Muestra las tarjetas de producto con filtros por categoría (chips) y rango de precio (slider). Un chip abre el **carrito** mostrando cantidad y total acumulado. Cada producto permite agregar al carrito y abrir el detalle.
 - **Detalle de producto (`ProductDetailScreen`)**: recibe el `productId`, muestra descripción extendida desde `ProductRepository` y permite sumar unidades al carrito usando el mismo `CatalogViewModel` compartido.
 - **Carrito (`CartScreen`)**: lista las líneas agregadas, permite incrementar/decrementar o eliminar, vaciar el carrito y navegar al *checkout* de resultados. Calcula subtotal, total y cantidad con `CatalogViewModel`.
@@ -65,7 +65,9 @@ DESARROLLO DE APLICACIONES MOVILES_007D
 
 ## Estructura rápida del módulo `app`
 - `MainActivity.kt`: arranque de Compose y grafo de navegación.
-- `model/`: modelos `Usuario`, `Producto`, `Region` y el `FakeDatabase` para autenticación.
-- `repository/`: `ProductRepository` (catálogo), `ApiClient` + `RegionComunaRepository` (regiones/comunas).
+- `model/`: modelos `Producto`, `Region` y los DTOs `RegisterRequest`, `RegisterResponse`, `LoginRequest` y `LoginResponse` para la API de autenticación.
+- `repository/`: `ProductRepository` (catálogo), `ApiClient` + `RegionComunaRepository` (regiones/comunas) y `AuthApi` para login/registro.
 - `viewmodel/`: `AuthViewModel`, `CatalogViewModel` (filtros, carrito, resumen de pedido) y `RegionViewModel` (carga de regiones).
 - `views/`: pantallas Compose; incluye subcarpeta `backoffice/` y `components/` con UI reutilizable.
+  app/src/main/java/com/example/diegoherrera22appmoviles007d_ev2_dherrera_jaraya/model/FakeDatabase.kt
+  Deleted

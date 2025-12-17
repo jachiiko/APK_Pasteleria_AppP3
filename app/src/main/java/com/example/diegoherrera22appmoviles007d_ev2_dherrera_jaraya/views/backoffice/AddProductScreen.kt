@@ -21,7 +21,6 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.TextButton
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
@@ -60,13 +59,27 @@ fun AddProductScreen(navController: NavController, parentEntry: NavBackStackEntr
     var sku by remember { mutableStateOf("") }
     var lot by remember { mutableStateOf("") }
     var stock by remember { mutableStateOf("") }
+    val defaultNutrients = listOf(
+        "Energía",
+        "Proteínas",
+        "Grasas totales",
+        "Grasas saturadas",
+        "Carbohidratos",
+        "Azúcares",
+        "Sodio"
+    )
+
     data class NutrientRowState(
         val name: String = "",
         val perServing: String = "",
-        val totalProduct: String = ""
+        val totalProduct: String = "",
     )
 
-    val nutrientRows = remember { mutableStateListOf(NutrientRowState()) }
+    val nutrientRows = remember {
+        mutableStateListOf<NutrientRowState>().apply {
+            defaultNutrients.forEach { add(NutrientRowState(name = it)) }
+        }
+    }
 
     val isValid = name.isNotBlank() && price.toIntOrNull() != null && sku.isNotBlank() && stock.toIntOrNull() != null
 
@@ -229,14 +242,14 @@ fun AddProductScreen(navController: NavController, parentEntry: NavBackStackEntr
                     Row(modifier = Modifier.fillMaxWidth()) {
                         OutlinedTextField(
                             value = row.name,
-                            onValueChange = { value ->
-                                nutrientRows[index] = nutrientRows[index].copy(name = value)
-                            },
-                            label = { Text("Nombre") },
+                            onValueChange = {},
+                            enabled = false,
+                            readOnly = true,
+                            label = { Text("Nutriente") },
                             modifier = Modifier
                                 .weight(1f)
                                 .padding(end = 4.dp),
-                            colors = pastelOutlinedTextFieldColors()
+                            colors = pastelOutlinedTextFieldColors(),
                         )
                         OutlinedTextField(
                             value = row.perServing,
@@ -247,7 +260,7 @@ fun AddProductScreen(navController: NavController, parentEntry: NavBackStackEntr
                             modifier = Modifier
                                 .weight(1f)
                                 .padding(horizontal = 4.dp),
-                            colors = pastelOutlinedTextFieldColors()
+                            colors = pastelOutlinedTextFieldColors(),
                         )
                         OutlinedTextField(
                             value = row.totalProduct,
@@ -258,16 +271,9 @@ fun AddProductScreen(navController: NavController, parentEntry: NavBackStackEntr
                             modifier = Modifier
                                 .weight(1f)
                                 .padding(start = 4.dp),
-                            colors = pastelOutlinedTextFieldColors()
+                            colors = pastelOutlinedTextFieldColors(),
                         )
                     }
-                }
-
-                TextButton(
-                    onClick = { nutrientRows.add(NutrientRowState()) },
-                    modifier = Modifier.padding(top = 4.dp)
-                ) {
-                    Text("Agregar nutriente")
                 }
             }
 
@@ -275,7 +281,6 @@ fun AddProductScreen(navController: NavController, parentEntry: NavBackStackEntr
                 value = imageInfo,
                 onValueChange = { imageInfo = it },
                 label = { Text("Imagen (referencia visual)") },
-                supportingText = { Text("Opcional: nombre del drawable o link") },
                 modifier = Modifier.fillMaxWidth(),
                 colors = pastelOutlinedTextFieldColors(),
             )

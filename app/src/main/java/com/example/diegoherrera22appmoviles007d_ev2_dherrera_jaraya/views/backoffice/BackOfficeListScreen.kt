@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.weight
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.text.KeyboardOptions
@@ -48,8 +49,8 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavBackStackEntry
-import com.example.diegoherrera22appmoviles007d_ev2_dherrera_jaraya.model.Producto
 import com.example.diegoherrera22appmoviles007d_ev2_dherrera_jaraya.model.NutrientInfo
+import com.example.diegoherrera22appmoviles007d_ev2_dherrera_jaraya.model.Producto
 import com.example.diegoherrera22appmoviles007d_ev2_dherrera_jaraya.ui.theme.pastelOutlinedTextFieldColors
 import com.example.diegoherrera22appmoviles007d_ev2_dherrera_jaraya.ui.theme.pastelTextButtonColors
 import com.example.diegoherrera22appmoviles007d_ev2_dherrera_jaraya.viewmodel.CatalogViewModel
@@ -58,6 +59,16 @@ private data class NutrientRowState(
     val name: String = "",
     val perServing: String = "",
     val totalProduct: String = ""
+)
+
+private val defaultNutrients = listOf(
+    "Energía",
+    "Proteínas",
+    "Grasas totales",
+    "Grasas saturadas",
+    "Carbohidratos",
+    "Azúcares",
+    "Sodio"
 )
 
 /**
@@ -81,7 +92,11 @@ fun BackOfficeListScreen(
     var skuInput by remember { mutableStateOf("") }
     var stockInput by remember { mutableStateOf("") }
     var lotInput by remember { mutableStateOf("") }
-    val nutrientRows = remember { mutableStateListOf(NutrientRowState()) }
+    val nutrientRows = remember {
+        mutableStateListOf<NutrientRowState>().apply {
+            defaultNutrients.forEach { add(NutrientRowState(name = it)) }
+        }
+    }
 
     Scaffold(
         topBar = {
@@ -116,17 +131,16 @@ fun BackOfficeListScreen(
                         stockInput = p.stock.toString()
                         lotInput = p.lotNumber
                         nutrientRows.clear()
-                        if (p.nutritionalInfo.isEmpty()) {
-                            nutrientRows.add(NutrientRowState())
-                        } else {
-                            nutrientRows.addAll(
-                                p.nutritionalInfo.map {
-                                    NutrientRowState(
-                                        name = it.name,
-                                        perServing = it.perServing,
-                                        totalProduct = it.totalProduct
-                                    )
-                                }
+                        defaultNutrients.forEach { nutrientName ->
+                            val nutrient = p.nutritionalInfo.firstOrNull {
+                                it.name.equals(nutrientName, ignoreCase = true)
+                            }
+                            nutrientRows.add(
+                                NutrientRowState(
+                                    name = nutrientName,
+                                    perServing = nutrient?.perServing.orEmpty(),
+                                    totalProduct = nutrient?.totalProduct.orEmpty()
+                                )
                             )
                         }
                     },
@@ -260,11 +274,10 @@ fun BackOfficeListScreen(
                                 Row(modifier = Modifier.fillMaxWidth()) {
                                     OutlinedTextField(
                                         value = row.name,
-                                        onValueChange = { value ->
-                                            nutrientRows[index] = nutrientRows[index].copy(name = value)
-                                        },
-                                        label = { Text("Nombre") },
-                                        modifier = Modifier
+                                        onValueChange = {},
+                                        enabled = false,
+                                        readOnly = true,
+                                        label = { Text("Nutriente") },
                                             .weight(1f)
                                             .padding(end = 4.dp),
                                         colors = pastelOutlinedTextFieldColors()
@@ -292,13 +305,6 @@ fun BackOfficeListScreen(
                                         colors = pastelOutlinedTextFieldColors()
                                     )
                                 }
-                            }
-
-                            TextButton(
-                                onClick = { nutrientRows.add(NutrientRowState()) },
-                                modifier = Modifier.padding(top = 4.dp)
-                            ) {
-                                Text("Agregar nutriente")
                             }
                         }
                     }

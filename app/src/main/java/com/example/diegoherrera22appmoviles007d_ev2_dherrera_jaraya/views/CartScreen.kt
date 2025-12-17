@@ -64,6 +64,12 @@ fun CartScreen(
         NumberFormat.getCurrencyInstance(Locale("es","CL")).apply { maximumFractionDigits = 0 }
     }
 
+    val snackbarHostState = remember { SnackbarHostState() }
+
+    LaunchedEffect(catalogVM.errorMessage) {
+        catalogVM.consumeError()?.let { snackbarHostState.showSnackbar(it) }
+    }
+
     Scaffold(
         topBar = {
             TopAppBar(
@@ -84,7 +90,8 @@ fun CartScreen(
                     }
                 }
             )
-        }
+        },
+        snackbarHost = { SnackbarHost(hostState = snackbarHostState) }
     ) { inner ->
         if (lines.isEmpty()) {
             Box(

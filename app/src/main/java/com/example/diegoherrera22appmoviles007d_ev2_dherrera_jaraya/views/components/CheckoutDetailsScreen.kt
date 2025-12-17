@@ -22,6 +22,8 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
@@ -78,6 +80,12 @@ fun CheckoutDetailsScreen(
     var customComuna by remember { mutableStateOf("") }
     var customCity by remember { mutableStateOf("") }
 
+    val snackbarHostState = remember { SnackbarHostState() }
+
+    LaunchedEffect(catalogVM.errorMessage) {
+        catalogVM.consumeError()?.let { snackbarHostState.showSnackbar(it) }
+    }
+
     Scaffold(
         topBar = {
             TopAppBar(
@@ -88,7 +96,8 @@ fun CheckoutDetailsScreen(
                     }
                 }
             )
-        }
+        },
+        snackbarHost = { SnackbarHost(hostState = snackbarHostState) }
     ) { inner ->
         Column(
             modifier = Modifier
@@ -217,12 +226,14 @@ fun CheckoutDetailsScreen(
                                 .ifBlank { "Dirección no indicada" }
                         }
 
-                        catalogVM.finalizeOrder(
+                        val summary = catalogVM.finalizeOrder(
                             recipient = resolvedRecipient,
                             address = resolvedAddress
                         )
 
-                        navController.navigate("checkout/success")
+                        if (summary != null) {
+                            navController.navigate("checkout/success")
+                        }
                     },
                     modifier = Modifier.fillMaxWidth(),
                     colors = pastelButtonColors()

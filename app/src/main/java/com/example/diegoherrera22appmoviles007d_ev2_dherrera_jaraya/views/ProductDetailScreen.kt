@@ -33,10 +33,13 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -56,8 +59,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavController
 import com.example.diegoherrera22appmoviles007d_ev2_dherrera_jaraya.repository.ProductRepository
-import com.example.diegoherrera22appmoviles007d_ev2_dherrera_jaraya.repository.ProductSpecifications
-import com.example.diegoherrera22appmoviles007d_ev2_dherrera_jaraya.repository.NutrientInfo
+import com.example.diegoherrera22appmoviles007d_ev2_dherrera_jaraya.model.NutrientInfo
 import com.example.diegoherrera22appmoviles007d_ev2_dherrera_jaraya.ui.theme.pastelButtonColors
 import com.example.diegoherrera22appmoviles007d_ev2_dherrera_jaraya.ui.theme.SoftPink
 import com.example.diegoherrera22appmoviles007d_ev2_dherrera_jaraya.viewmodel.CatalogViewModel
@@ -77,7 +79,6 @@ fun ProductDetailScreen(
         catalogVM.products.firstOrNull { it.id == productId } ?: ProductRepository.getById(productId)
     }
     val detailDescription = remember(productId) { ProductRepository.getDetailDescription(productId) }
-    val specifications: ProductSpecifications? = remember(productId) { catalogVM.getSpecifications(productId) }
 
     val money = remember {
         NumberFormat.getCurrencyInstance(Locale("es", "CL")).apply { maximumFractionDigits = 0 }
@@ -85,6 +86,12 @@ fun ProductDetailScreen(
 
     var quantity by remember { mutableStateOf(1) }
     var showSpecifications by remember { mutableStateOf(false) }
+
+    val snackbarHostState = remember { SnackbarHostState() }
+
+    LaunchedEffect(catalogVM.errorMessage) {
+        catalogVM.consumeError()?.let { snackbarHostState.showSnackbar(it) }
+    }
 
     val contentProduct = product
 
@@ -99,6 +106,7 @@ fun ProductDetailScreen(
                 }
             )
         },
+        snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
         bottomBar = {
             contentProduct?.let { product ->
                 Column(
@@ -109,10 +117,11 @@ fun ProductDetailScreen(
                 ) {
                     Button(
                         onClick = {
-                            catalogVM.addToCart(product, quantity)
-                            quantity = 1
+                            val added = catalogVM.addToCart(product, quantity)
+                            if (added) quantity = 1
                         },
                         modifier = Modifier.fillMaxWidth(),
+                        enabled = product.stock > 0,
                         colors = pastelButtonColors()
                     ) { Text("Agregar al carrito") }
 
@@ -205,6 +214,13 @@ fun ProductDetailScreen(
                                 )
                                 Text(money.format(contentProduct.price), style = MaterialTheme.typography.titleLarge)
 
+                            Text(
+                                "Stock disponible: ${contentProduct.stock}",
+                                style = MaterialTheme.typography.bodyMedium,
+                                color = if (contentProduct.stock > 0) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.error,
+                                fontWeight = FontWeight.Medium
+                            )
+
                                 Text(
                                     detailDescription ?: contentProduct.description,
                                     style = MaterialTheme.typography.bodyLarge,
@@ -252,7 +268,7 @@ fun ProductDetailScreen(
                                                 fontWeight = FontWeight.Bold
                                             )
 
-                                            if (specifications != null) {
+                                            if (contentProduct != null) {
                                                 Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
                                                     Row(modifier = Modifier.fillMaxWidth()) {
                                                         Text(
@@ -261,7 +277,7 @@ fun ProductDetailScreen(
                                                             fontWeight = FontWeight.Bold
                                                         )
                                                         Text(
-                                                            specifications.sku,
+                                                            contentProduct.sku.ifBlank { "Sin SKU" },
                                                             style = MaterialTheme.typography.bodyMedium,
                                                             modifier = Modifier.padding(start = 4.dp)
                                                         )
@@ -273,76 +289,97 @@ fun ProductDetailScreen(
                                                             fontWeight = FontWeight.Bold
                                                         )
                                                         Text(
-                                                            specifications.lotNumber,
+                                                            contentProduct.lotNumber.ifBlank { "Sin lote asignado" },
+                                                            style = MaterialTheme.typography.bodyMedium,
+                                                            modifier = Modifier.padding(start = 4.dp)
+                                                        )
+                                                    }
+                                                    Row(modifier = Modifier.fillMaxWidth()) {
+                                                        Text(
+                                                            "Stock:",
+                                                            style = MaterialTheme.typography.bodyMedium,
+                                                            fontWeight = FontWeight.Bold
+                                                        )
+                                                        Text(
+                                                            contentProduct.stock.toString(),
                                                             style = MaterialTheme.typography.bodyMedium,
                                                             modifier = Modifier.padding(start = 4.dp)
                                                         )
                                                     }
                                                 }
 
-                                                Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                                                    val headerStyle = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.SemiBold)
-                                                    val dataColumnIndent = 12.dp
-                                                    val showTotalProductColumn =
-                                                        specifications.nutritionalInfo.any { it.totalProduct.isNotBlank() }
-                                                    Row(modifier = Modifier.fillMaxWidth()) {
-                                                        Text("Nutirentes", modifier = Modifier.weight(1f), style = headerStyle)
-                                                        Text(
-                                                            "Por porción",
-                                                            modifier = Modifier
-                                                                .weight(1f)
-                                                                .padding(start = dataColumnIndent),
-                                                            style = headerStyle,
-                                                            softWrap = false
-                                                        )
-                                                        if (showTotalProductColumn) {
+                                                val nutritionalInfo = contentProduct.nutritionalInfo
+                                                if (nutritionalInfo.isNotEmpty()) {
+                                                    Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                                                        val headerStyle = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.SemiBold)
+                                                        val dataColumnIndent = 12.dp
+                                                        val showTotalProductColumn =
+                                                            nutritionalInfo.any { it.totalProduct.isNotBlank() }
+                                                        Row(modifier = Modifier.fillMaxWidth()) {
+                                                            Text("Nutirentes", modifier = Modifier.weight(1f), style = headerStyle)
                                                             Text(
-                                                                "Total producto",
+                                                                "Por porción",
                                                                 modifier = Modifier
                                                                     .weight(1f)
                                                                     .padding(start = dataColumnIndent),
-                                                                style = headerStyle
+                                                                style = headerStyle,
+                                                                softWrap = false
                                                             )
-                                                        }
-                                                    }
-
-                                                    Divider()
-
-                                                    Spacer(modifier = Modifier.height(8.dp))
-
-                                                    Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
-                                                        specifications.nutritionalInfo.forEach { nutrient: NutrientInfo ->
-                                                            Row(
-                                                                modifier = Modifier
-                                                                    .fillMaxWidth()
-                                                                    .padding(vertical = 6.dp)
-                                                            ) {
+                                                            if (showTotalProductColumn) {
                                                                 Text(
-                                                                    nutrient.name,
-                                                                    modifier = Modifier.weight(1f),
-                                                                    style = MaterialTheme.typography.bodyMedium
-                                                                )
-                                                                Text(
-                                                                    nutrient.perServing,
+                                                                    "Total producto",
                                                                     modifier = Modifier
                                                                         .weight(1f)
                                                                         .padding(start = dataColumnIndent),
-                                                                    style = MaterialTheme.typography.bodyMedium
+                                                                    style = headerStyle
                                                                 )
-                                                                if (showTotalProductColumn) {
+                                                            }
+                                                        }
+
+                                                        Divider()
+
+                                                        Spacer(modifier = Modifier.height(8.dp))
+
+                                                        Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                                                            nutritionalInfo.forEach { nutrient: NutrientInfo ->
+                                                                Row(
+                                                                    modifier = Modifier
+                                                                        .fillMaxWidth()
+                                                                        .padding(vertical = 6.dp)
+                                                                ) {
                                                                     Text(
-                                                                        nutrient.totalProduct,
+                                                                        nutrient.name,
+                                                                        modifier = Modifier.weight(1f),
+                                                                        style = MaterialTheme.typography.bodyMedium
+                                                                    )
+                                                                    Text(
+                                                                        nutrient.perServing,
                                                                         modifier = Modifier
                                                                             .weight(1f)
                                                                             .padding(start = dataColumnIndent),
                                                                         style = MaterialTheme.typography.bodyMedium
                                                                     )
+                                                                    if (showTotalProductColumn) {
+                                                                        Text(
+                                                                            nutrient.totalProduct,
+                                                                            modifier = Modifier
+                                                                                .weight(1f)
+                                                                                .padding(start = dataColumnIndent),
+                                                                            style = MaterialTheme.typography.bodyMedium
+                                                                        )
+                                                                    }
                                                                 }
                                                             }
                                                         }
                                                     }
+                                                } else {
+                                                    Text(
+                                                        "Tabla nutricional no disponible para este producto.",
+                                                        style = MaterialTheme.typography.bodyMedium
+                                                    )
                                                 }
-                                            } else {
+                                            }
+                                            else {
                                                 Text(
                                                     "Pronto agregaremos las especificaciones para este producto.",
                                                     style = MaterialTheme.typography.bodyMedium

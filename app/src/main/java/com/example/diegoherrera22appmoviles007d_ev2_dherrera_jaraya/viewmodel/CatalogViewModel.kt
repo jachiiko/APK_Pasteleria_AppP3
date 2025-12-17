@@ -5,14 +5,16 @@ import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
-import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.runtime.snapshots.SnapshotStateMap
 import androidx.lifecycle.ViewModel
 import com.example.diegoherrera22appmoviles007d_ev2_dherrera_jaraya.model.Producto
 import com.example.diegoherrera22appmoviles007d_ev2_dherrera_jaraya.repository.ProductRepository
-import java.text.SimpleDateFormat
-import java.util.Date
+import com.example.diegoherrera22appmoviles007d_ev2_dherrera_jaraya.repository.ProductSpecifications
+import java.time.ZoneId
+import java.time.ZonedDateTime
+import java.time.format.DateTimeFormatter
 import java.util.Locale
+import kotlin.math.roundToInt
 import kotlin.ranges.ClosedFloatingPointRange
 
 data class CartLine(
@@ -23,6 +25,8 @@ data class CartLine(
 data class OrderItem(
     val name: String,
     val unitPrice: Int,
+    val netPrice: Int,
+    val ivaAmount: Int,
     val qty: Int,
     val subtotal: Int
 )
@@ -30,13 +34,44 @@ data class OrderItem(
 data class OrderSummary(
     val orderId: String,
     val dateText: String,
+    val recipientName: String,
+    val shippingAddress: String,
     val items: List<OrderItem>,
-    val total: Int
+    val total: Int,
+    val discountPercent: Int,
+    val discountAmount: Int,
+    val finalTotal: Int
+)
+
+data class AppliedDiscount(
+    val code: String,
+    val percent: Int
+)
+
+data class DiscountResult(
+    val success: Boolean,
+    val message: String
 )
 
 class CatalogViewModel : ViewModel() {
+    companion object {
+        private const val IVA_RATE = 0.19
+        private val AVAILABLE_CODES = mapOf(
+            "PASTELITO" to 10,
+            "1000SABOR" to 20
+        )
+    }
     val products: List<Producto> = ProductRepository.getCatalog()
     val categories: List<String> = products.map { it.category }.distinct().sorted()
+
+    var userEmail: String? by mutableStateOf(null)
+        private set
+
+    private val _orderHistory = mutableStateListOf<OrderSummary>()
+    val orderHistory: List<OrderSummary> get() = _orderHistory
+
+    var lastOrderSummary: OrderSummary? by mutableStateOf(null)
+        private set
 
     private val priceMin = products.minOf { it.price }.toFloat()
     private val priceMax = products.maxOf { it.price }.toFloat()
@@ -48,6 +83,8 @@ class CatalogViewModel : ViewModel() {
         private set
 
     val priceRangeLimits: ClosedFloatingPointRange<Float> get() = priceMin..priceMax
+    val priceMinLimit: Float get() = priceMin
+    val priceMaxLimit: Float get() = priceMax
 
     val filteredProducts: List<Producto>
         get() {
@@ -60,6 +97,18 @@ class CatalogViewModel : ViewModel() {
 
     private val _cart: SnapshotStateMap<String, CartLine> = mutableStateMapOf()
     val cartLines: List<CartLine> get() = _cart.values.toList()
+
+    private val usedDiscountsByUser = mutableStateMapOf<String, MutableSet<String>>()
+
+    var appliedDiscount: AppliedDiscount? by mutableStateOf(null)
+        private set
+
+    private var checkoutRecipient: String? by mutableStateOf(null)
+    private var checkoutAddress: String? by mutableStateOf(null)
+
+    fun updateUserEmail(email: String?) {
+        userEmail = email
+    }
 
     fun toggleCategory(category: String) {
         if (_selectedCategories.contains(category)) {
@@ -91,27 +140,104 @@ class CatalogViewModel : ViewModel() {
     }
 
     fun removeLine(productId: String) { _cart.remove(productId) }
-    fun clearCart() { _cart.clear() }
+    fun clearCart() {
+        _cart.clear()
+        appliedDiscount = null
+        checkoutRecipient = null
+        checkoutAddress = null
+    }
 
     fun totalCLP(): Int = _cart.values.sumOf { it.product.price * it.qty }
+    fun discountAmount(): Int {
+        val discount = appliedDiscount?.percent ?: 0
+        return (totalCLP() * discount) / 100
+    }
+    fun totalWithDiscount(): Int = totalCLP() - discountAmount()
     fun itemsCount(): Int = _cart.values.sumOf { it.qty }
     fun distinctCount(): Int = _cart.size
 
+    fun getSpecifications(productId: String): ProductSpecifications? {
+        return ProductRepository.getProductSpecifications(productId)
+    }
+
+
     fun buildOrderSummary(): OrderSummary {
         val items = cartLines.map {
+            val netPrice = priceWithoutIva(it.product.price)
             OrderItem(
                 name = it.product.name,
                 unitPrice = it.product.price,
+                netPrice = netPrice,
+                ivaAmount = it.product.price - netPrice,
                 qty = it.qty,
                 subtotal = it.product.price * it.qty
             )
         }
-        val fmt = SimpleDateFormat("yyyy-MM-dd HH:mm", Locale("es", "CL"))
+        val discountPercent = appliedDiscount?.percent ?: 0
+        val discountAmount = (items.sumOf { it.subtotal } * discountPercent) / 100
+        val finalTotal = items.sumOf { it.subtotal } - discountAmount
+        val recipient = checkoutRecipient?.takeIf { it.isNotBlank() } ?: "Destinatario"
+        val address = checkoutAddress?.takeIf { it.isNotBlank() } ?: "Dirección no indicada"
+        val localeCL = Locale("es", "CL")
+        val chileZone = ZoneId.of("America/Santiago")
+        val zonedDateTime = ZonedDateTime.now(chileZone)
+        val dateFormatter = DateTimeFormatter.ofPattern("EEEE d 'de' MMMM yyyy, HH:mm", localeCL)
+        val zoneFormatter = DateTimeFormatter.ofPattern("z", localeCL)
+        val dateText = "${zonedDateTime.format(dateFormatter)} hr."
         return OrderSummary(
             orderId = "P-${System.currentTimeMillis()}",
-            dateText = fmt.format(Date()),
+            dateText = dateText,
+            recipientName = recipient,
+            shippingAddress = address,
             items = items,
-            total = items.sumOf { it.subtotal }
+            total = items.sumOf { it.subtotal },
+            discountPercent = discountPercent,
+            discountAmount = discountAmount,
+            finalTotal = finalTotal
         )
+    }
+
+    fun finalizeOrder(recipient: String, address: String): OrderSummary {
+        checkoutRecipient = recipient
+        checkoutAddress = address
+        val summary = buildOrderSummary()
+        lastOrderSummary = summary
+        _orderHistory.add(0, summary)
+        return summary
+    }
+
+    fun updateCheckoutDetails(recipient: String?, address: String?) {
+        checkoutRecipient = recipient
+        checkoutAddress = address
+    }
+
+    fun applyDiscountCode(input: String): DiscountResult {
+        val code = input.trim().uppercase()
+        val percent = AVAILABLE_CODES[code]
+            ?: return DiscountResult(false, "Código inválido o no disponible.")
+
+        val userKey = userEmail ?: "guest"
+        val usedCodes = usedDiscountsByUser.getOrPut(userKey) { mutableSetOf() }
+
+        if (appliedDiscount != null && appliedDiscount?.code != code) {
+            return DiscountResult(false, "Solo puedes usar un código por compra.")
+        }
+
+        if (appliedDiscount?.code == code) {
+            return DiscountResult(true, "El código ya está aplicado.")
+        }
+
+        if (usedCodes.contains(code)) {
+            return DiscountResult(false, "Ya utilizaste este código en una compra anterior.")
+        }
+
+        appliedDiscount = AppliedDiscount(code = code, percent = percent)
+        usedCodes.add(code)
+
+        return DiscountResult(true, "Aplicando ${percent}% de descuento con $code.")
+    }
+
+    private fun priceWithoutIva(priceWithIva: Int): Int {
+        return (priceWithIva / (1 + IVA_RATE)).roundToInt()
     }
 }

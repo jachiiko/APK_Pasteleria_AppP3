@@ -76,7 +76,10 @@ fun CartScreen(
                 actions = {
                     if (lines.isNotEmpty()) {
                         TextButton(onClick = { catalogVM.clearCart() }, colors = pastelTextButtonColors()) {
-                            Text("Vaciar")
+                            Text(
+                                "Vaciar",
+                                style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold)
+                            )
                         }
                     }
                 }
@@ -129,11 +132,14 @@ fun CartScreen(
                 }
 
                 Button(
-                    onClick = { navController.navigate("checkout/results") },
+                    onClick = { navController.navigate("checkout/details") },
                     modifier = Modifier.fillMaxWidth(),
                     colors = pastelButtonColors()
                 ) {
-                    Text("Finalizar compra")
+                    Text(
+                        "Continuar compra",
+                        style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold)
+                    )
                 }
             }
         }

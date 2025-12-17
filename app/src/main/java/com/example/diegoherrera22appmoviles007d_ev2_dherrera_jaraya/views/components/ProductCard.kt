@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -17,12 +18,14 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.example.diegoherrera22appmoviles007d_ev2_dherrera_jaraya.model.Producto
 import com.example.diegoherrera22appmoviles007d_ev2_dherrera_jaraya.ui.theme.pastelButtonColors
 import java.text.NumberFormat
@@ -41,7 +44,8 @@ fun ProductCard (
         onClick = { onClick(product) },
         modifier = modifier,
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
-        colors = CardDefaults.cardColors(containerColor = Color.White)
+        colors = CardDefaults.cardColors(containerColor = Color.White),
+        shape = RoundedCornerShape(16.dp)
     ) {
         Column(
             modifier = Modifier.padding(12.dp),
@@ -55,12 +59,14 @@ fun ProductCard (
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(140.dp)
+                        .clip(RoundedCornerShape(12.dp))
                 )
             } else {
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(140.dp)
+                        .clip(RoundedCornerShape(12.dp))
                         .background(MaterialTheme.colorScheme.surfaceVariant),
                     contentAlignment = Alignment.Center
                 ) {
@@ -73,8 +79,15 @@ fun ProductCard (
                 }
             }
 
-            Text(product.name, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
-            Text(product.category, style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.primary)
+            Text(
+                product.name,
+                style = MaterialTheme.typography.titleLarge.copy(fontSize = 20.sp, fontWeight = FontWeight.Bold)
+            )
+            Text(
+                product.category,
+                style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.SemiBold),
+                color = MaterialTheme.colorScheme.primary
+            )
             Text(product.description, style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
 
             Row(
@@ -83,7 +96,12 @@ fun ProductCard (
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(money.format(product.price), style = MaterialTheme.typography.titleMedium)
-                Button(onClick = { onAddToCart(product) }, colors = pastelButtonColors()) { Text("Agregar") }
+                Button(onClick = { onAddToCart(product) }, colors = pastelButtonColors()) {
+                    Text(
+                        "Agregar",
+                        style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold)
+                    )
+                }
             }
         }
     }

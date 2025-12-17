@@ -1,17 +1,16 @@
 package com.example.diegoherrera22appmoviles007d_ev2_dherrera_jaraya.views
 
-import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.Button
@@ -20,43 +19,34 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Tab
-import androidx.compose.material3.TabRow
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavController
-import com.example.diegoherrera22appmoviles007d_ev2_dherrera_jaraya.ui.theme.SoftPink
 import com.example.diegoherrera22appmoviles007d_ev2_dherrera_jaraya.ui.theme.pastelButtonColors
-import com.example.diegoherrera22appmoviles007d_ev2_dherrera_jaraya.ui.theme.pastelTextButtonColors
 import com.example.diegoherrera22appmoviles007d_ev2_dherrera_jaraya.viewmodel.CatalogViewModel
-import com.example.diegoherrera22appmoviles007d_ev2_dherrera_jaraya.viewmodel.OrderSummary
 import java.text.NumberFormat
 import java.util.Locale
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun CheckoutResultTabsScreen(
+fun CheckoutSuccessScreen(
     navController: NavController,
     parentEntry: NavBackStackEntry
 ) {
     val catalogVM: CatalogViewModel = viewModel(parentEntry)
-    val order = remember(catalogVM.cartLines) { catalogVM.buildOrderSummary() }
-
-    var selectedTab by remember { mutableStateOf(0) } // 0=Éxito, 1=Rechazada
-    val tabs = listOf("Compra exitosa", "Compra rechazada")
+    val order = catalogVM.lastOrderSummary ?: catalogVM.buildOrderSummary()
 
     val money = remember {
         NumberFormat.getCurrencyInstance(Locale("es", "CL")).apply { maximumFractionDigits = 0 }
@@ -78,150 +68,191 @@ fun CheckoutResultTabsScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(inner)
-                .background(MaterialTheme.colorScheme.background)
+                .padding(16.dp)
         ) {
-            TabRow(selectedTabIndex = selectedTab) {
-                tabs.forEachIndexed { index, title ->
-                    Tab(
-                        selected = selectedTab == index,
-                        onClick = { selectedTab = index },
-                        text = { Text(title) }
-                    )
-                }
-            }
-
-            when (selectedTab) {
-                0 -> SuccessTab(
-                    order = order,
-                    money = money,
-                    onContinueShopping = {
-                        navController.popBackStack() // back a cart
-                        navController.popBackStack() // back a home
-                    },
-                    onGoCart = {
-                        navController.popBackStack() // back a cart
-                    },
-                    onClearCart = { catalogVM.clearCart() }
-                )
-
-                1 -> FailureTab(
-                    money = money,
-                    onGoCart = {
-                        navController.popBackStack() // back a cart
-                    },
-                    onReviewPayment = {
-                        navController.popBackStack()
-                    }
-                )
-            }
-        }
-    }
-}
-
-@Composable
-private fun SuccessTab(
-    order: OrderSummary,
-    money: NumberFormat,
-    onContinueShopping: () -> Unit,
-    onGoCart: () -> Unit,
-    onClearCart: () -> Unit
-) {
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(MaterialTheme.colorScheme.background)
-            .padding(16.dp),
-        verticalArrangement = Arrangement.spacedBy(12.dp)
-    ) {
-        Text("¡Compra exitosa!", style = MaterialTheme.typography.headlineSmall, fontWeight = FontWeight.Bold)
-        Text("N° Pedido: ${order.orderId}")
-        Text("Fecha: ${order.dateText}")
-
-        Divider()
-
-        Text("Detalle de pedido", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold)
-        LazyColumn(
-            modifier = Modifier.weight(1f),
-            verticalArrangement = Arrangement.spacedBy(8.dp)
-        ) {
-            items(order.items) { line ->
-                Row(
-                    Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween
+            Surface(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .weight(1f),
+                shape = RoundedCornerShape(16.dp),
+                color = Color.White,
+                shadowElevation = 4.dp
+            ) {
+                Column(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(16.dp),
+                    verticalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
-                    Text("${line.qty} x ${line.name}")
-                    Text("${money.format(line.unitPrice)}  →  ${money.format(line.subtotal)}")
+                    Column(
+                        modifier = Modifier
+                            .weight(1f)
+                            .verticalScroll(rememberScrollState()),
+                        verticalArrangement = Arrangement.spacedBy(12.dp)
+                    ) {
+                        Text(
+                            "¡Compra exitosa!",
+                            style = MaterialTheme.typography.headlineSmall,
+                            fontWeight = FontWeight.Bold
+                        )
+                        Text("N° Pedido: ${order.orderId}")
+                        Text("Fecha: ${order.dateText}")
+                        Text("Destinatario: ${order.recipientName}")
+                        Text("Dirección: ${order.shippingAddress}")
+
+                        Divider()
+
+                        Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                            Text(
+                                "Detalle de pedido",
+                                style = MaterialTheme.typography.titleMedium,
+                                fontWeight = FontWeight.SemiBold
+                            )
+                            order.items.forEach { line ->
+                                Row(
+                                    Modifier.fillMaxWidth(),
+                                    horizontalArrangement = Arrangement.spacedBy(12.dp),
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    Column(modifier = Modifier.weight(1f)) {
+                                        Text(line.name, fontWeight = FontWeight.SemiBold)
+                                        Text(
+                                            "${money.format(line.unitPrice)} = ${money.format(line.netPrice)} + ${money.format(line.ivaAmount)} (19% IVA)",
+                                            style = MaterialTheme.typography.bodySmall,
+                                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                                        )
+                                        Text(
+                                            "${line.qty} x ${money.format(line.unitPrice)}",
+                                            style = MaterialTheme.typography.bodyMedium,
+                                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                                        )
+                                    }
+                                    Text(
+                                        money.format(line.subtotal),
+                                        textAlign = TextAlign.End,
+                                        modifier = Modifier.align(Alignment.CenterVertically)
+                                    )
+                                }
+                            }
+                        }
+                    }
+
+                    Divider()
+
+                    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+                            Text("Subtotal", style = MaterialTheme.typography.titleMedium)
+                            Text(money.format(order.total))
+                        }
+                        if (order.discountAmount > 0) {
+                            Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+                                Text(
+                                    "Descuento (${order.discountPercent}%)",
+                                    color = MaterialTheme.colorScheme.primary
+                                )
+                                Text(
+                                    "-${money.format(order.discountAmount)}",
+                                    color = MaterialTheme.colorScheme.primary
+                                )
+                            }
+                        }
+                        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+                            Text("Total", style = MaterialTheme.typography.titleMedium)
+                            Text(
+                                money.format(order.finalTotal),
+                                style = MaterialTheme.typography.titleMedium,
+                                fontWeight = FontWeight.SemiBold
+                            )
+                        }
+                    }
                 }
             }
-        }
 
-        Divider()
+            Spacer(modifier = Modifier.height(12.dp))
 
-        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-            Text("Total", style = MaterialTheme.typography.titleMedium)
-            Text(
-                money.format(order.total),
-                style = MaterialTheme.typography.titleMedium,
-                fontWeight = FontWeight.SemiBold
-            )
-        }
-
-        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
             Button(
                 onClick = {
-                    onClearCart()
-                    onContinueShopping()
+                    catalogVM.clearCart()
+                    val emailArg = catalogVM.userEmail ?: ""
+                    navController.navigate("home/$emailArg") {
+                        popUpTo("shop") { inclusive = false }
+                        launchSingleTop = true
+                    }
                 },
-                modifier = Modifier.weight(1f),
+                modifier = Modifier.fillMaxWidth(),
                 colors = pastelButtonColors(),
             ) {
-                Text("Seguir comprando")
-            }
-
-            OutlinedButton(
-                onClick = onGoCart,
-                modifier = Modifier.weight(1f),
-                colors = pastelTextButtonColors(),
-                border = BorderStroke(1.dp, SoftPink)
-            ) {
-                Text("Volver al carrito")
+                Text("Volver al catalogo")
             }
         }
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun FailureTab(
-    money: NumberFormat,
-    onGoCart: () -> Unit,
-    onReviewPayment: () -> Unit
+fun CheckoutFailureScreen(
+    navController: NavController,
+    parentEntry: NavBackStackEntry
 ) {
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(MaterialTheme.colorScheme.background)
-            .padding(16.dp),
-        verticalArrangement = Arrangement.spacedBy(12.dp),
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        Text("No pudimos procesar tu compra", style = MaterialTheme.typography.headlineSmall, fontWeight = FontWeight.Bold)
-        Text(
-            "Puede deberse a falta de stock o un error en el pago. Revisa tu carrito o intenta nuevamente.",
-            color = MaterialTheme.colorScheme.onSurfaceVariant
-        )
+    val catalogVM: CatalogViewModel = viewModel(parentEntry)
 
-        Spacer(Modifier.size(8.dp))
-
-        Button(onClick = onGoCart, modifier = Modifier.fillMaxWidth(), colors = pastelButtonColors()) {
-            Text("Volver al carrito")
+    Scaffold(
+        topBar = {
+            TopAppBar(
+                title = { Text("Resultado de compra") },
+                navigationIcon = {
+                    IconButton(onClick = { navController.popBackStack() }) {
+                        Icon(Icons.Filled.ArrowBack, contentDescription = "Volver")
+                    }
+                }
+            )
         }
-        OutlinedButton(
-            onClick = onReviewPayment,
-            modifier = Modifier.fillMaxWidth(),
-            colors = pastelTextButtonColors(),
-            border = BorderStroke(1.dp, SoftPink)
+    ) { inner ->
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(inner)
+                .padding(16.dp)
         ) {
-            Text("Revisar métodos de pago")
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .weight(1f),
+                verticalArrangement = Arrangement.Center,
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Text(
+                    "Algo salio mal :(",
+                    style = MaterialTheme.typography.headlineMedium,
+                    fontWeight = FontWeight.Bold,
+                    textAlign = TextAlign.Center
+                )
+                Text(
+                    "No pudimos procesar tu compra",
+                    style = MaterialTheme.typography.titleLarge,
+                    fontWeight = FontWeight.SemiBold,
+                    textAlign = TextAlign.Center
+                )
+                Text(
+                    "Revise su medio de pago e intente realizar nuevamente su compra en unos minutos.",
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    textAlign = TextAlign.Center
+                )
+            }
+
+            Button(
+                onClick = {
+                    val emailArg = catalogVM.userEmail ?: ""
+                    navController.navigate("home/$emailArg") {
+                        popUpTo("shop") { inclusive = false }
+                        launchSingleTop = true
+                    }
+                },
+                modifier = Modifier.fillMaxWidth(),
+                colors = pastelButtonColors(),
+            ) {
+                Text("Volver al catalogo")
+            }
         }
     }
 }

@@ -24,6 +24,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
@@ -115,7 +116,10 @@ fun AddProductScreen(navController: NavController) {
                 modifier = Modifier.fillMaxWidth(),
                 colors = pastelButtonColors()
             ) {
-                Text("Guardar (no funcional)")
+                Text(
+                    "Guardar (no funcional)",
+                    style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold)
+                )
             }
         }
     }

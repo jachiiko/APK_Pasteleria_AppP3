@@ -4,38 +4,49 @@ package com.example.diegoherrera22appmoviles007d_ev2_dherrera_jaraya
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.core.view.WindowCompat
+import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.WindowInsetsControllerCompat
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import androidx.navigation.navArgument
+import androidx.navigation.compose.navigation
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
 import com.example.diegoherrera22appmoviles007d_ev2_dherrera_jaraya.ui.theme.DiegoHerrera22AppMoviles007D_EV2_DHerrera_JArayaTheme
 import com.example.diegoherrera22appmoviles007d_ev2_dherrera_jaraya.viewmodel.AuthViewModel
-import com.example.diegoherrera22appmoviles007d_ev2_dherrera_jaraya.views.HomeScreen
-import com.example.diegoherrera22appmoviles007d_ev2_dherrera_jaraya.views.LoginScreen
-import com.example.diegoherrera22appmoviles007d_ev2_dherrera_jaraya.views.RegisterScreen
-import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.navigation.compose.navigation
-import com.example.diegoherrera22appmoviles007d_ev2_dherrera_jaraya.views.ProductDetailScreen
-import androidx.navigation.navigation
-import androidx.navigation.navArgument
 import com.example.diegoherrera22appmoviles007d_ev2_dherrera_jaraya.viewmodel.RegionViewModel
 import com.example.diegoherrera22appmoviles007d_ev2_dherrera_jaraya.views.CartScreen
-import com.example.diegoherrera22appmoviles007d_ev2_dherrera_jaraya.views.CheckoutResultTabsScreen
+import com.example.diegoherrera22appmoviles007d_ev2_dherrera_jaraya.views.CheckoutDetailsScreen
+import com.example.diegoherrera22appmoviles007d_ev2_dherrera_jaraya.views.CheckoutFailureScreen
+import com.example.diegoherrera22appmoviles007d_ev2_dherrera_jaraya.views.CheckoutSuccessScreen
+import com.example.diegoherrera22appmoviles007d_ev2_dherrera_jaraya.views.HomeScreen
+import com.example.diegoherrera22appmoviles007d_ev2_dherrera_jaraya.views.LoginScreen
+import com.example.diegoherrera22appmoviles007d_ev2_dherrera_jaraya.views.ProductDetailScreen
+import com.example.diegoherrera22appmoviles007d_ev2_dherrera_jaraya.views.RegisterScreen
+import com.example.diegoherrera22appmoviles007d_ev2_dherrera_jaraya.views.UserProfileScreen
 import com.example.diegoherrera22appmoviles007d_ev2_dherrera_jaraya.views.backoffice.AddProductScreen
 import com.example.diegoherrera22appmoviles007d_ev2_dherrera_jaraya.views.backoffice.BackOfficeListScreen
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
+
+        WindowCompat.setDecorFitsSystemWindows(window, true)
+
+        window.decorView.post {
+            WindowCompat.getInsetsController(window, window.decorView)?.let { controller ->
+                controller.systemBarsBehavior = WindowInsetsControllerCompat.BEHAVIOR_DEFAULT
+                controller.show(WindowInsetsCompat.Type.systemBars())
+            }
+        }
         setContent {
             DiegoHerrera22AppMoviles007D_EV2_DHerrera_JArayaTheme {
                 Surface(
@@ -102,6 +113,15 @@ fun AppNavigation() {
                 ProductDetailScreen(productId = id, navController = navController, parentEntry = parentEntry)
             }
 
+            composable(
+                route = "profile/{email}",
+                arguments = listOf(navArgument("email") { type = NavType.StringType })
+            ) { backStackEntry ->
+                val parentEntry = remember(backStackEntry) { navController.getBackStackEntry("shop") }
+                val email = backStackEntry.arguments?.getString("email")
+                UserProfileScreen(email = email, navController = navController, parentEntry = parentEntry)
+            }
+
             composable("backoffice") {
                 BackOfficeListScreen(
                     onAddProduct = { navController.navigate("backoffice/add") }
@@ -117,9 +137,19 @@ fun AppNavigation() {
                 CartScreen(navController = navController, parentEntry = parentEntry)
             }
 
-            composable("checkout/results") { backStackEntry ->
+            composable("checkout/details") { backStackEntry ->
                 val parentEntry = remember(backStackEntry) { navController.getBackStackEntry("shop") }
-                CheckoutResultTabsScreen(navController = navController, parentEntry = parentEntry)
+                CheckoutDetailsScreen(navController = navController, parentEntry = parentEntry)
+            }
+
+            composable("checkout/success") { backStackEntry ->
+                val parentEntry = remember(backStackEntry) { navController.getBackStackEntry("shop") }
+                CheckoutSuccessScreen(navController = navController, parentEntry = parentEntry)
+            }
+
+            composable("checkout/failure") { backStackEntry ->
+                val parentEntry = remember(backStackEntry) { navController.getBackStackEntry("shop") }
+                CheckoutFailureScreen(navController = navController, parentEntry = parentEntry)
             }
         }
     }

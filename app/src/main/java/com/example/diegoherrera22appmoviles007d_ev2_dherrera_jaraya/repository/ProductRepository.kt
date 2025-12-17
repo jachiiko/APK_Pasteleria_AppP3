@@ -32,7 +32,7 @@ object ProductRepository {
         ),
         "TC002" to ProductSpecifications(
             sku = "TQ-FRUT-CHANT-2800",
-            lotNumber = "",
+            lotNumber = "L-202512-TF",
             nutritionalInfo = listOf(
                 NutrientInfo("Energía", "390 kcal", "5.460 kcal"),
                 NutrientInfo("Proteínas", "18 g", "224 g"),
@@ -46,7 +46,7 @@ object ProductRepository {
         ),
         "TT001" to ProductSpecifications(
             sku = "TC-VAIN-CLAS-2000",
-            lotNumber = "",
+            lotNumber = "L-202512-TV",
             nutritionalInfo = listOf(
                 NutrientInfo("Energía", "420 kcal", "4.200 kcal"),
                 NutrientInfo("Proteínas", "24 g", "210 g"),
@@ -182,7 +182,7 @@ object ProductRepository {
         ),
         "PV001" to ProductSpecifications(
             sku = "TV-CHOC-VEG-2300",
-            lotNumber = "",
+            lotNumber = "L-202512-VEG",
             nutritionalInfo = listOf(
                 NutrientInfo("Energía", "420 kcal", "5.600 kcal"),
                 NutrientInfo("Proteínas", "5 g", "60 g"),
@@ -210,7 +210,7 @@ object ProductRepository {
         ),
         "TE001" to ProductSpecifications(
             sku = "TE-CUMP-PERS-3000",
-            lotNumber = "",
+            lotNumber = "L-202512-CUMP",
             nutritionalInfo = listOf(
                 NutrientInfo("Energía", "470 kcal", "4.600 kcal"),
                 NutrientInfo("Proteínas", "22 g", "160 g"),

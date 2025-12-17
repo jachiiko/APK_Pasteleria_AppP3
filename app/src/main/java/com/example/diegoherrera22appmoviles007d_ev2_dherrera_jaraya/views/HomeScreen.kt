@@ -44,6 +44,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -61,8 +62,8 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.compose.ui.res.painterResource
-import com.example.diegoherrera22appmoviles007d_ev2_dherrera_jaraya.model.FakeDatabase
 import com.example.diegoherrera22appmoviles007d_ev2_dherrera_jaraya.viewmodel.CatalogViewModel
+import com.example.diegoherrera22appmoviles007d_ev2_dherrera_jaraya.viewmodel.UserViewModel
 import com.example.diegoherrera22appmoviles007d_ev2_dherrera_jaraya.views.components.CartSummaryButton
 import com.example.diegoherrera22appmoviles007d_ev2_dherrera_jaraya.views.components.ProductCard
 import com.example.diegoherrera22appmoviles007d_ev2_dherrera_jaraya.R
@@ -84,10 +85,14 @@ fun HomeScreen(
 
     // Usa la MISMA instancia de CatalogViewModel en Home y Detalle
     val catalogVM: CatalogViewModel = viewModel(parentEntry)
+    val userViewModel: UserViewModel = viewModel(parentEntry)
 
-    LaunchedEffect(email) {
-        catalogVM.updateUserEmail(email?.trim())
+    LaunchedEffect(Unit) {
+        userViewModel.loadMe()
     }
+
+
+    val registeredUser by userViewModel.user.collectAsState()
 
     val money = remember {
         NumberFormat.getCurrencyInstance(Locale("es", "CL")).apply { maximumFractionDigits = 0 }
@@ -132,13 +137,7 @@ fun HomeScreen(
                 .padding(inner)
                 .padding(horizontal = 16.dp, vertical = 12.dp)
         ) {
-            val displayName = remember(email) {
-                email?.let { mail ->
-                    FakeDatabase.obtenerPorEmail(mail.trim())?.let { usuario ->
-                        "${usuario.nombre} ${usuario.apellido}".trim()
-                    }
-                }
-            }
+            val displayName = registeredUser?.let { "${it.nombre} ${it.apellido}".trim() }
 
             if (!displayName.isNullOrBlank()) {
                 Text(

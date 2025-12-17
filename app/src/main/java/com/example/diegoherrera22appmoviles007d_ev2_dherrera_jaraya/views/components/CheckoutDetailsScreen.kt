@@ -26,6 +26,8 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -38,10 +40,10 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavController
-import com.example.diegoherrera22appmoviles007d_ev2_dherrera_jaraya.model.FakeDatabase
 import com.example.diegoherrera22appmoviles007d_ev2_dherrera_jaraya.ui.theme.pastelButtonColors
 import com.example.diegoherrera22appmoviles007d_ev2_dherrera_jaraya.viewmodel.CatalogViewModel
 import com.example.diegoherrera22appmoviles007d_ev2_dherrera_jaraya.viewmodel.DiscountResult
+import com.example.diegoherrera22appmoviles007d_ev2_dherrera_jaraya.viewmodel.UserViewModel
 import java.text.NumberFormat
 import java.util.Locale
 
@@ -52,8 +54,15 @@ fun CheckoutDetailsScreen(
     parentEntry: NavBackStackEntry
 ) {
     val catalogVM: CatalogViewModel = viewModel(parentEntry)
+    val userViewModel: UserViewModel = viewModel(parentEntry)
     val userEmail = catalogVM.userEmail
-    val registeredUser = remember(userEmail) { userEmail?.let { FakeDatabase.obtenerPorEmail(it) } }
+
+    LaunchedEffect(Unit) {
+        userViewModel.loadMe()
+    }
+
+
+    val registeredUser by userViewModel.user.collectAsState()
 
     val money = remember {
         NumberFormat.getCurrencyInstance(Locale("es", "CL")).apply { maximumFractionDigits = 0 }
@@ -157,7 +166,7 @@ fun CheckoutDetailsScreen(
                         useSavedAddress = useSavedAddress,
                         savedAddress = registeredUser?.direccion,
                         savedComuna = registeredUser?.comuna,
-                        savedRegion = registeredUser?.region,
+                        savedRegion = registeredUser?.region?.nombre,
                         customAddress = customAddress,
                         customComuna = customComuna,
                         customCity = customCity,
@@ -192,12 +201,13 @@ fun CheckoutDetailsScreen(
                                 .joinToString(" ")
                                 .ifBlank { "Destinatario" }
                         }
+                        val user = registeredUser
 
-                        val resolvedAddress = if (useSavedAddress && registeredUser != null) {
+                        val resolvedAddress = if (useSavedAddress && user != null) {
                             listOfNotNull(
-                                registeredUser.direccion.takeIf { it.isNotBlank() },
-                                registeredUser.comuna.takeIf { it.isNotBlank() },
-                                registeredUser.region.takeIf { it.isNotBlank() }
+                                user.direccion.takeIf { it.isNotBlank() },
+                                user.comuna.takeIf { it.isNotBlank() },
+                                user.region.nombre.takeIf { it.isNotBlank() }
                             ).joinToString(", ")
                                 .ifBlank { "Dirección no indicada" }
                         } else {

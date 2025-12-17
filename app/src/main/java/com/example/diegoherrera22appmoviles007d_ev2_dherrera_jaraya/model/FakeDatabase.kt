@@ -1,5 +1,6 @@
 package com.example.diegoherrera22appmoviles007d_ev2_dherrera_jaraya.model
 
+@Deprecated("Legacy – solo pruebas locales")
 object FakeDatabase {
     private val usuarios = mutableListOf<Usuario>()
 

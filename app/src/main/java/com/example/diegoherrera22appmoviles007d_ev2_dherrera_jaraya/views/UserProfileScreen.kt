@@ -49,13 +49,13 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavController
-import com.example.diegoherrera22appmoviles007d_ev2_dherrera_jaraya.model.FakeDatabase
 import com.example.diegoherrera22appmoviles007d_ev2_dherrera_jaraya.ui.theme.pastelButtonColors
 import com.example.diegoherrera22appmoviles007d_ev2_dherrera_jaraya.ui.theme.pastelOutlinedTextFieldColors
 import com.example.diegoherrera22appmoviles007d_ev2_dherrera_jaraya.viewmodel.CatalogViewModel
 import com.example.diegoherrera22appmoviles007d_ev2_dherrera_jaraya.viewmodel.OrderItem
 import com.example.diegoherrera22appmoviles007d_ev2_dherrera_jaraya.viewmodel.OrderSummary
 import com.example.diegoherrera22appmoviles007d_ev2_dherrera_jaraya.viewmodel.RegionViewModel
+import com.example.diegoherrera22appmoviles007d_ev2_dherrera_jaraya.viewmodel.UserViewModel
 import java.text.NumberFormat
 import java.util.Locale
 
@@ -68,16 +68,18 @@ fun UserProfileScreen(
 ) {
     val catalogVM: CatalogViewModel = viewModel(parentEntry)
     val regionViewModel: RegionViewModel = viewModel(parentEntry)
-    val user = remember(email) { email?.let { FakeDatabase.obtenerPorEmail(it.trim()) } }
+    val userViewModel: UserViewModel = viewModel(parentEntry)
+    val user by userViewModel.user.collectAsState()
+    val message by userViewModel.message.collectAsState()
 
     var nombre by remember(user) { mutableStateOf(user?.nombre.orEmpty()) }
     var apellido by remember(user) { mutableStateOf(user?.apellido.orEmpty()) }
     var direccion by remember(user) { mutableStateOf(user?.direccion.orEmpty()) }
     var comuna by remember(user) { mutableStateOf(user?.comuna.orEmpty()) }
-    var region by remember(user) { mutableStateOf(user?.region.orEmpty()) }
+    var region by remember(user) { mutableStateOf(user?.region?.nombre.orEmpty()) }
     var selectedOrder by remember { mutableStateOf<OrderSummary?>(null) }
     var userDataExpanded by remember { mutableStateOf(false) }
-    var saveMessage by remember { mutableStateOf<String?>(null) }
+    var localMessage by remember { mutableStateOf<String?>(null) }
 
     val regionesState by regionViewModel.regiones.collectAsState()
     val regiones = regionesState.map { it.nombre }
@@ -89,9 +91,10 @@ fun UserProfileScreen(
         NumberFormat.getCurrencyInstance(Locale("es", "CL")).apply { maximumFractionDigits = 0 }
     }
 
-    LaunchedEffect(email) {
-        if (email != null) catalogVM.updateUserEmail(email)
+    LaunchedEffect(Unit) {
+        userViewModel.loadMe()
     }
+
 
     Scaffold(
         topBar = {
@@ -272,8 +275,17 @@ fun UserProfileScreen(
                             Button(
                                 onClick = {
                                     if (!email.isNullOrBlank()) {
-                                        FakeDatabase.actualizarDireccion(email, direccion.trim(), comuna.trim(), region.trim())
-                                        saveMessage = "Datos guardados"
+                                        val selectedRegion = regionesState.firstOrNull { it.nombre == region }
+                                        if (selectedRegion != null) {
+                                            userViewModel.updateAddress(
+                                                direccion = direccion.trim(),
+                                                comuna = comuna.trim(),
+                                                region = selectedRegion
+                                            )
+                                            localMessage = null
+                                        } else {
+                                            localMessage = "Selecciona una región válida"
+                                        }
                                     }
                                 },
                                 modifier = Modifier.fillMaxWidth(),
@@ -285,6 +297,7 @@ fun UserProfileScreen(
                                     textAlign = TextAlign.Center
                                 )
                             }
+                            val saveMessage = message ?: localMessage
                             AnimatedVisibility(visible = saveMessage != null) {
                                 Text(
                                     saveMessage.orEmpty(),

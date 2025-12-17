@@ -21,6 +21,8 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.navigation
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
+import com.example.diegoherrera22appmoviles007d_ev2_dherrera_jaraya.repository.ApiClient
+import com.example.diegoherrera22appmoviles007d_ev2_dherrera_jaraya.repository.TokenDataStore
 import com.example.diegoherrera22appmoviles007d_ev2_dherrera_jaraya.ui.theme.DiegoHerrera22AppMoviles007D_EV2_DHerrera_JArayaTheme
 import com.example.diegoherrera22appmoviles007d_ev2_dherrera_jaraya.viewmodel.AuthViewModel
 import com.example.diegoherrera22appmoviles007d_ev2_dherrera_jaraya.viewmodel.RegionViewModel
@@ -39,6 +41,8 @@ import com.example.diegoherrera22appmoviles007d_ev2_dherrera_jaraya.views.backof
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        ApiClient.init(TokenDataStore(applicationContext))
 
         WindowCompat.setDecorFitsSystemWindows(window, true)
 

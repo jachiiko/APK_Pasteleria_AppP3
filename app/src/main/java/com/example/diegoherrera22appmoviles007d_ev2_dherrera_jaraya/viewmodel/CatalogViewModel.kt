@@ -259,6 +259,11 @@ class CatalogViewModel : ViewModel() {
         ProductRepository.updateInventory(productId, stock, lotNumber)
     }
 
+    fun updateProduct(product: Producto) {
+        ProductRepository.updateProduct(product)
+        selectedPriceRange = priceRangeLimitsState
+    }
+
     fun addProduct(product: Producto) {
         ProductRepository.addProduct(product)
         selectedPriceRange = priceRangeLimitsState

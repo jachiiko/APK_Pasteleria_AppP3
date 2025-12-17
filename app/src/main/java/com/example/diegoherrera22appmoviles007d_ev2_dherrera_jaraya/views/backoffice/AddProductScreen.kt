@@ -90,7 +90,7 @@ fun AddProductScreen(navController: NavController, parentEntry: NavBackStackEntr
                                 null
                             } else {
                                 NutrientInfo(
-                                    name = row.name.ifBlank { "Dato" },
+                                    name = row.name,
                                     perServing = row.perServing,
                                     totalProduct = row.totalProduct
                                 )

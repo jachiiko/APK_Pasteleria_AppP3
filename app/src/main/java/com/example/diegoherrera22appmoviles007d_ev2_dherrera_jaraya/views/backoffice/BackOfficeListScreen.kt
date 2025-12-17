@@ -16,6 +16,8 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
@@ -34,6 +36,7 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -46,9 +49,16 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavBackStackEntry
 import com.example.diegoherrera22appmoviles007d_ev2_dherrera_jaraya.model.Producto
+import com.example.diegoherrera22appmoviles007d_ev2_dherrera_jaraya.model.NutrientInfo
 import com.example.diegoherrera22appmoviles007d_ev2_dherrera_jaraya.ui.theme.pastelOutlinedTextFieldColors
 import com.example.diegoherrera22appmoviles007d_ev2_dherrera_jaraya.ui.theme.pastelTextButtonColors
 import com.example.diegoherrera22appmoviles007d_ev2_dherrera_jaraya.viewmodel.CatalogViewModel
+
+private data class NutrientRowState(
+    val name: String = "",
+    val perServing: String = "",
+    val totalProduct: String = ""
+)
 
 /**
  * Back Office: ahora permite editar lote y stock sobre el catálogo en memoria.
@@ -64,8 +74,14 @@ fun BackOfficeListScreen(
 
     var toDelete by remember { mutableStateOf<Producto?>(null) }
     var editingProduct by remember { mutableStateOf<Producto?>(null) }
+    var nameInput by remember { mutableStateOf("") }
+    var priceInput by remember { mutableStateOf("") }
+    var descriptionInput by remember { mutableStateOf("") }
+    var categoryInput by remember { mutableStateOf("") }
+    var skuInput by remember { mutableStateOf("") }
     var stockInput by remember { mutableStateOf("") }
     var lotInput by remember { mutableStateOf("") }
+    val nutrientRows = remember { mutableStateListOf(NutrientRowState()) }
 
     Scaffold(
         topBar = {
@@ -92,8 +108,27 @@ fun BackOfficeListScreen(
                     p = p,
                     onEdit = {
                         editingProduct = p
+                        nameInput = p.name
+                        priceInput = p.price.toString()
+                        descriptionInput = p.description
+                        categoryInput = p.category
+                        skuInput = p.sku
                         stockInput = p.stock.toString()
                         lotInput = p.lotNumber
+                        nutrientRows.clear()
+                        if (p.nutritionalInfo.isEmpty()) {
+                            nutrientRows.add(NutrientRowState())
+                        } else {
+                            nutrientRows.addAll(
+                                p.nutritionalInfo.map {
+                                    NutrientRowState(
+                                        name = it.name,
+                                        perServing = it.perServing,
+                                        totalProduct = it.totalProduct
+                                    )
+                                }
+                            )
+                        }
                     },
                     onDelete = { toDelete = p }
                 )
@@ -142,14 +177,42 @@ fun BackOfficeListScreen(
         if (editingProduct != null) {
             AlertDialog(
                 onDismissRequest = { editingProduct = null },
-                title = { Text("Editar inventario") },
+                title = { Text("Editar producto") },
+                containerColor = Color.White,
                 text = {
-                    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    Column(
+                        verticalArrangement = Arrangement.spacedBy(10.dp),
+                        modifier = Modifier.verticalScroll(rememberScrollState())
+                    ) {
                         OutlinedTextField(
-                            value = stockInput,
-                            onValueChange = { stockInput = it.filter { ch -> ch.isDigit() } },
-                            label = { Text("Stock disponible") },
+                            value = nameInput,
+                            onValueChange = { nameInput = it },
+                            label = { Text("Nombre del producto") },
+                            colors = pastelOutlinedTextFieldColors()
+                        )
+                        OutlinedTextField(
+                            value = priceInput,
+                            onValueChange = { priceInput = it.filter { ch -> ch.isDigit() } },
+                            label = { Text("Precio (CLP)") },
                             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                            colors = pastelOutlinedTextFieldColors()
+                        )
+                        OutlinedTextField(
+                            value = descriptionInput,
+                            onValueChange = { descriptionInput = it },
+                            label = { Text("Descripción") },
+                            colors = pastelOutlinedTextFieldColors()
+                        )
+                        OutlinedTextField(
+                            value = categoryInput,
+                            onValueChange = { categoryInput = it },
+                            label = { Text("Categoría") },
+                            colors = pastelOutlinedTextFieldColors()
+                        )
+                        OutlinedTextField(
+                            value = skuInput,
+                            onValueChange = { skuInput = it },
+                            label = { Text("SKU") },
                             colors = pastelOutlinedTextFieldColors()
                         )
                         OutlinedTextField(
@@ -158,13 +221,116 @@ fun BackOfficeListScreen(
                             label = { Text("Lote") },
                             colors = pastelOutlinedTextFieldColors()
                         )
+                        OutlinedTextField(
+                            value = stockInput,
+                            onValueChange = { stockInput = it.filter { ch -> ch.isDigit() } },
+                            label = { Text("Stock disponible") },
+                            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                            colors = pastelOutlinedTextFieldColors()
+                        )
+
+                        Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                            Text(
+                                text = "Tabla nutricional",
+                                style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold)
+                            )
+                            Row(modifier = Modifier.fillMaxWidth()) {
+                                Text(
+                                    text = "Nutriente",
+                                    modifier = Modifier.weight(1f),
+                                    style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.SemiBold)
+                                )
+                                Text(
+                                    text = "Por porción",
+                                    modifier = Modifier
+                                        .weight(1f)
+                                        .padding(start = 8.dp),
+                                    style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.SemiBold)
+                                )
+                                Text(
+                                    text = "Total",
+                                    modifier = Modifier
+                                        .weight(1f)
+                                        .padding(start = 8.dp),
+                                    style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.SemiBold)
+                                )
+                            }
+
+                            nutrientRows.forEachIndexed { index, row ->
+                                Row(modifier = Modifier.fillMaxWidth()) {
+                                    OutlinedTextField(
+                                        value = row.name,
+                                        onValueChange = { value ->
+                                            nutrientRows[index] = nutrientRows[index].copy(name = value)
+                                        },
+                                        label = { Text("Nombre") },
+                                        modifier = Modifier
+                                            .weight(1f)
+                                            .padding(end = 4.dp),
+                                        colors = pastelOutlinedTextFieldColors()
+                                    )
+                                    OutlinedTextField(
+                                        value = row.perServing,
+                                        onValueChange = { value ->
+                                            nutrientRows[index] = nutrientRows[index].copy(perServing = value)
+                                        },
+                                        label = { Text("Por porción") },
+                                        modifier = Modifier
+                                            .weight(1f)
+                                            .padding(horizontal = 4.dp),
+                                        colors = pastelOutlinedTextFieldColors()
+                                    )
+                                    OutlinedTextField(
+                                        value = row.totalProduct,
+                                        onValueChange = { value ->
+                                            nutrientRows[index] = nutrientRows[index].copy(totalProduct = value)
+                                        },
+                                        label = { Text("Total producto") },
+                                        modifier = Modifier
+                                            .weight(1f)
+                                            .padding(start = 4.dp),
+                                        colors = pastelOutlinedTextFieldColors()
+                                    )
+                                }
+                            }
+
+                            TextButton(
+                                onClick = { nutrientRows.add(NutrientRowState()) },
+                                modifier = Modifier.padding(top = 4.dp)
+                            ) {
+                                Text("Agregar nutriente")
+                            }
+                        }
                     }
                 },
                 confirmButton = {
                     TextButton(
                         onClick = {
-                            val newStock = stockInput.toIntOrNull() ?: editingProduct!!.stock
-                            catalogVM.updateInventory(editingProduct!!.id, newStock, lotInput)
+                            val updatedNutrients = nutrientRows
+                                .mapNotNull { row ->
+                                    if (row.name.isBlank() && row.perServing.isBlank() && row.totalProduct.isBlank()) {
+                                        null
+                                    } else {
+                                        NutrientInfo(
+                                            name = row.name,
+                                            perServing = row.perServing,
+                                            totalProduct = row.totalProduct
+                                        )
+                                    }
+                                }
+
+                            val updatedProduct = editingProduct!!.copy(
+                                name = nameInput.ifBlank { editingProduct!!.name },
+                                price = priceInput.toIntOrNull() ?: editingProduct!!.price,
+                                description = descriptionInput,
+                                category = categoryInput.ifBlank { editingProduct!!.category },
+                                sku = skuInput.ifBlank { editingProduct!!.sku }.uppercase(),
+                                stock = stockInput.toIntOrNull() ?: editingProduct!!.stock,
+                                lotNumber = lotInput,
+                                nutritionalInfo = updatedNutrients
+                            )
+
+                            catalogVM.updateProduct(updatedProduct)
                             editingProduct = null
                         },
                         colors = pastelTextButtonColors()

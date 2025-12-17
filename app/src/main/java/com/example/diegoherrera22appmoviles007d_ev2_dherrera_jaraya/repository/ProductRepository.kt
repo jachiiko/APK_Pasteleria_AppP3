@@ -618,6 +618,14 @@ object ProductRepository {
         }
     }
 
+    fun updateProduct(updated: Producto) {
+        val idx = products.indexOfFirst { it.id == updated.id }
+        if (idx != -1) {
+            val current = products[idx]
+            products[idx] = updated.copy(id = current.id)
+        }
+    }
+
     fun getById(id: String): Producto? =
         products.firstOrNull { it.id == id }
 

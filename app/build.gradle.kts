@@ -68,6 +68,9 @@ dependencies {
     implementation(libs.okhttp)
     implementation(libs.logging.interceptor)
 
+    // DataStore
+    implementation("androidx.datastore:datastore-preferences:1.1.1")
+
     // Room
     implementation(libs.androidx.room.runtime)
     implementation(libs.androidx.room.ktx)

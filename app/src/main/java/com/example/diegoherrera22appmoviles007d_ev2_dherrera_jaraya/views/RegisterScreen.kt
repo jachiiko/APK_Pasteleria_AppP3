@@ -183,7 +183,7 @@ fun RegisterScreen(
                         onExpandedChange = { regionsExpanded = !regionsExpanded }
                     ) {
                         OutlinedTextField(
-                            value = region,
+                            value = selectedRegion?.nombre ?: "",
                             onValueChange = {},
                             readOnly = true,
                             label = { Text("Región") },
@@ -198,14 +198,13 @@ fun RegisterScreen(
 
                         ExposedDropdownMenu(
                             expanded = regionsExpanded,
-                            onDismissRequest = { regionsExpanded = false },
-                            containerColor = Color.White
+                            onDismissRequest = { regionsExpanded = false }
                         ) {
-                            regiones.forEach { r ->
+                            regionesState.forEach { region ->
                                 DropdownMenuItem(
-                                    text = { Text(r) },
+                                    text = { Text(region.nombre) },
                                     onClick = {
-                                        region = r
+                                        selectedRegion = region
                                         comuna = ""
                                         regionsExpanded = false
                                     }
@@ -218,7 +217,7 @@ fun RegisterScreen(
                     ExposedDropdownMenuBox(
                         expanded = comunasExpanded,
                         onExpandedChange = {
-                            if (region.isNotBlank()) comunasExpanded = !comunasExpanded
+                            if (selectedRegion != null) comunasExpanded = !comunasExpanded
                         }
                     ) {
                         OutlinedTextField(
@@ -237,8 +236,7 @@ fun RegisterScreen(
 
                         ExposedDropdownMenu(
                             expanded = comunasExpanded,
-                            onDismissRequest = { comunasExpanded = false },
-                            containerColor = Color.White
+                            onDismissRequest = { comunasExpanded = false }
                         ) {
                             comunas.forEach { c ->
                                 DropdownMenuItem(

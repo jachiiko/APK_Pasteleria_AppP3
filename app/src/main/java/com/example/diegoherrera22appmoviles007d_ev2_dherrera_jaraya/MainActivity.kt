@@ -10,6 +10,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
@@ -64,9 +65,12 @@ class MainActivity : ComponentActivity() {
 fun AppNavigation() {
 
     val navController = rememberNavController()
+    val context = LocalContext.current
 
     // ViewModels que deben ser únicos en toda la app
-    val authViewModel: AuthViewModel = viewModel()
+    val authViewModel: AuthViewModel = viewModel(
+        factory = AuthViewModel.provideFactory(context)
+    )
     val regionViewModel: RegionViewModel = viewModel() // ← **IMPORTANTE**
 
     NavHost(

@@ -1,24 +1,38 @@
 package com.example.diegoherrera22appmoviles007d_ev2_dherrera_jaraya.viewmodel
 
+import android.content.Context
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.viewModelScope
 import com.example.diegoherrera22appmoviles007d_ev2_dherrera_jaraya.dto.LoginRequest
-import com.example.diegoherrera22appmoviles007d_ev2_dherrera_jaraya.model.Region
 import com.example.diegoherrera22appmoviles007d_ev2_dherrera_jaraya.dto.RegisterRequest
+import com.example.diegoherrera22appmoviles007d_ev2_dherrera_jaraya.model.Region
 import com.example.diegoherrera22appmoviles007d_ev2_dherrera_jaraya.repository.ApiClient
+import com.example.diegoherrera22appmoviles007d_ev2_dherrera_jaraya.repository.TokenDataStore
 import com.example.diegoherrera22appmoviles007d_ev2_dherrera_jaraya.repository.api.AuthApi
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 import retrofit2.HttpException
 
 class AuthViewModel(
-    private val authApi: AuthApi = ApiClient.authApi
+    private val authApi: AuthApi = ApiClient.authApi,
+    private val tokenDataStore: TokenDataStore
 ) : ViewModel() {
 
     var mensaje = mutableStateOf("")
     var usuarioActual = mutableStateOf<String?>(null)
     var token = mutableStateOf<String?>(null)
+
+    init {
+        viewModelScope.launch {
+            tokenDataStore.tokenFlow.collect { savedToken ->
+                token.value = savedToken
+            }
+        }
+    }
 
     fun registrar(
         nombre: String,
@@ -107,6 +121,9 @@ class AuthViewModel(
                     authApi.login(LoginRequest(email, password))
                 }
                 token.value = response.token
+                withContext(Dispatchers.IO) {
+                    tokenDataStore.saveToken(response.token)
+                }
                 usuarioActual.value = email
                 mensaje.value = "Inicio de sesión exitoso"
                 true
@@ -120,6 +137,19 @@ class AuthViewModel(
             } catch (e: Exception) {
                 mensaje.value = "Error de conexión. Intenta nuevamente"
                 false
+            }
+        }
+    }
+
+    companion object {
+        fun provideFactory(
+            context: Context,
+            authApi: AuthApi = ApiClient.authApi
+        ): ViewModelProvider.Factory = object : ViewModelProvider.Factory {
+            @Suppress("UNCHECKED_CAST")
+            override fun <T : ViewModel> create(modelClass: Class<T>): T {
+                val dataStore = TokenDataStore(context.applicationContext)
+                return AuthViewModel(authApi, dataStore) as T
             }
         }
     }

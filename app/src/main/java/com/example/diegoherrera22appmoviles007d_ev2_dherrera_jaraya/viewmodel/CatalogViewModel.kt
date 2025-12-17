@@ -170,8 +170,8 @@ class CatalogViewModel : ViewModel() {
         val discountPercent = appliedDiscount?.percent ?: 0
         val discountAmount = (items.sumOf { it.subtotal } * discountPercent) / 100
         val finalTotal = items.sumOf { it.subtotal } - discountAmount
-        recipientName = recipient,
-        shippingAddress = address,
+        val recipient = checkoutRecipient?.takeIf { it.isNotBlank() } ?: "Destinatario"
+        val address = checkoutAddress?.takeIf { it.isNotBlank() } ?: "Dirección no indicada"
         val localeCL = Locale("es", "CL")
         val chileZone = ZoneId.of("America/Santiago")
         val zonedDateTime = ZonedDateTime.now(chileZone)

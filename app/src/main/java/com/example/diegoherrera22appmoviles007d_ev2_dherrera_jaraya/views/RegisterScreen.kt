@@ -277,6 +277,8 @@ fun RegisterScreen(
                     colors = pastelOutlinedTextFieldColors()
                 )
 
+                Spacer(modifier = Modifier.weight(1f))
+
                 // BOTÓN REGISTRO
                 Button(
                     onClick = {
@@ -327,9 +329,6 @@ fun RegisterScreen(
                         modifier = Modifier.fillMaxWidth()
                     )
                 }
-
-                // MENSAJE DEL VIEWMODEL
-                Text(viewModel.mensaje.value, modifier = Modifier.padding(top = 6.dp))
             }
         }
     }

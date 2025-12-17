@@ -1,6 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <network-security-config>
+
+    <!-- Permitir HTTP para desarrollo -->
+    <base-config cleartextTrafficPermitted="true" />
+
+    <!-- Emulador -> tu PC local -->
     <domain-config cleartextTrafficPermitted="true">
         <domain includeSubdomains="true">10.0.2.2</domain>
     </domain-config>
+
+    <!-- Tu EC2 -->
+    <domain-config cleartextTrafficPermitted="true">
+        <domain includeSubdomains="true">3.129.19.7</domain>
+    </domain-config>
+
 </network-security-config>

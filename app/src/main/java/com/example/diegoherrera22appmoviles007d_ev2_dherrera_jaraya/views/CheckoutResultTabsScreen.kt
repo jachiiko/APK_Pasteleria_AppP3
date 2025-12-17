@@ -137,13 +137,31 @@ fun CheckoutSuccessScreen(
 
                     Divider()
 
-                    Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-                        Text("Total", style = MaterialTheme.typography.titleMedium)
-                        Text(
-                            money.format(order.total),
-                            style = MaterialTheme.typography.titleMedium,
-                            fontWeight = FontWeight.SemiBold
-                        )
+                    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+                            Text("Subtotal", style = MaterialTheme.typography.titleMedium)
+                            Text(money.format(order.total))
+                        }
+                        if (order.discountAmount > 0) {
+                            Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+                                Text(
+                                    "Descuento (${order.discountPercent}%)",
+                                    color = MaterialTheme.colorScheme.primary
+                                )
+                                Text(
+                                    "-${money.format(order.discountAmount)}",
+                                    color = MaterialTheme.colorScheme.primary
+                                )
+                            }
+                        }
+                        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+                            Text("Total", style = MaterialTheme.typography.titleMedium)
+                            Text(
+                                money.format(order.finalTotal),
+                                style = MaterialTheme.typography.titleMedium,
+                                fontWeight = FontWeight.SemiBold
+                            )
+                        }
                     }
                 }
             }

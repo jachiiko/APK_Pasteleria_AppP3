@@ -1,17 +1,15 @@
 package com.example.diegoherrera22appmoviles007d_ev2_dherrera_jaraya.views
 
 import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.Button
@@ -43,6 +41,9 @@ import androidx.navigation.NavController
 import com.example.diegoherrera22appmoviles007d_ev2_dherrera_jaraya.model.FakeDatabase
 import com.example.diegoherrera22appmoviles007d_ev2_dherrera_jaraya.ui.theme.pastelButtonColors
 import com.example.diegoherrera22appmoviles007d_ev2_dherrera_jaraya.viewmodel.CatalogViewModel
+import com.example.diegoherrera22appmoviles007d_ev2_dherrera_jaraya.viewmodel.DiscountResult
+import java.text.NumberFormat
+import java.util.Locale
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -54,7 +55,12 @@ fun CheckoutDetailsScreen(
     val userEmail = catalogVM.userEmail
     val registeredUser = remember(userEmail) { userEmail?.let { FakeDatabase.obtenerPorEmail(it) } }
 
+    val money = remember {
+        NumberFormat.getCurrencyInstance(Locale("es", "CL")).apply { maximumFractionDigits = 0 }
+    }
+
     var discountCode by remember { mutableStateOf("") }
+    var discountFeedback by remember { mutableStateOf<DiscountResult?>(null) }
     var recipientOption by remember { mutableStateOf(RecipientOption.Me) }
     var recipientName by remember { mutableStateOf("") }
     var recipientLastname by remember { mutableStateOf("") }
@@ -83,14 +89,18 @@ fun CheckoutDetailsScreen(
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
             Surface(
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .weight(1f),
                 shape = RoundedCornerShape(16.dp),
                 shadowElevation = 4.dp,
                 color = Color.White
             ) {
+                val scrollState = rememberScrollState()
                 Column(
                     modifier = Modifier
-                        .fillMaxWidth()
+                        .fillMaxSize()
+                        .verticalScroll(scrollState)
                         .padding(16.dp),
                     verticalArrangement = Arrangement.spacedBy(16.dp)
                 ) {
@@ -101,11 +111,34 @@ fun CheckoutDetailsScreen(
                     )
                     OutlinedTextField(
                         value = discountCode,
-                        onValueChange = { discountCode = it },
+                        onValueChange = {
+                            discountCode = it
+                            discountFeedback = null
+                        },
                         modifier = Modifier.fillMaxWidth(),
                         placeholder = { Text("Ingresa tu código") },
                         singleLine = true
                     )
+                    Button(
+                        onClick = {
+                            discountFeedback = catalogVM.applyDiscountCode(discountCode)
+                        },
+                        modifier = Modifier.fillMaxWidth(),
+                        enabled = discountCode.isNotBlank(),
+                        colors = pastelButtonColors()
+                    ) {
+                        Text("Aplicar código")
+                    }
+                    val applied = catalogVM.appliedDiscount
+                    val feedback = discountFeedback ?: applied?.let {
+                        DiscountResult(true, "Aplicando ${it.percent}% de descuento con ${it.code}.")
+                    }
+                    feedback?.let { result ->
+                        Text(
+                            text = result.message,
+                            color = if (result.success) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.error
+                        )
+                    }
 
                     DividerSection(title = "Destinatario")
                     RecipientSection(
@@ -134,10 +167,17 @@ fun CheckoutDetailsScreen(
                         onCityChange = { customCity = it },
                         hasSavedAddress = registeredUser != null
                     )
+
+                    DividerSection(title = "Resumen")
+                    SummaryRows(
+                        subtotal = catalogVM.totalCLP(),
+                        discountAmount = catalogVM.discountAmount(),
+                        discountInfo = applied?.let { "${it.code} -${it.percent}%" },
+                        totalWithDiscount = catalogVM.totalWithDiscount(),
+                        money = money
+                    )
                 }
             }
-
-            Spacer(modifier = Modifier.height(8.dp))
 
             Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                 Button(
@@ -194,26 +234,21 @@ private fun RecipientSection(
     onLastnameChange: (String) -> Unit,
 ) {
     Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-        Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-            Box(modifier = Modifier.weight(1f)) {
-                RecipientOptionCard(
-                    title = "Para mí",
-                    description = registeredUserName ?: "Usa tus datos registrados",
-                    selected = option == RecipientOption.Me,
-                    onClick = { onOptionSelected(RecipientOption.Me) },
-                    modifier = Modifier.fillMaxWidth()
-                )
-            }
-            Box(modifier = Modifier.weight(1f)) {
-                RecipientOptionCard(
-                    title = "Otro destinatario",
-                    description = "Enviar a otra persona",
-                    selected = option == RecipientOption.Other,
-                    onClick = { onOptionSelected(RecipientOption.Other) },
-                    modifier = Modifier.fillMaxWidth()
-                )
-            }
-        }
+        RecipientOptionCard(
+            title = "Para mí",
+            description = registeredUserName ?: "Usa tus datos registrados",
+            selected = option == RecipientOption.Me,
+            onClick = { onOptionSelected(RecipientOption.Me) },
+            modifier = Modifier.fillMaxWidth()
+        )
+
+        RecipientOptionCard(
+            title = "Otro destinatario",
+            description = "Enviar a otra persona",
+            selected = option == RecipientOption.Other,
+            onClick = { onOptionSelected(RecipientOption.Other) },
+            modifier = Modifier.fillMaxWidth()
+        )
 
         if (option == RecipientOption.Other) {
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -324,20 +359,62 @@ private fun AddressOptionRow(
     enabled: Boolean = true,
     onSelect: () -> Unit,
 ) {
-    val background = if (selected) MaterialTheme.colorScheme.primary.copy(alpha = 0.1f) else MaterialTheme.colorScheme.surface
+    val background = if (selected) MaterialTheme.colorScheme.primary.copy(alpha = 0.1f) else Color.White
+    val borderColor = if (selected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.outline
 
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .background(background, shape = RoundedCornerShape(12.dp))
-            .padding(12.dp),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(12.dp)
+    Card(
+        onClick = { if (enabled) onSelect() },
+        colors = CardDefaults.cardColors(containerColor = background),
+        border = BorderStroke(1.dp, borderColor),
+        modifier = Modifier.fillMaxWidth(),
+        enabled = enabled
     ) {
-        RadioButton(selected = selected, onClick = onSelect, enabled = enabled)
-        Column(modifier = Modifier.weight(1f)) {
-            Text(title, fontWeight = FontWeight.SemiBold)
-            Text(description, color = MaterialTheme.colorScheme.onSurfaceVariant)
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(12.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(12.dp)
+        ) {
+            RadioButton(selected = selected, onClick = onSelect, enabled = enabled)
+            Column(modifier = Modifier.weight(1f)) {
+                Text(title, fontWeight = FontWeight.SemiBold)
+                Text(description, color = MaterialTheme.colorScheme.onSurfaceVariant)
+            }
+        }
+    }
+}
+
+@Composable
+private fun SummaryRows(
+    subtotal: Int,
+    discountAmount: Int,
+    discountInfo: String?,
+    totalWithDiscount: Int,
+    money: NumberFormat
+) {
+    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+        Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+            Text("Subtotal")
+            Text(money.format(subtotal))
+        }
+        if (discountAmount > 0 && discountInfo != null) {
+            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+                Text("Descuento ($discountInfo)", color = MaterialTheme.colorScheme.primary)
+                Text("-${money.format(discountAmount)}", color = MaterialTheme.colorScheme.primary)
+            }
+        }
+        Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+            Text(
+                "Total a pagar",
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.SemiBold
+            )
+            Text(
+                money.format(totalWithDiscount),
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.SemiBold
+            )
         }
     }
 }

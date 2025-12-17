@@ -35,12 +35,29 @@ data class OrderSummary(
     val orderId: String,
     val dateText: String,
     val items: List<OrderItem>,
-    val total: Int
+    val total: Int,
+    val discountPercent: Int,
+    val discountAmount: Int,
+    val finalTotal: Int
+)
+
+data class AppliedDiscount(
+    val code: String,
+    val percent: Int
+)
+
+data class DiscountResult(
+    val success: Boolean,
+    val message: String
 )
 
 class CatalogViewModel : ViewModel() {
     companion object {
         private const val IVA_RATE = 0.19
+        private val AVAILABLE_CODES = mapOf(
+            "PASTELITO" to 10,
+            "1000SABOR" to 20
+        )
     }
     val products: List<Producto> = ProductRepository.getCatalog()
     val categories: List<String> = products.map { it.category }.distinct().sorted()
@@ -72,6 +89,11 @@ class CatalogViewModel : ViewModel() {
 
     private val _cart: SnapshotStateMap<String, CartLine> = mutableStateMapOf()
     val cartLines: List<CartLine> get() = _cart.values.toList()
+
+    private val usedDiscountsByUser = mutableStateMapOf<String, MutableSet<String>>()
+
+    var appliedDiscount: AppliedDiscount? by mutableStateOf(null)
+        private set
 
     fun updateUserEmail(email: String?) {
         userEmail = email
@@ -107,9 +129,17 @@ class CatalogViewModel : ViewModel() {
     }
 
     fun removeLine(productId: String) { _cart.remove(productId) }
-    fun clearCart() { _cart.clear() }
+    fun clearCart() {
+        _cart.clear()
+        appliedDiscount = null
+    }
 
     fun totalCLP(): Int = _cart.values.sumOf { it.product.price * it.qty }
+    fun discountAmount(): Int {
+        val discount = appliedDiscount?.percent ?: 0
+        return (totalCLP() * discount) / 100
+    }
+    fun totalWithDiscount(): Int = totalCLP() - discountAmount()
     fun itemsCount(): Int = _cart.values.sumOf { it.qty }
     fun distinctCount(): Int = _cart.size
 
@@ -130,6 +160,9 @@ class CatalogViewModel : ViewModel() {
                 subtotal = it.product.price * it.qty
             )
         }
+        val discountPercent = appliedDiscount?.percent ?: 0
+        val discountAmount = (items.sumOf { it.subtotal } * discountPercent) / 100
+        val finalTotal = items.sumOf { it.subtotal } - discountAmount
         val localeCL = Locale("es", "CL")
         val chileZone = ZoneId.of("America/Santiago")
         val zonedDateTime = ZonedDateTime.now(chileZone)
@@ -140,8 +173,37 @@ class CatalogViewModel : ViewModel() {
             orderId = "P-${System.currentTimeMillis()}",
             dateText = dateText,
             items = items,
-            total = items.sumOf { it.subtotal }
+            total = items.sumOf { it.subtotal },
+            discountPercent = discountPercent,
+            discountAmount = discountAmount,
+            finalTotal = finalTotal
         )
+    }
+
+    fun applyDiscountCode(input: String): DiscountResult {
+        val code = input.trim().uppercase()
+        val percent = AVAILABLE_CODES[code]
+            ?: return DiscountResult(false, "Código inválido o no disponible.")
+
+        val userKey = userEmail ?: "guest"
+        val usedCodes = usedDiscountsByUser.getOrPut(userKey) { mutableSetOf() }
+
+        if (appliedDiscount != null && appliedDiscount?.code != code) {
+            return DiscountResult(false, "Solo puedes usar un código por compra.")
+        }
+
+        if (appliedDiscount?.code == code) {
+            return DiscountResult(true, "El código ya está aplicado.")
+        }
+
+        if (usedCodes.contains(code)) {
+            return DiscountResult(false, "Ya utilizaste este código en una compra anterior.")
+        }
+
+        appliedDiscount = AppliedDiscount(code = code, percent = percent)
+        usedCodes.add(code)
+
+        return DiscountResult(true, "Aplicando ${percent}% de descuento con $code.")
     }
 
     private fun priceWithoutIva(priceWithIva: Int): Int {

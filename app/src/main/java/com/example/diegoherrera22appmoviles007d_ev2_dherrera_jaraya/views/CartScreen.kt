@@ -131,34 +131,15 @@ fun CartScreen(
                     )
                 }
 
-                Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                    Button(
-                        onClick = {
-                            val emailArg = catalogVM.userEmail ?: ""
-                            navController.navigate("home/$emailArg") {
-                                popUpTo("shop") { inclusive = false }
-                                launchSingleTop = true
-                            }
-                        },
-                        modifier = Modifier.fillMaxWidth(),
-                        colors = pastelButtonColors()
-                    ) {
-                        Text(
-                            "Volver al catalogo",
-                            style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold)
-                        )
-                    }
-
-                    Button(
-                        onClick = { navController.navigate("checkout/details") },
-                        modifier = Modifier.fillMaxWidth(),
-                        colors = pastelButtonColors()
-                    ) {
-                        Text(
-                            "Continuar compra",
-                            style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold)
-                        )
-                    }
+                Button(
+                    onClick = { navController.navigate("checkout/details") },
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = pastelButtonColors()
+                ) {
+                    Text(
+                        "Continuar compra",
+                        style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold)
+                    )
                 }
             }
         }

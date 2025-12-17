@@ -78,5 +78,8 @@ class CatalogViewModelTest : StringSpec({
         item.qty shouldBe 3
         item.subtotal shouldBe (producto.price * 3)
         resumen.total shouldBe (producto.price * 3)
+        resumen.discountPercent shouldBe 0
+        resumen.discountAmount shouldBe 0
+        resumen.finalTotal shouldBe resumen.total
     }
 })

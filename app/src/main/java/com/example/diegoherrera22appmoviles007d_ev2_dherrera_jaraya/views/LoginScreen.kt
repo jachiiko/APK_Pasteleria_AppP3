@@ -154,7 +154,7 @@ fun LoginScreen(navController: NavController, viewModel: AuthViewModel) {
                         "home/${email.trim()}"
                     }
                     navController.navigate(destination) {
-                        popUpTo("login") { inclusive = true }
+                        popUpTo("login") { inclusive = false }
                     }
                 },
                 colors = pastelButtonColors(),

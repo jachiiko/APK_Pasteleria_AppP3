@@ -84,6 +84,7 @@ fun RegisterScreen(
             onCutRequested: (() -> Unit)?,
             onSelectAllRequested: (() -> Unit)?
         ) = Unit
+
         override fun hide() = Unit
     }
 
@@ -96,188 +97,197 @@ fun RegisterScreen(
 
             Column(
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 20.dp, vertical = 24.dp)
-                    .padding(top = 56.dp)
-                    .verticalScroll(rememberScrollState()),
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.spacedBy(4.dp)
+                    .fillMaxSize()
+                    .padding(horizontal = 20.dp, vertical = 24.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
             ) {
 
-                Text(
-                    "Registro",
-                    style = MaterialTheme.typography.titleLarge,
-                    textAlign = TextAlign.Center,
-                    modifier = Modifier.fillMaxWidth()
-                )
+                Column(
+                    modifier = Modifier
+                        .weight(1f)
+                        .fillMaxWidth()
+                        .padding(top = 56.dp)
+                        .verticalScroll(rememberScrollState()),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.spacedBy(4.dp)
+                ) {
 
-                // CAMPOS NORMALES
-                OutlinedTextField(
-                    value = nombre,
-                    onValueChange = { nombre = it },
-                    label = { Text("Nombre") },
-                    modifier = Modifier.fillMaxWidth(),
-                    singleLine = true,
-                    keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
-                    colors = pastelOutlinedTextFieldColors()
-                )
+                    Text(
+                        "Registro",
+                        style = MaterialTheme.typography.titleLarge,
+                        textAlign = TextAlign.Center,
+                        modifier = Modifier.fillMaxWidth()
+                    )
 
-                OutlinedTextField(
-                    value = apellido,
-                    onValueChange = { apellido = it },
-                    label = { Text("Apellido") },
-                    modifier = Modifier.fillMaxWidth(),
-                    singleLine = true,
-                    keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
-                    colors = pastelOutlinedTextFieldColors()
-                )
+                    // CAMPOS NORMALES
+                    OutlinedTextField(
+                        value = nombre,
+                        onValueChange = { nombre = it },
+                        label = { Text("Nombre") },
+                        modifier = Modifier.fillMaxWidth(),
+                        singleLine = true,
+                        keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
+                        colors = pastelOutlinedTextFieldColors()
+                    )
 
-                OutlinedTextField(
-                    value = rutText,
-                    onValueChange = {
-                        val cleaned = it
-                            .uppercase()
-                            .filter { char -> char.isDigit() || char == 'K' }
+                    OutlinedTextField(
+                        value = apellido,
+                        onValueChange = { apellido = it },
+                        label = { Text("Apellido") },
+                        modifier = Modifier.fillMaxWidth(),
+                        singleLine = true,
+                        keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
+                        colors = pastelOutlinedTextFieldColors()
+                    )
 
-                        val cuerpo = cleaned.takeWhile { ch -> ch.isDigit() }.take(8)
-                        val dv = cleaned.drop(cuerpo.length).firstOrNull()?.takeIf { ch -> ch.isDigit() || ch == 'K' }
+                    OutlinedTextField(
+                        value = rutText,
+                        onValueChange = {
+                            val cleaned = it
+                                .uppercase()
+                                .filter { char -> char.isDigit() || char == 'K' }
 
-                        rutText = buildString {
-                            append(cuerpo)
-                            if (cuerpo.isNotEmpty() && dv != null) {
-                                append('-')
-                                append(dv)
+                            val cuerpo = cleaned.takeWhile { ch -> ch.isDigit() }.take(8)
+                            val dv = cleaned.drop(cuerpo.length).firstOrNull()
+                                ?.takeIf { ch -> ch.isDigit() || ch == 'K' }
+
+                            rutText = buildString {
+                                append(cuerpo)
+                                if (cuerpo.isNotEmpty() && dv != null) {
+                                    append('-')
+                                    append(dv)
+                                }
+                            }
+                        },
+                        label = { Text("RUT (ej: 12345678-9)") },
+                        modifier = Modifier.fillMaxWidth(),
+                        singleLine = true,
+                        keyboardOptions = KeyboardOptions(
+                            keyboardType = KeyboardType.Text,
+                            imeAction = ImeAction.Next
+                        ),
+                        colors = pastelOutlinedTextFieldColors()
+                    )
+
+                    OutlinedTextField(
+                        value = direccion,
+                        onValueChange = { direccion = it },
+                        label = { Text("Dirección") },
+                        modifier = Modifier.fillMaxWidth(),
+                        keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
+                        colors = pastelOutlinedTextFieldColors()
+                    )
+
+                    // REGIÓN
+                    ExposedDropdownMenuBox(
+                        expanded = regionsExpanded,
+                        onExpandedChange = { regionsExpanded = !regionsExpanded }
+                    ) {
+                        OutlinedTextField(
+                            value = region,
+                            onValueChange = {},
+                            readOnly = true,
+                            label = { Text("Región") },
+                            trailingIcon = {
+                                ExposedDropdownMenuDefaults.TrailingIcon(expanded = regionsExpanded)
+                            },
+                            modifier = Modifier
+                                .menuAnchor()
+                                .fillMaxWidth(),
+                            colors = pastelOutlinedTextFieldColors()
+                        )
+
+                        ExposedDropdownMenu(
+                            expanded = regionsExpanded,
+                            onDismissRequest = { regionsExpanded = false },
+                            containerColor = Color.White
+                        ) {
+                            regiones.forEach { r ->
+                                DropdownMenuItem(
+                                    text = { Text(r) },
+                                    onClick = {
+                                        region = r
+                                        comuna = ""
+                                        regionsExpanded = false
+                                    }
+                                )
                             }
                         }
-                    },
-                    label = { Text("RUT (ej: 12345678-9)") },
-                    modifier = Modifier.fillMaxWidth(),
-                    singleLine = true,
-                    keyboardOptions = KeyboardOptions(
-                        keyboardType = KeyboardType.Text,
-                        imeAction = ImeAction.Next
-                    ),
-                    colors = pastelOutlinedTextFieldColors()
-                )
-
-                OutlinedTextField(
-                    value = direccion,
-                    onValueChange = { direccion = it },
-                    label = { Text("Dirección") },
-                    modifier = Modifier.fillMaxWidth(),
-                    keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
-                    colors = pastelOutlinedTextFieldColors()
-                )
-
-                // REGIÓN
-                ExposedDropdownMenuBox(
-                    expanded = regionsExpanded,
-                    onExpandedChange = { regionsExpanded = !regionsExpanded }
-                ) {
-                    OutlinedTextField(
-                        value = region,
-                        onValueChange = {},
-                        readOnly = true,
-                        label = { Text("Región") },
-                        trailingIcon = {
-                            ExposedDropdownMenuDefaults.TrailingIcon(expanded = regionsExpanded)
-                        },
-                        modifier = Modifier
-                            .menuAnchor()
-                            .fillMaxWidth(),
-                        colors = pastelOutlinedTextFieldColors()
-                    )
-
-                    ExposedDropdownMenu(
-                        expanded = regionsExpanded,
-                        onDismissRequest = { regionsExpanded = false },
-                        containerColor = Color.White
-                    ) {
-                        regiones.forEach { r ->
-                            DropdownMenuItem(
-                                text = { Text(r) },
-                                onClick = {
-                                    region = r
-                                    comuna = ""
-                                    regionsExpanded = false
-                                }
-                            )
-                        }
                     }
-                }
 
-                // COMUNA
-                ExposedDropdownMenuBox(
-                    expanded = comunasExpanded,
-                    onExpandedChange = {
-                        if (region.isNotBlank()) comunasExpanded = !comunasExpanded
-                    }
-                ) {
-                    OutlinedTextField(
-                        value = comuna,
-                        onValueChange = {},
-                        readOnly = true,
-                        label = { Text("Comuna") },
-                        trailingIcon = {
-                            ExposedDropdownMenuDefaults.TrailingIcon(expanded = comunasExpanded)
-                        },
-                        modifier = Modifier
-                            .menuAnchor()
-                            .fillMaxWidth(),
-                        colors = pastelOutlinedTextFieldColors()
-                    )
-
-                    ExposedDropdownMenu(
+                    // COMUNA
+                    ExposedDropdownMenuBox(
                         expanded = comunasExpanded,
-                        onDismissRequest = { comunasExpanded = false },
-                        containerColor = Color.White
-                    ) {
-                        comunas.forEach { c ->
-                            DropdownMenuItem(
-                                text = { Text(c) },
-                                onClick = {
-                                    comuna = c
-                                    comunasExpanded = false
-                                }
-                            )
+                        onExpandedChange = {
+                            if (region.isNotBlank()) comunasExpanded = !comunasExpanded
                         }
+                    ) {
+                        OutlinedTextField(
+                            value = comuna,
+                            onValueChange = {},
+                            readOnly = true,
+                            label = { Text("Comuna") },
+                            trailingIcon = {
+                                ExposedDropdownMenuDefaults.TrailingIcon(expanded = comunasExpanded)
+                            },
+                            modifier = Modifier
+                                .menuAnchor()
+                                .fillMaxWidth(),
+                            colors = pastelOutlinedTextFieldColors()
+                        )
 
+                        ExposedDropdownMenu(
+                            expanded = comunasExpanded,
+                            onDismissRequest = { comunasExpanded = false },
+                            containerColor = Color.White
+                        ) {
+                            comunas.forEach { c ->
+                                DropdownMenuItem(
+                                    text = { Text(c) },
+                                    onClick = {
+                                        comuna = c
+                                        comunasExpanded = false
+                                    }
+                                )
+                            }
+
+                        }
                     }
+
+
+                    // EMAIL
+                    OutlinedTextField(
+                        value = email,
+                        onValueChange = {
+                            email = it
+                            emailError = null
+                        },
+                        isError = emailError != null,
+                        label = { Text("Email") },
+                        supportingText = {
+                            if (emailError != null) Text(emailError!!)
+                            else Text("Ingresa un correo electrónico válido")
+                        },
+                        modifier = Modifier.fillMaxWidth(),
+                        singleLine = true,
+                        keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
+                        colors = pastelOutlinedTextFieldColors()
+                    )
+
+                    // CONTRASEÑA
+                    OutlinedTextField(
+                        value = password,
+                        onValueChange = { password = it },
+                        label = { Text("Contraseña") },
+                        modifier = Modifier.fillMaxWidth(),
+                        singleLine = true,
+                        keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
+                        visualTransformation = PasswordVisualTransformation(),
+                        colors = pastelOutlinedTextFieldColors()
+                    )
                 }
 
-
-                // EMAIL
-                OutlinedTextField(
-                    value = email,
-                    onValueChange = {
-                        email = it
-                        emailError = null
-                    },
-                    isError = emailError != null,
-                    label = { Text("Email") },
-                    supportingText = {
-                        if (emailError != null) Text(emailError!!)
-                        else Text("Ingresa un correo electrónico válido")
-                    },
-                    modifier = Modifier.fillMaxWidth(),
-                    singleLine = true,
-                    keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
-                    colors = pastelOutlinedTextFieldColors()
-                )
-
-                // CONTRASEÑA
-                OutlinedTextField(
-                    value = password,
-                    onValueChange = { password = it },
-                    label = { Text("Contraseña") },
-                    modifier = Modifier.fillMaxWidth(),
-                    singleLine = true,
-                    keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
-                    visualTransformation = PasswordVisualTransformation(),
-                    colors = pastelOutlinedTextFieldColors()
-                )
-
-                Spacer(modifier = Modifier.weight(1f))
+                Spacer(modifier = Modifier.height(12.dp))
 
                 // BOTÓN REGISTRO
                 Button(
